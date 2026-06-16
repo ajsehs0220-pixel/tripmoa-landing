@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 /* ===================================================================
    [설정] Google Forms 연동
@@ -13,12 +13,24 @@ const EMAIL_ENTRY_ID = "entry.1550714327";
 const AGE_ENTRY_ID = "entry.301504869";
 const GENDER_ENTRY_ID = "entry.1467489279";
 
+/* GA4 이벤트 전송 헬퍼 (gtag 없으면 무시) */
+function sendGAEvent(name: string, params: Record<string, unknown> = {}) {
+  if (typeof window !== "undefined" && (window as any).gtag) {
+    (window as any).gtag("event", name, params);
+  }
+}
+
 export default function Home() {
   const [email, setEmail] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // 페이지 진입 시 1회 - 랜딩 도착 이벤트 (전환율 분모)
+  useEffect(() => {
+    sendGAEvent("view_landing");
+  }, []);
 
   const handleSubmit = async () => {
     if (!email.includes("@")) {
@@ -32,8 +44,8 @@ export default function Home() {
 
     setLoading(true);
 
-    // TODO: GA4 - 사전등록 제출 이벤트
-    // gtag("event", "pre_register", { method: "email" });
+    // 버튼 클릭(제출 시도) 이벤트
+    sendGAEvent("click_register", { age_group: age, gender: gender });
 
     try {
       const formData = new FormData();
@@ -47,6 +59,9 @@ export default function Home() {
         mode: "no-cors",
         body: formData,
       });
+
+      // 사전등록 완료 이벤트 (핵심 전환) - 이메일은 개인정보라 제외, 연령/성별만 전송
+      sendGAEvent("pre_register", { age_group: age, gender: gender });
 
       setSubmitted(true);
     } catch (err) {
