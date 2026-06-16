@@ -1,66 +1,154 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useState } from "react";
+
+/* ===================================================================
+   [설정] Google Forms 연동
+   - FORM_ACTION: 폼 주소 (.../viewform → .../formResponse)
+   - 각 ENTRY_ID: 미리보기 폼 → F12 → entry.숫자 확인
+   =================================================================== */
+const FORM_ACTION =
+  "https://docs.google.com/forms/d/e/1FAIpQLScFEMJDPZwVT4ST6OslJ7h-efagGHE3Rzm4fE_WCFVq2BvFYA/formResponse";
+const EMAIL_ENTRY_ID = "entry.1550714327";
+const AGE_ENTRY_ID = "entry.301504869";
+const GENDER_ENTRY_ID = "entry.1467489279";
 
 export default function Home() {
+  const [email, setEmail] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!email.includes("@")) {
+      alert("이메일 주소를 확인해주세요.");
+      return;
+    }
+    if (!age || !gender) {
+      alert("연령대와 성별을 선택해주세요.");
+      return;
+    }
+
+    setLoading(true);
+
+    // TODO: GA4 - 사전등록 제출 이벤트
+    // gtag("event", "pre_register", { method: "email" });
+
+    try {
+      const formData = new FormData();
+      formData.append(EMAIL_ENTRY_ID, email);
+      formData.append(AGE_ENTRY_ID, age);
+      formData.append(GENDER_ENTRY_ID, gender);
+
+      // 구글폼은 CORS 미허용 → no-cors로 전송 (응답 확인 불가, 낙관적 성공 처리)
+      await fetch(FORM_ACTION, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData,
+      });
+
+      setSubmitted(true);
+    } catch (err) {
+      alert("잠시 후 다시 시도해주세요.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
+    <main className="app-wrap">
+      <div className="phone">
+        {/* 히어로 */}
+        <section className="hero">
+          <div className="logo">
+            {/* 로고 아이콘 - 추후 앱 아이콘으로 교체 */}
+            <span style={{ fontSize: 22, color: "var(--primary)" }}>✈</span>
+            <span className="logo-name">트립모아</span>
+          </div>
+          <p className="badge">coming soon</p>
+          <h1>
+            일본 여행, 검색은 그만!
+            <br />
+            고수들의 찐여행기만 모았어요
+          </h1>
           <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+            카페에 흩어진 여행 후기를
+            <br />
+            트립모아 AI가 한눈에 요약해드려요
           </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        </section>
+
+        {/* 본문 */}
+        <section className="body">
+          {/* 컨셉 미리보기 */}
+          <div className="preview">
+            <span style={{ fontSize: 18, color: "var(--primary)" }}>✦</span>
+            <div>
+              <p className="q">"오사카 3박4일 추천 코스?"</p>
+              <p className="a">→ 후기 47건 요약 · 출처 링크 포함</p>
+            </div>
+          </div>
+
+          {/* 사전등록 폼 / 완료 화면 */}
+          {!submitted ? (
+            <>
+              <p className="form-label">간단한 정보만 남기면 끝!</p>
+
+              <div className="select-row">
+                <select
+                  className="email-input select-half"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                >
+                  <option value="">연령대 선택</option>
+                  <option value="20대">20대</option>
+                  <option value="30대">30대</option>
+                  <option value="40대">40대</option>
+                  <option value="50대">50대</option>
+                  <option value="60대 이상">60대 이상</option>
+                </select>
+
+                <select
+                  className="email-input select-half"
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                >
+                  <option value="">성별 선택</option>
+                  <option value="여성">여성</option>
+                  <option value="남성">남성</option>
+                </select>
+              </div>
+
+              <input
+                type="email"
+                className="email-input"
+                placeholder="이메일 주소"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSubmit();
+                }}
+              />
+
+              <button
+                className="submit-btn"
+                onClick={handleSubmit}
+                disabled={loading}
+              >
+                {loading ? "등록 중..." : "오픈 알림 받기"}
+              </button>
+              <p className="form-hint">출시되면 가장 먼저 알려드릴게요</p>
+            </>
+          ) : (
+            <div className="success">
+              <div className="icon">✓</div>
+              <p className="title">오픈 알림 받기 완료!</p>
+              <p className="desc">오픈 소식을 여행자님의 이메일로 알려드릴게요</p>
+            </div>
+          )}
+        </section>
+      </div>
+    </main>
   );
 }
