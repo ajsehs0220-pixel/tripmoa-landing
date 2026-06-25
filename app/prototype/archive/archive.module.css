@@ -1,0 +1,197 @@
+/* ── 아카이브 ── */
+
+.screen {
+  min-height: 100dvh;
+  background: #f7f8fa;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 20px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: #1f2329;
+}
+
+/* 헤더 */
+.header {
+  padding: 24px 0 16px;
+}
+.headerTitle {
+  font-size: 24px;
+  font-weight: 900;
+  color: #1a1d21;
+  letter-spacing: -0.5px;
+}
+
+/* 분류 카드 2×2 */
+.catGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.catCard {
+  background: #ffffff;
+  border: none;
+  border-radius: 18px;
+  padding: 20px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.catCard:active { transform: scale(0.97); box-shadow: 0 0 0 rgba(0,0,0,0); }
+.catEmoji { font-size: 22px; margin-bottom: 6px; }
+.catCount {
+  font-size: 28px;
+  font-weight: 900;
+  color: #28c5f0;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.catLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* 섹션 공통 */
+.section { margin-bottom: 28px; }
+.sectionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.sectionTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1a1d21;
+}
+.seeAll {
+  font-size: 13px;
+  font-weight: 600;
+  color: #28c5f0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+/* 가로 스크롤 래퍼 */
+.scrollRow {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+}
+.scrollRow::-webkit-scrollbar { display: none; }
+
+/* 최근 추가 카드 */
+.recentCard {
+  flex: 0 0 140px;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+.recentImg {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  display: block;
+}
+.recentBody { padding: 8px 10px 10px; }
+.recentBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+.recentTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1d21;
+  margin: 5px 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recentDate {
+  font-size: 11px;
+  color: #9aa0a6;
+}
+
+/* 폴더 카드 */
+.folderCard {
+  flex: 0 0 110px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+}
+.folderIconWrap {
+  font-size: 28px;
+  line-height: 1;
+}
+.folderAdd { border: 1.5px dashed #d5dae0; background: #fafbfc; }
+.folderAddIcon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f0f1f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9aa0a6;
+  font-weight: 700;
+}
+.folderName {
+  font-size: 12px;
+  font-weight: 700;
+  color: #3a3f45;
+  text-align: center;
+  word-break: keep-all;
+  line-height: 1.3;
+}
+.folderCount { font-size: 11px; color: #9aa0a6; }
+
+/* 컬렉션 카드 */
+.collCard {
+  flex: 0 0 160px;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+.collImg {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  display: block;
+}
+.collTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1d21;
+  padding: 8px 10px 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.collCount { font-size: 11px; color: #9aa0a6; padding: 0 10px 10px; }
+
+.bottomPad { height: 80px; }

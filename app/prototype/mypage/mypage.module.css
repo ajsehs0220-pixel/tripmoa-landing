@@ -1,0 +1,186 @@
+/* ── 마이페이지 ── */
+
+.screen {
+  min-height: 100dvh;
+  background: #f7f8fa;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 20px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: #1f2329;
+}
+
+.header {
+  padding: 24px 0 16px;
+}
+.headerTitle {
+  font-size: 24px;
+  font-weight: 900;
+  color: #1a1d21;
+  letter-spacing: -0.5px;
+}
+
+/* 프로필 */
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 18px 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.profileAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f0f1f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.profileInfo { flex: 1; min-width: 0; }
+.profileName {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1a1d21;
+  letter-spacing: -0.3px;
+}
+.profileSub {
+  font-size: 12px;
+  color: #9aa0a6;
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.loginChip {
+  background: #28c5f0;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+.loginChip:active { opacity: 0.8; }
+
+/* 섹션 공통 */
+.section { margin-bottom: 20px; }
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 800;
+  color: #5a6068;
+  margin-bottom: 10px;
+  letter-spacing: -0.2px;
+}
+
+/* 진행중인 여행 카드 */
+.tripCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.tripThumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.tripBody {
+  flex: 1;
+  min-width: 0;
+}
+.tripTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1d21;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tripDate { font-size: 11px; color: #9aa0a6; margin-top: 3px; }
+.updateBtn {
+  background: #eafaff;
+  color: #0c9ed1;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.updateBtn:active { background: #d0f4ff; }
+
+/* 메뉴 리스트 */
+.menuList {
+  background: #ffffff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.menuItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f0f1f3;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: background 0.1s;
+}
+.menuItem:last-child { border-bottom: none; }
+.menuItem:active { background: #f7f8fa; }
+.menuEmoji { font-size: 20px; flex-shrink: 0; }
+.menuLabel { flex: 1; font-size: 15px; font-weight: 600; color: #3a3f45; }
+
+/* 인스타그램 박스 */
+.instaBox {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 18px 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+  transition: background 0.12s;
+}
+.instaBox:active { background: #f7f8fa; }
+.instaIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+.instaBody { flex: 1; min-width: 0; }
+.instaTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1d21;
+}
+.instaSub { font-size: 12px; color: #9aa0a6; margin-top: 2px; }
+
+.bottomPad { height: 80px; }

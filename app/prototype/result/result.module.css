@@ -1,0 +1,223 @@
+/* ── 검색 결과 (새 스키마: summary/sections/warning/places/follow_up/sources) ── */
+
+.screen {
+  min-height: 100dvh;
+  background: #ffffff;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px 20px 40px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: #1f2329;
+}
+
+/* 상단 헤더 (뒤로가기 + 워드마크) */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.backBtn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #4a4a4a;
+  padding: 4px;
+  display: flex;
+}
+.headerWordmark { font-size: 20px; font-weight: 800; letter-spacing: -.5px; }
+.wTrip { color: #4a4a4a; }
+.wMoa { color: #28c5f0; }
+
+/* 유저 질문 말풍선 (우측) */
+.queryBubble {
+  margin-left: auto;
+  max-width: 80%;
+  background: #f1f3f5;
+  color: #1f2329;
+  padding: 12px 16px;
+  border-radius: 18px 18px 4px 18px;
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+  width: fit-content;
+}
+
+/* 로딩 */
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #28c5f0;
+  font-size: 15px;
+  padding: 20px 0;
+}
+.dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #28c5f0;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.dot:nth-child(2) { animation-delay: .2s; }
+.dot:nth-child(3) { animation-delay: .4s; }
+@keyframes pulse { 0%,100%{opacity:.3;transform:scale(.8)} 50%{opacity:1;transform:scale(1)} }
+
+/* 에러 */
+.error {
+  background: #fdecea; color: #b71c1c;
+  padding: 14px 16px; border-radius: 12px; font-size: 14px; line-height: 1.5;
+}
+
+/* ── summary: 한 줄 핵심 요약 ── */
+.summary {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: #16181d;
+  margin: 4px 0 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eceef1;
+}
+
+/* ── warning: 주의사항 배너 ── */
+.warningBox {
+  background: #fff8e6;
+  border: 1px solid #ffe1a3;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+}
+.warningItem {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #8a5a00;
+  margin: 4px 0;
+}
+
+/* ── sections: icon + title + content + table 카드 ── */
+.sectionList { display: flex; flex-direction: column; gap: 14px; margin-bottom: 12px; }
+.sectionCard {
+  border: 1px solid #eceef1;
+  border-radius: 14px;
+  padding: 16px;
+  background: #fff;
+}
+.sectionTitle {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 16px; font-weight: 800; color: #16181d;
+  margin: 0 0 8px;
+}
+.sectionIcon { font-size: 18px; line-height: 1; }
+.sectionContent {
+  font-size: 14.5px; line-height: 1.7; color: #2a2e34;
+  white-space: pre-wrap; margin: 0;
+}
+
+/* [ref:N] → 클릭 가능한 숫자 뱃지 */
+.refBadge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px;
+  font-size: 11px; font-weight: 700;
+  border: none; border-radius: 50%;
+  background: #e6f4fc; color: #0070e0;
+  cursor: pointer; margin: 0 1px;
+  vertical-align: middle;
+}
+.refBadge:hover { background: #cbe9fa; }
+
+/* table (비교형 섹션) */
+.tableWrap { overflow-x: auto; margin-top: 12px; }
+.table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+.table th, .table td {
+  border: 1px solid #e6e8eb; padding: 8px 10px; text-align: left;
+  vertical-align: top; line-height: 1.5;
+}
+.table th { background: #f7f8fa; font-weight: 700; white-space: nowrap; }
+
+/* ── places: 지도 + 장소 카드 ── */
+.placesBlock { margin: 24px 0; }
+.placesTitle { font-size: 16px; font-weight: 800; margin: 0 0 12px; }
+/* GoogleMap은 부모에 명시적 height가 없으면 0px로 렌더되므로 직접 지정 */
+.mapContainer {
+  width: 100%;
+  height: 220px;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.placeCardList { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.placeCard {
+  display: flex; gap: 12px;
+  border: 1px solid #eceef1; border-radius: 12px;
+  padding: 10px; background: #fbfcfd;
+}
+.placeImg {
+  width: 64px; height: 64px; border-radius: 10px;
+  object-fit: cover; flex-shrink: 0; background: #f0f1f3;
+}
+.placeInfo { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+.placeNameRow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.placeDay {
+  font-size: 11px; font-weight: 700; color: #0070e0;
+  background: #e6f4fc; padding: 2px 7px; border-radius: 999px;
+}
+.placeName { font-size: 14.5px; font-weight: 700; color: #1f2329; }
+.placeDesc { font-size: 13px; color: #6b7280; margin: 3px 0 0; line-height: 1.5; }
+
+/* ── follow_up: 후속 질문 칩 ── */
+.followUpBlock { margin: 28px 0; }
+.followUpTitle { font-size: 15px; font-weight: 800; margin: 0 0 12px; color: #1f2329; }
+.followUpChips { display: flex; flex-wrap: wrap; gap: 8px; }
+.followUpChip {
+  border: 1px solid #d8e7f5; background: #f3f9fd;
+  color: #0070e0; font-size: 13px; font-weight: 600;
+  padding: 8px 14px; border-radius: 999px; cursor: pointer;
+}
+.followUpChip:hover { background: #e6f4fc; }
+
+/* ── 출처 섹션 (차별점 ①②③) ── */
+.sourcesTitle {
+  font-size: 16px; font-weight: 800; margin: 32px 0 14px;
+  padding-top: 20px; border-top: 1px solid #eceef1;
+}
+.sourceList { display: flex; flex-direction: column; gap: 12px; }
+.sourceCard {
+  border: 1px solid #e6e8eb;
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: #fbfcfd;
+  transition: background-color .3s ease, border-color .3s ease;
+}
+/* ref 뱃지 클릭 시 잠깐 하이라이트 */
+.sourceHighlight {
+  background: #eafaff !important;
+  border-color: #28c5f0 !important;
+}
+.sourceMeta {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;
+}
+/* 차별점 ① 카페/블로그 라벨 */
+.badge {
+  font-size: 12px; font-weight: 700;
+  padding: 3px 10px; border-radius: 999px;
+}
+.badgeCafe { background: #eafaff; color: #0c9ed1; }
+.badgeBlog { background: #e9f7ec; color: #2e9e4f; }
+.badgeEtc  { background: #f0f1f3; color: #6b7280; }
+/* 차별점 ③ 날짜 — 백엔드가 항상 YY.MM 형태로 줌 */
+.date { font-size: 12px; color: #9aa0a6; }
+
+.sourceText {
+  font-size: 13.5px; line-height: 1.6; color: #3a3f45;
+  white-space: pre-wrap; margin: 0 0 10px;
+}
+/* ② 원문 링크 */
+.sourceLink {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 13px; font-weight: 600; color: #0070e0;
+  text-decoration: none;
+}
+.sourceLink:hover { text-decoration: underline; }
+
+.empty { color: #9aa0a6; font-size: 14px; padding: 16px 0; }
+
+.bottomPad { height: 80px; }

@@ -1,0 +1,128 @@
+/* ── 트립모아 홈화면 (홈화면_구성_1.png 재현) ── */
+/* 컬러는 목업 + 너희 컬러 시스템 기준: MOA cyan #28C5F0 */
+
+.screen {
+  min-height: 100dvh;
+  background: #ffffff;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  position: relative;
+}
+
+.bottomPad { height: 80px; }
+
+/* 로고 영역 (상단) */
+.logoWrap {
+  margin-top: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.logoImg {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+}
+.wordmark {
+  font-family: var(--font-mungyeong), 'Pretendard', sans-serif;
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.wordmarkTrip { color: #4a4a4a; }
+.wordmarkMoa { color: #28c5f0; margin-left: 8px; }
+
+/* 헤드라인 (중앙) */
+.headline {
+  margin-top: 80px;
+  text-align: center;
+  font-size: 30px;
+  line-height: 1.4;
+  font-weight: 700;
+  color: #a6acb4;
+}
+.headlineLine2 { color: #5a6068; }
+.headlineStrong { color: #383c42; font-weight: 800; }
+
+/* 아래로 밀어내는 스페이서 */
+.spacer { flex: 1 1 auto; min-height: 40px; }
+
+/* 도시 칩 */
+.chips {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+.chip {
+  border: 1.5px solid #d5dae0;
+  background: #fff;
+  color: #3a3f45;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 11px 15px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  font-family: inherit;
+}
+.chip:hover { border-color: #28c5f0; }
+.chip:active { background: #f0fbfe; }
+.chipActive {
+  border-color: #28c5f0;
+  background: #eafaff;
+  color: #0c9ed1;
+}
+
+/* 검색바 */
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #e3e6ea;
+  border-radius: 16px;
+  padding: 10px 12px 10px 18px;
+  margin-bottom: 28px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,.02);
+  transition: border-color .15s, box-shadow .15s;
+}
+.searchBar:focus-within {
+  border-color: #28c5f0;
+  box-shadow: 0 0 0 3px rgba(40,197,240,.12);
+}
+.searchIcon { flex-shrink: 0; color: #6b7280; }
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 17px;
+  color: #1f2937;
+  background: transparent;
+  font-family: inherit;
+}
+.searchInput::placeholder { color: #9aa0a6; }
+
+/* 스파클(AI) 전송 버튼 */
+.submitBtn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #6f86f5 0%, #8b7cf6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .1s, opacity .15s;
+}
+.submitBtn:active { transform: scale(.92); }
+.submitBtn:disabled { opacity: .4; cursor: default; }

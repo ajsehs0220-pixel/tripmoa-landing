@@ -1,0 +1,317 @@
+/* ── 탐색 (맞춤 여행 설계) ── */
+
+.screen {
+  min-height: 100dvh;
+  background: #ffffff;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 24px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: #1f2329;
+  position: relative;
+}
+
+/* ── 공통 헤더 (결과 화면) ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 0 16px;
+}
+.backBtn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #4a4a4a;
+  padding: 4px;
+  display: flex;
+  flex-shrink: 0;
+}
+.headerWordmark { font-size: 20px; font-weight: 800; letter-spacing: -.5px; }
+.wTrip { color: #4a4a4a; }
+.wMoa  { color: #28c5f0; }
+
+/* ── 진행 바 ── */
+.progressWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 0 8px;
+}
+.progressBar {
+  flex: 1;
+  height: 4px;
+  background: #eceef1;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #28c5f0, #005f80);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.progressCount {
+  font-size: 13px;
+  font-weight: 700;
+  color: #28c5f0;
+  min-width: 28px;
+  text-align: right;
+}
+.progressTotal { color: #b0b8c2; font-weight: 500; }
+
+/* ── STEP 0: 도시 선택 ── */
+.cityStep {
+  display: flex;
+  flex-direction: column;
+  padding-top: 48px;
+}
+.logoRow {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 28px;
+}
+.stepTitle {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #1a1d21;
+  margin-bottom: 32px;
+}
+.cityCards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+.cityCard {
+  border: none;
+  border-radius: 18px;
+  padding: 28px 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  outline: 3px solid transparent;
+  font-family: inherit;
+}
+.cityCard:active { transform: scale(0.97); }
+.cityCardActive {
+  outline-color: #ffffff;
+  box-shadow: 0 0 0 3px #28c5f0, 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+.cityEmoji { font-size: 32px; }
+.cityName {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+.ctaBtn {
+  width: 100%;
+  padding: 18px 0;
+  background: linear-gradient(135deg, #28c5f0 0%, #005f80 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 16px;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s, transform 0.1s;
+  letter-spacing: -0.3px;
+}
+.ctaBtn:active { transform: scale(0.98); }
+.ctaBtn:disabled { opacity: 0.35; cursor: default; }
+
+/* ── STEP 1~5: 객관식 ── */
+.questionStep {
+  padding-top: 24px;
+}
+.questionTitle {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: #1a1d21;
+  margin-bottom: 28px;
+}
+.optionGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.optionBtn {
+  border: 1.5px solid #d5dae0;
+  background: #fff;
+  color: #3a3f45;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 13px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.optionBtn:hover { border-color: #28c5f0; background: #f0fbfe; }
+.optionBtn:active { transform: scale(0.96); }
+.optionBtnActive {
+  border-color: #28c5f0;
+  background: #eafaff;
+  color: #0c9ed1;
+}
+
+/* ── 로딩 화면 ── */
+.loadingScreen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+.loadingRing {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.circleTextSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: rotateSvg 8s linear infinite;
+}
+@keyframes rotateSvg { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.circleTextEl {
+  fill: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  letter-spacing: 1px;
+}
+.loadingCityInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 1;
+}
+.loadingEmoji { font-size: 36px; }
+.loadingCityName {
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+.loadingText {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: -0.3px;
+}
+.loadingDots {
+  display: flex;
+  gap: 8px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* ── 결과 화면 ── */
+.tagsWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.tag {
+  background: #eafaff;
+  color: #0c9ed1;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+.resultSubtitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a1d21;
+  margin-bottom: 24px;
+  line-height: 1.35;
+}
+.section { margin-bottom: 28px; }
+.sectionTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1a1d21;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #eceef1;
+}
+.cardRow {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+}
+.cardRow::-webkit-scrollbar { display: none; }
+.card {
+  flex: 0 0 200px;
+  border: 1px solid #e6e8eb;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.cardImg {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+.cardBody { padding: 10px 12px 12px; }
+.cardTag {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0c9ed1;
+  background: #eafaff;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.cardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1d21;
+  margin: 6px 0 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cardSub {
+  font-size: 12px;
+  color: #8a9099;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bottomPad { height: 80px; }
