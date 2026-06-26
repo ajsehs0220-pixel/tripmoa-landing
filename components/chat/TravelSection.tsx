@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import styles from './chat.module.css';
 import RenderContent from './RenderContent';
 import type { Section, Place } from './types';
@@ -13,6 +14,16 @@ interface Props {
   index?: number;
 }
 
+async function fetchPlacePhoto(name: string): Promise<string | null> {
+  try {
+    const res = await fetch(`/api/place-photo?name=${encodeURIComponent(name)}`);
+    const data = await res.json();
+    return data.url ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export default function TravelSection({ section, places, onRefClick, index = 0 }: Props) {
   const isDaySection = DAY_PATTERN.test(section.title.trim());
   const hasTable = !!(
@@ -22,14 +33,39 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
     section.table.rows.length > 0
   );
 
-  const dayPhoto = (() => {
-    if (!isDaySection) return null;
+  const [dayPhotos, setDayPhotos] = useState<{ url: string; alt: string }[]>([]);
+
+  useEffect(() => {
+    if (!isDaySection) return;
+
     const m = section.title.trim().match(/(\d+)/);
-    if (!m) return null;
+    if (!m) return;
     const dayNum = Number(m[1]);
-    const hit = places.find((p) => p.day === dayNum && p.photo_url);
-    return hit?.photo_url ?? null;
-  })();
+
+    const dayPlaces = places.filter((p) => p.day === dayNum).slice(0, 6);
+    if (dayPlaces.length === 0) return;
+
+    let cancelled = false;
+
+    Promise.all(
+      dayPlaces.map(async (p) => {
+        const url = p.photo_url ?? await fetchPlacePhoto(p.name);
+        return url ? { url, alt: p.name } : null;
+      })
+    ).then((results) => {
+      if (cancelled) return;
+      const seen = new Set<string>();
+      setDayPhotos(
+        results.filter((r): r is { url: string; alt: string } => {
+          if (!r || seen.has(r.url)) return false;
+          seen.add(r.url);
+          return true;
+        })
+      );
+    });
+
+    return () => { cancelled = true; };
+  }, [isDaySection, section.title, places]);
 
   const staggerStyle = { '--section-i': index } as React.CSSProperties;
 
@@ -75,13 +111,18 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
           </div>
           <h3 className={styles.sectionDayTitle}>{section.title}</h3>
         </div>
-        {dayPhoto && (
-          <img
-            className={styles.sectionDayPhoto}
-            src={dayPhoto}
-            alt={section.title}
-            loading="lazy"
-          />
+        {dayPhotos.length > 0 && (
+          <div className={styles.dayCarousel}>
+            {dayPhotos.map((img, i) => (
+              <img
+                key={i}
+                className={styles.dayCarouselImg}
+                src={img.url}
+                alt={img.alt}
+                loading="lazy"
+              />
+            ))}
+          </div>
         )}
         <p className={styles.sectionContent}>
           <RenderContent content={section.content} onRefClick={onRefClick} />

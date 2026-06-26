@@ -1,9 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
 import styles from './chat.module.css';
 import AIAnalysisCard from './AIAnalysisCard';
-import HeroGallery from './HeroGallery';
 import TravelSection from './TravelSection';
 import MapSection from './MapSection';
 import SourceAccordion from './SourceAccordion';
@@ -44,25 +42,9 @@ export default function AssistantMessage({
     ? places.filter((p) => p.day === activeDay)
     : places;
 
-  // Deduplicated hero images (max 8, first image loads eager)
-  const heroImages = useMemo(() => {
-    const seen = new Set<string>();
-    return places
-      .filter((p) => {
-        if (!p.photo_url || seen.has(p.photo_url)) return false;
-        seen.add(p.photo_url);
-        return true;
-      })
-      .map((p) => ({ url: p.photo_url!, alt: p.name }))
-      .slice(0, 8);
-  }, [places]);
-
   return (
     <div className={styles.assistantRow}>
       <div className={styles.assistantContent}>
-
-        {/* Hero image gallery */}
-        {heroImages.length > 0 && <HeroGallery images={heroImages} />}
 
         {/* AI metadata — compact single line */}
         <AIAnalysisCard

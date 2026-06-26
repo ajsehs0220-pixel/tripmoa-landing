@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 13px 16px 11px;
+  padding: 13px 10px 11px;
   max-width: 800px;
   margin: 0 auto;
   position: sticky;
@@ -49,7 +49,7 @@
 .chatWrap {
   max-width: 760px;
   margin: 0 auto;
-  padding: 22px 16px 52px;
+  padding: 22px 30px 52px;
 }
 
 /* Error state */
@@ -103,7 +103,7 @@
   right: 0;
   max-width: 767px;
   margin: 0 auto;
-  padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  padding: 12px 20px calc(16px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(to top, rgba(255,255,255,1) 40%, rgba(255,255,255,0));
   z-index: 99;
   box-sizing: border-box;
