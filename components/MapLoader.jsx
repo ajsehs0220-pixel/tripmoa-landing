@@ -3,7 +3,7 @@
 import { useLoadScript } from "@react-google-maps/api";
 import MapView from "./MapView";
 
-const LIBRARIES = []; // Places, Geocoding 안 쓰니 빈 배열로 충분
+const LIBRARIES = [];
 
 export default function MapLoader(props) {
   const { isLoaded, loadError } = useLoadScript({

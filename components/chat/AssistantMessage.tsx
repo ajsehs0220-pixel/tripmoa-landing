@@ -59,7 +59,6 @@ export default function AssistantMessage({
 
   return (
     <div className={styles.assistantRow}>
-      <div className={styles.avatar}>✈</div>
       <div className={styles.assistantContent}>
 
         {/* Hero image gallery */}

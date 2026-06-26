@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { GoogleMap, MarkerF, InfoWindowF } from "@react-google-maps/api";
 
 const MAP_CONTAINER_STYLE = {
@@ -9,42 +9,39 @@ const MAP_CONTAINER_STYLE = {
 };
 
 const DEFAULT_OPTIONS = {
-  disableDefaultUI: false,
+  disableDefaultUI: true,
   zoomControl: true,
   streetViewControl: false,
   mapTypeControl: false,
   fullscreenControl: false,
+  gestureHandling: "greedy",
 };
 
 /**
- * 범용 지도 컴포넌트
- * @param {Array} locations - [{ name, lat, lng, image?, day?, ... }]
- * @param {number} activeDay - 필터링할 day (없으면 전체 표시)
- * @param {Function} onMarkerClick - 마커 클릭 시 콜백
+ * @param {Array} locations - [{ name, lat, lng, image?, day? }]
+ * @param {number|null} activeDay
+ * @param {number|null} selectedIndex - externally controlled selected marker index
+ * @param {Function} onMarkerSelect - called with index (or null) when a marker is clicked
+ * @param {Function} onMapLoad - called with the google.maps.Map instance when ready
  */
-export default function MapView({ locations = [], activeDay = null, onMarkerClick }) {
-  const [selected, setSelected] = useState(null);
-
+export default function MapView({ locations = [], activeDay = null, selectedIndex = null, onMarkerSelect, onMapLoad }) {
   const filtered = useMemo(() => {
     if (activeDay == null) return locations;
     return locations.filter((loc) => loc.day === activeDay);
   }, [locations, activeDay]);
 
   const center = useMemo(() => {
-    if (filtered.length === 0) {
-      return { lat: 34.6937, lng: 135.5023 }; // 오사카 기본값
-    }
+    if (filtered.length === 0) return { lat: 34.6937, lng: 135.5023 };
     const avgLat = filtered.reduce((sum, l) => sum + l.lat, 0) / filtered.length;
     const avgLng = filtered.reduce((sum, l) => sum + l.lng, 0) / filtered.length;
     return { lat: avgLat, lng: avgLng };
   }, [filtered]);
 
   const handleMarkerClick = useCallback(
-    (loc, idx) => {
-      setSelected(idx);
-      onMarkerClick?.(loc);
+    (idx) => {
+      onMarkerSelect?.(selectedIndex === idx ? null : idx);
     },
-    [onMarkerClick]
+    [onMarkerSelect, selectedIndex]
   );
 
   if (locations.length === 0) {
@@ -61,47 +58,52 @@ export default function MapView({ locations = [], activeDay = null, onMarkerClic
       center={center}
       zoom={12}
       options={DEFAULT_OPTIONS}
+      onLoad={onMapLoad}
     >
-      {filtered.map((loc, idx) => (
-        <MarkerF
-          key={`${loc.name}-${idx}`}
-          position={{ lat: loc.lat, lng: loc.lng }}
-          // 기본 흰 배경 핀 대신 작은 검은 원 SVG로 — 숫자만 깔끔하게 보이도록
-          icon={{
-            url:
-              'data:image/svg+xml;charset=UTF-8,' +
-              encodeURIComponent(`
-                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
-                  <circle cx="13" cy="13" r="12" fill="#1f2329" stroke="#ffffff" stroke-width="2"/>
-                </svg>
-              `),
-            scaledSize: new window.google.maps.Size(26, 26),
-            anchor: new window.google.maps.Point(13, 13),
-          }}
-          label={{
-            text: String(idx + 1),
-            color: "#fff",
-            fontSize: "12px",
-            fontWeight: "bold",
-          }}
-          onClick={() => handleMarkerClick(loc, idx)}
-        />
-      ))}
+      {filtered.map((loc, idx) => {
+        const isSelected = idx === selectedIndex;
+        const size = isSelected ? 36 : 28;
+        const fill = isSelected ? "#28c5f0" : "#1f2329";
+        const r = size / 2 - 2;
+        return (
+          <MarkerF
+            key={`${loc.name}-${idx}`}
+            position={{ lat: loc.lat, lng: loc.lng }}
+            icon={{
+              url:
+                "data:image/svg+xml;charset=UTF-8," +
+                encodeURIComponent(
+                  `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="${fill}" stroke="#ffffff" stroke-width="2.5"/></svg>`
+                ),
+              scaledSize: new window.google.maps.Size(size, size),
+              anchor: new window.google.maps.Point(size / 2, size / 2),
+            }}
+            label={{
+              text: String(idx + 1),
+              color: "#fff",
+              fontSize: isSelected ? "13px" : "11px",
+              fontWeight: "bold",
+            }}
+            zIndex={isSelected ? 100 : 1}
+            onClick={() => handleMarkerClick(idx)}
+          />
+        );
+      })}
 
-      {selected !== null && filtered[selected] && (
+      {selectedIndex !== null && filtered[selectedIndex] && (
         <InfoWindowF
-          position={{ lat: filtered[selected].lat, lng: filtered[selected].lng }}
-          onCloseClick={() => setSelected(null)}
+          position={{ lat: filtered[selectedIndex].lat, lng: filtered[selectedIndex].lng }}
+          onCloseClick={() => onMarkerSelect?.(null)}
         >
-          <div style={{ maxWidth: "180px" }}>
-            {filtered[selected].image && (
+          <div style={{ maxWidth: "160px", fontFamily: "sans-serif" }}>
+            {filtered[selectedIndex].image && (
               <img
-                src={filtered[selected].image}
-                alt={filtered[selected].name}
-                style={{ width: "100%", borderRadius: "4px", marginBottom: "4px" }}
+                src={filtered[selectedIndex].image}
+                alt={filtered[selectedIndex].name}
+                style={{ width: "100%", borderRadius: "6px", marginBottom: "5px", display: "block" }}
               />
             )}
-            <strong>{filtered[selected].name}</strong>
+            <strong style={{ fontSize: "13px", color: "#1a1d21" }}>{filtered[selectedIndex].name}</strong>
           </div>
         </InfoWindowF>
       )}

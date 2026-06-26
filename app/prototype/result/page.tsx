@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import styles from './result.module.css';
 import { search } from '@/lib/searchClient';
-import BottomNav from '@/components/prototype/BottomNav';
 import UserMessage from '@/components/chat/UserMessage';
 import LoadingMessage from '@/components/chat/LoadingMessage';
 import AssistantMessage from '@/components/chat/AssistantMessage';
@@ -29,6 +28,7 @@ function ResultInner() {
   const city = params.get('city') ?? '';
 
   const [query, setQuery] = useState(initialQuery);
+  const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SearchResponse | null>(null);
@@ -42,7 +42,7 @@ function ResultInner() {
     setError(null);
     startRef.current = Date.now();
 
-    search({ query, city, match_count: 5 })
+    search({ query, city, match_count: 20 })
       .then((data) => {
         setResult(data);
         setGenTime((Date.now() - startRef.current) / 1000);
@@ -84,6 +84,15 @@ function ResultInner() {
     trackFollowUpClick(text);
     setResult(null);
     setQuery(text);
+    setInputValue('');
+  };
+
+  const handleNewSearch = () => {
+    const q = inputValue.trim();
+    if (!q) return;
+    setResult(null);
+    setQuery(q);
+    setInputValue('');
   };
 
   return (
@@ -101,7 +110,7 @@ function ResultInner() {
         </button>
         <span className={styles.headerWordmark}>
           <span className={styles.wTrip}>Trip</span>
-          <span className={styles.wMoa}>MOA</span>
+          <span className={styles.wMoa}> MOA</span>
         </span>
       </div>
 
@@ -145,8 +154,35 @@ function ResultInner() {
         )}
       </div>
 
+      {/* 하단 고정 검색바 */}
+      <div className={styles.searchBarWrap}>
+        <div className={styles.searchBar}>
+          <svg className={styles.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="16.5" y1="16.5" x2="21" y2="21" />
+          </svg>
+          <input
+            className={styles.searchInput}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleNewSearch(); }}
+            placeholder="Trip MOA에게 묻기"
+            enterKeyHint="search"
+          />
+          <button
+            className={styles.submitBtn}
+            onClick={handleNewSearch}
+            disabled={!inputValue.trim() || loading}
+            aria-label="검색"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+              <path d="M12 2.5l1.9 5.4a3 3 0 001.8 1.8l5.4 1.9-5.4 1.9a3 3 0 00-1.8 1.8L12 20.7l-1.9-5.4a3 3 0 00-1.8-1.8L2.9 11.6l5.4-1.9a3 3 0 001.8-1.8L12 2.5z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
       <div className={styles.bottomPad} />
-      <BottomNav />
     </main>
   );
 }

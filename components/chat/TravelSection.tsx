@@ -31,18 +31,9 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
     return hit?.photo_url ?? null;
   })();
 
-  const findPlacePhoto = (name: string): string | null => {
-    const clean = name.trim();
-    if (!clean) return null;
-    const hit = places.find(
-      (p) => p.photo_url && (p.name.includes(clean) || clean.includes(p.name))
-    );
-    return hit?.photo_url ?? null;
-  };
-
   const staggerStyle = { '--section-i': index } as React.CSSProperties;
 
-  // ── Recommendation cards (table section) ──
+  // ── Recommendation text list (table section) ──
   if (hasTable) {
     return (
       <div className={styles.sectionTableBlock} style={staggerStyle}>
@@ -50,25 +41,17 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
           <span className={styles.sectionIcon}>{section.icon}</span>
           {section.title}
         </h3>
-        <div className={styles.recCardList}>
+        <div className={styles.recTextList}>
           {section.table!.rows.map((row, ri) => {
             const [label, ...descCells] = row;
-            const photo = findPlacePhoto(label);
             return (
-              <div key={ri} className={`${styles.recCard} ${!photo ? styles.recCardNoImg : ''}`}>
-                {photo && (
-                  <div className={styles.recCardImgWrap}>
-                    <img className={styles.recCardImg} src={photo} alt={label} loading="lazy" />
-                  </div>
-                )}
-                <div className={styles.recCardBody}>
-                  <span className={styles.recCardName}>{label}</span>
-                  {descCells.map((cell, ci) => (
-                    <p key={ci} className={styles.recCardDesc}>
-                      <RenderContent content={cell} onRefClick={onRefClick} />
-                    </p>
-                  ))}
-                </div>
+              <div key={ri} className={styles.recTextItem}>
+                <p className={styles.recTextName}>{ri + 1}. {label}</p>
+                {descCells.map((cell, ci) => (
+                  <p key={ci} className={styles.recTextDesc}>
+                    <RenderContent content={cell} onRefClick={onRefClick} />
+                  </p>
+                ))}
               </div>
             );
           })}
