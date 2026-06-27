@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './chat.module.css';
 import RenderContent from './RenderContent';
+import PhotoGallery from './PhotoGallery';
 import type { Section, Place } from './types';
 
 const DAY_PATTERN = /^(day\s*\d+|\d+일차)/i;
@@ -48,16 +49,19 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
     let cancelled = false;
 
     Promise.all(
-      dayPlaces.map(async (p) => {
-        const url = p.photo_url ?? await fetchPlacePhoto(p.name);
-        return url ? { url, alt: p.name } : null;
+      dayPlaces.map(async (p): Promise<{ url: string; alt: string }[]> => {
+        if (p.photo_urls && p.photo_urls.length > 0) {
+          return p.photo_urls.map((url) => ({ url, alt: p.name }));
+        }
+        const url = await fetchPlacePhoto(p.name);
+        return url ? [{ url, alt: p.name }] : [];
       })
     ).then((results) => {
       if (cancelled) return;
       const seen = new Set<string>();
       setDayPhotos(
-        results.filter((r): r is { url: string; alt: string } => {
-          if (!r || seen.has(r.url)) return false;
+        results.flat().filter((r) => {
+          if (seen.has(r.url)) return false;
           seen.add(r.url);
           return true;
         })
@@ -80,6 +84,9 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
         <div className={styles.recTextList}>
           {section.table!.rows.map((row, ri) => {
             const [label, ...descCells] = row;
+            const matched = places.find(
+              (p) => p.name === label || label.includes(p.name) || p.name.includes(label)
+            );
             return (
               <div key={ri} className={styles.recTextItem}>
                 <p className={styles.recTextName}>{ri + 1}. {label}</p>
@@ -88,6 +95,9 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
                     <RenderContent content={cell} onRefClick={onRefClick} />
                   </p>
                 ))}
+                {matched?.photo_urls && matched.photo_urls.length > 0 && (
+                  <PhotoGallery urls={matched.photo_urls} alt={label} />
+                )}
               </div>
             );
           })}
@@ -106,10 +116,9 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
     return (
       <div className={styles.sectionDayBlock} style={staggerStyle}>
         <div className={styles.sectionDayHeader}>
-          <div className={styles.sectionDayMeta}>
-            <span className={styles.sectionDayPill}>{section.icon}</span>
-          </div>
+          <span className={styles.sectionDayPill}>{section.icon}</span>
           <h3 className={styles.sectionDayTitle}>{section.title}</h3>
+          <div className={styles.sectionDayRule} aria-hidden="true" />
         </div>
         {dayPhotos.length > 0 && (
           <div className={styles.dayCarousel}>

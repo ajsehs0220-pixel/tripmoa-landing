@@ -13,16 +13,31 @@ export default function AIAnalysisCard({ reviewCount, placeCount, genTime }: Pro
 
   return (
     <div className={styles.analysisCard}>
-      <span className={styles.analysisBrain}>🧠</span>
-      <span className={styles.analysisText}>
-        리뷰 <span className={styles.analysisHighlight}>{reviewCount}개</span>
-        <span className={styles.analysisDot}>·</span>
-        장소 <span className={styles.analysisHighlight}>{placeCount}곳</span>
-        <span className={styles.analysisDot}>·</span>
-        신뢰도 <span className={styles.analysisHighlight}>{confidence}%</span>
-        <span className={styles.analysisDot}>·</span>
-        {genTime.toFixed(1)}s
-      </span>
+      <div className={styles.analysisHeader}>
+        <span className={styles.analysisBrain}>🧠</span>
+        <span className={styles.analysisTitle}>실리뷰 분석</span>
+      </div>
+      <div className={styles.analysisStats}>
+        <div className={styles.analysisStat}>
+          <span className={styles.statNum}>{reviewCount}</span>
+          <span className={styles.statLabel}>총 리뷰</span>
+        </div>
+        <div className={styles.analysisDivider} />
+        <div className={styles.analysisStat}>
+          <span className={styles.statNum}>{confidence}%</span>
+          <span className={styles.statLabel}>신뢰도</span>
+        </div>
+        <div className={styles.analysisDivider} />
+        <div className={styles.analysisStat}>
+          <span className={styles.statNum}>{placeCount}</span>
+          <span className={styles.statLabel}>분석 장소</span>
+        </div>
+        <div className={styles.analysisDivider} />
+        <div className={styles.analysisStat}>
+          <span className={styles.statNum}>{genTime.toFixed(1)}s</span>
+          <span className={styles.statLabel}>분석 시간</span>
+        </div>
+      </div>
     </div>
   );
 }

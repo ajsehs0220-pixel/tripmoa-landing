@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import styles from './favorites.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
+import { useToast } from '@/components/prototype/Toast';
 
 const FAVORITES = [
   { id: 'fav1', title: '도고 온천 본관', subtitle: '마쓰야마 필수 방문지', image: 'https://placehold.co/72x72/28c5f0/ffffff?text=Dogo', category: 'SNS스팟', date: '2026.06.20' },
@@ -29,6 +30,7 @@ const BADGE_STYLES: Record<string, { bg: string; color: string }> = {
 
 export default function FavoritesPage() {
   const router = useRouter();
+  const { showToast } = useToast();
 
   return (
     <main className={styles.screen}>
@@ -62,7 +64,7 @@ export default function FavoritesPage() {
                 <p className={styles.itemTitle}>{item.title}</p>
                 <p className={styles.itemSubtitle}>{item.subtitle}</p>
               </div>
-              <button className={styles.heartBtn} aria-label="찜 해제">
+              <button className={styles.heartBtn} aria-label="찜 해제" onClick={() => showToast()}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="#28c5f0" stroke="#28c5f0" strokeWidth="1.5">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>

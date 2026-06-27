@@ -5,7 +5,7 @@
   background: #f7f8fa;
   max-width: 767px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 24px;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   color: #1f2329;
 }
@@ -30,16 +30,6 @@
   padding: 18px 16px;
   margin-bottom: 20px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-}
-.profileAvatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #f0f1f3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
 }
 .profileInfo { flex: 1; min-width: 0; }
 .profileName {

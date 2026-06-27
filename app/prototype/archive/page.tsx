@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import styles from './archive.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
+import { useToast } from '@/components/prototype/Toast';
 
 // ── Mock 데이터 ──────────────────────────────────────────────
 
@@ -46,6 +47,7 @@ const BADGE_STYLES: Record<string, { bg: string; color: string }> = {
 
 export default function ArchivePage() {
   const router = useRouter();
+  const { showToast } = useToast();
 
   return (
     <main className={styles.screen}>
@@ -60,7 +62,7 @@ export default function ArchivePage() {
           <button
             key={label}
             className={styles.catCard}
-            onClick={route ? () => router.push(route) : undefined}
+            onClick={() => (route ? router.push(route) : showToast())}
           >
             <span className={styles.catEmoji}>{emoji}</span>
             <span className={styles.catCount}>{count}</span>
@@ -73,13 +75,20 @@ export default function ArchivePage() {
       <section className={styles.section}>
         <div className={styles.sectionRow}>
           <h2 className={styles.sectionTitle}>최근 추가한 항목</h2>
-          <button className={styles.seeAll}>전체보기</button>
+          <button className={styles.seeAll} onClick={() => showToast()}>전체보기</button>
         </div>
         <div className={styles.scrollRow}>
           {RECENT_ITEMS.map((item) => {
             const badge = BADGE_STYLES[item.category] ?? { bg: '#f0f1f3', color: '#6b7280' };
             return (
-              <div key={item.id} className={styles.recentCard}>
+              <div
+                key={item.id}
+                className={styles.recentCard}
+                role="button"
+                tabIndex={0}
+                onClick={() => showToast()}
+                onKeyDown={(e) => { if (e.key === 'Enter') showToast(); }}
+              >
                 <img src={item.image} alt={item.title} className={styles.recentImg} />
                 <div className={styles.recentBody}>
                   <span className={styles.recentBadge} style={{ background: badge.bg, color: badge.color }}>
@@ -98,17 +107,30 @@ export default function ArchivePage() {
       <section className={styles.section}>
         <div className={styles.sectionRow}>
           <h2 className={styles.sectionTitle}>내 폴더</h2>
-          <button className={styles.seeAll}>전체보기</button>
+          <button className={styles.seeAll} onClick={() => showToast()}>전체보기</button>
         </div>
         <div className={styles.scrollRow}>
           {MY_FOLDERS.map((folder) => (
-            <div key={folder.id} className={styles.folderCard}>
+            <div
+              key={folder.id}
+              className={styles.folderCard}
+              role="button"
+              tabIndex={0}
+              onClick={() => showToast()}
+              onKeyDown={(e) => { if (e.key === 'Enter') showToast(); }}
+            >
               <div className={styles.folderIconWrap}>📁</div>
               <p className={styles.folderName}>{folder.name}</p>
               <p className={styles.folderCount}>{folder.count}개</p>
             </div>
           ))}
-          <div className={`${styles.folderCard} ${styles.folderAdd}`}>
+          <div
+            className={`${styles.folderCard} ${styles.folderAdd}`}
+            role="button"
+            tabIndex={0}
+            onClick={() => showToast()}
+            onKeyDown={(e) => { if (e.key === 'Enter') showToast(); }}
+          >
             <div className={`${styles.folderIconWrap} ${styles.folderAddIcon}`}>+</div>
             <p className={styles.folderName}>새 폴더 만들기</p>
           </div>
@@ -119,11 +141,18 @@ export default function ArchivePage() {
       <section className={styles.section}>
         <div className={styles.sectionRow}>
           <h2 className={styles.sectionTitle}>컬렉션</h2>
-          <button className={styles.seeAll}>전체보기</button>
+          <button className={styles.seeAll} onClick={() => showToast()}>전체보기</button>
         </div>
         <div className={styles.scrollRow}>
           {COLLECTIONS.map((col) => (
-            <div key={col.id} className={styles.collCard}>
+            <div
+              key={col.id}
+              className={styles.collCard}
+              role="button"
+              tabIndex={0}
+              onClick={() => showToast()}
+              onKeyDown={(e) => { if (e.key === 'Enter') showToast(); }}
+            >
               <img src={col.cover} alt={col.title} className={styles.collImg} />
               <p className={styles.collTitle}>{col.title}</p>
               <p className={styles.collCount}>{col.count}개</p>

@@ -34,9 +34,9 @@ export default function AssistantMessage({
   onSourceClick,
 }: Props) {
   const sections = Array.isArray(result.sections) ? result.sections : [];
-  const sources = Array.isArray(result.sources) ? result.sources : [];
-  const warnings = Array.isArray(result.warning) ? result.warning : [];
-  const followUps = Array.isArray(result.follow_up) ? result.follow_up : [];
+  const sources  = Array.isArray(result.sources)  ? result.sources  : [];
+  const warnings = Array.isArray(result.warning)  ? result.warning  : [];
+  const followUps= Array.isArray(result.follow_up)? result.follow_up: [];
 
   const visiblePlaces = dayList.length > 0
     ? places.filter((p) => p.day === activeDay)
@@ -46,30 +46,32 @@ export default function AssistantMessage({
     <div className={styles.assistantRow}>
       <div className={styles.assistantContent}>
 
-        {/* AI metadata — compact single line */}
+        {/* 실리뷰 분석 — 메타 통계 카드 */}
         <AIAnalysisCard
           reviewCount={sources.length}
           placeCount={places.length}
           genTime={genTime}
         />
 
-        {/* Summary */}
+        {/* 한줄 요약 */}
         {result.summary && (
           <p className={styles.summaryText}>{result.summary}</p>
         )}
 
-        {/* Inline warnings */}
+        {/* 주의사항 배너 */}
         {warnings.length > 0 && (
-          <div className={styles.inlineWarnings}>
+          <div className={styles.inlineWarnings} role="note">
             {warnings.map((w, i) => (
               <p key={i} className={styles.inlineWarning}>⚠️ {w}</p>
             ))}
           </div>
         )}
 
-        {/* Travel plan sections (staggered) */}
+        {/* 여행 정보 섹션들 */}
         {sections.length === 0 ? (
-          <p className={styles.emptyMsg}>매칭되는 후기를 찾지 못했어요. 검색어를 바꿔보세요.</p>
+          <p className={styles.emptyMsg}>
+            매칭되는 후기를 찾지 못했어요. 검색어를 조금 바꿔보세요.
+          </p>
         ) : (
           <div className={styles.sectionFlow}>
             {sections.map((sec, i) => (
@@ -84,7 +86,7 @@ export default function AssistantMessage({
           </div>
         )}
 
-        {/* Interactive map */}
+        {/* 지도 + 장소 카드 */}
         <MapSection
           places={places}
           visiblePlaces={visiblePlaces}
@@ -94,10 +96,10 @@ export default function AssistantMessage({
           query={query}
         />
 
-        {/* Sources accordion */}
+        {/* 참고 후기 아코디언 */}
         <SourceAccordion sources={sources} onSourceClick={onSourceClick} />
 
-        {/* Follow-up suggestion chips */}
+        {/* 추가 질문 칩 */}
         <FollowUpChips questions={followUps} onSelect={onFollowUpClick} />
 
       </div>

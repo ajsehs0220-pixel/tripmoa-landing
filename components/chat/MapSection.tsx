@@ -67,6 +67,7 @@ export default function MapSection({
         <span className={styles.searchCapsuleText}>{query}</span>
       </div>
 
+      {/* Map */}
       <div className={styles.mapStage}>
         <div className={styles.mapStageInner}>
           {/* Day tabs — float at top-center of map */}
@@ -85,14 +86,14 @@ export default function MapSection({
             </div>
           )}
 
-          {/* Map */}
+          {/* Map canvas */}
           <div className={styles.mapContainer}>
             <MapLoader
               locations={places.map((p) => ({
                 name: p.name,
                 lat: p.lat,
                 lng: p.lng,
-                image: p.photo_url,
+                image: p.photo_urls?.[0] ?? null,
                 day: p.day,
               }))}
               activeDay={dayList.length > 0 ? activeDay : null}
@@ -101,39 +102,43 @@ export default function MapSection({
               onMapLoad={handleMapLoad}
             />
           </div>
-
-          {/* Floating place cards — bottom of map, Google Maps style */}
-          <div className={styles.placeStrip} ref={stripRef}>
-            {visiblePlaces.map((p, i) => (
-              <div
-                key={i}
-                ref={(el) => { cardRefs.current[i] = el; }}
-                className={`${styles.placeStripCard} ${selectedIdx === i ? styles.placeStripCardActive : ''}`}
-                onClick={() => handleCardClick(p, i)}
-              >
-                {p.photo_url ? (
-                  <img
-                    className={styles.placeStripImg}
-                    src={p.photo_url}
-                    alt={p.name}
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className={styles.placeStripImgPlaceholder}>
-                    <span>{i + 1}</span>
-                  </div>
-                )}
-                <div className={styles.placeStripInfo}>
-                  <span className={styles.placeStripNum}>{i + 1}</span>
-                  <span className={styles.placeStripName}>{p.name}</span>
-                  {p.description && (
-                    <span className={styles.placeStripDesc}>{p.description}</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
+      </div>
+
+      {/* Place cards — below the map */}
+      <div className={styles.placeStrip} ref={stripRef}>
+        {visiblePlaces.map((p, i) => (
+          <div
+            key={i}
+            ref={(el) => { cardRefs.current[i] = el; }}
+            className={`${styles.placeStripCard} ${selectedIdx === i ? styles.placeStripCardActive : ''}`}
+            onClick={() => handleCardClick(p, i)}
+            role="button"
+            tabIndex={0}
+            aria-label={`${p.name} 선택`}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleCardClick(p, i); }}
+          >
+            {p.photo_urls?.[0] ? (
+              <img
+                className={styles.placeStripImg}
+                src={p.photo_urls[0]}
+                alt={p.name}
+                loading="lazy"
+              />
+            ) : (
+              <div className={styles.placeStripImgPlaceholder}>
+                <span>{i + 1}</span>
+              </div>
+            )}
+            <div className={styles.placeStripInfo}>
+              <span className={styles.placeStripNum}>{i + 1}</span>
+              <span className={styles.placeStripName}>{p.name}</span>
+              {p.description && (
+                <span className={styles.placeStripDesc}>{p.description}</span>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

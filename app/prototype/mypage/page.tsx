@@ -2,11 +2,11 @@
 
 import styles from './mypage.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
+import { useToast } from '@/components/prototype/Toast';
 
 const DUMMY_TRIP = {
-  title: '마쓰야마 & 시코쿠 힐링 여행',
-  thumbnail: 'https://placehold.co/80x80/28c5f0/ffffff?text=Matsuyama',
-  lastModified: '2026.06.22 오후 3:42',
+  title: '오사카 2박 3일 여행',
+  thumbnail: '/mypage_thumbnail.png',
 };
 
 const MENU_ITEMS = [
@@ -17,6 +17,8 @@ const MENU_ITEMS = [
 ];
 
 export default function MyPage() {
+  const { showToast } = useToast();
+
   return (
     <main className={styles.screen}>
       {/* 헤더 */}
@@ -27,17 +29,12 @@ export default function MyPage() {
       {/* 프로필 영역 */}
       <div className={styles.profileSection}>
         <div className={styles.profileAvatar}>
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#b0b8c2"
-            strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-          </svg>
+          <img src="/persona.svg" alt="프로필" width="72" height="72" />
         </div>
         <div className={styles.profileInfo}>
           <p className={styles.profileName}>지수님</p>
-          <p className={styles.profileSub}>로그인하고 더 많은 기능을 이용해보세요</p>
         </div>
-        <button className={styles.loginChip}>로그아웃</button>
+        <button className={styles.loginChip} onClick={() => showToast()}>로그아웃</button>
       </div>
 
       {/* 진행중인 여행 */}
@@ -47,9 +44,9 @@ export default function MyPage() {
           <img src={DUMMY_TRIP.thumbnail} alt={DUMMY_TRIP.title} className={styles.tripThumb} />
           <div className={styles.tripBody}>
             <p className={styles.tripTitle}>{DUMMY_TRIP.title}</p>
-            <p className={styles.tripDate}>마지막 수정 {DUMMY_TRIP.lastModified}</p>
+            <p className={styles.tripDate}>마지막 수정 2시간 전</p>
           </div>
-          <button className={styles.updateBtn}>업데이트</button>
+          <button className={styles.updateBtn} onClick={() => showToast()}>채팅이어하기</button>
         </div>
       </section>
 
@@ -57,7 +54,7 @@ export default function MyPage() {
       <section className={styles.section}>
         <div className={styles.menuList}>
           {MENU_ITEMS.map(({ label, emoji }) => (
-            <button key={label} className={styles.menuItem}>
+            <button key={label} className={styles.menuItem} onClick={() => showToast()}>
               <span className={styles.menuEmoji}>{emoji}</span>
               <span className={styles.menuLabel}>{label}</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b0b8c2"
@@ -72,22 +69,17 @@ export default function MyPage() {
       {/* 인스타그램 링크 박스 */}
       <section className={styles.section}>
         <a
-          href="https://instagram.com/tripmoa_official"
+          href="https://www.instagram.com/tripmoa.kr/"
           target="_blank"
           rel="noopener noreferrer"
           className={styles.instaBox}
         >
           <div className={styles.instaIconWrap}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-            </svg>
+            <img src="/instagram.svg" alt="Instagram" width="44" height="44" />
           </div>
           <div className={styles.instaBody}>
-            <p className={styles.instaTitle}>트립모아 인스타그램</p>
-            <p className={styles.instaSub}>@tripmoa_official · 팔로우하고 여행 인사이트 받기</p>
+            <p className={styles.instaTitle}>Trip MOA 공식계정</p>
+            <p className={styles.instaSub}>@tripmoa.kr · 팔로우하고 여행정보 추천받기</p>
           </div>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b0b8c2"
             strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">

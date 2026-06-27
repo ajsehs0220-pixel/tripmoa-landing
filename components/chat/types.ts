@@ -5,7 +5,7 @@ export type Place = {
   name: string;
   lat: number;
   lng: number;
-  photo_url: string | null;
+  photo_urls?: string[];
   description: string;
 };
 export type Source = { id: number; title: string; channel: string; date: string; link: string };

@@ -1,151 +1,183 @@
-/* ── Result Page — Layout & Container ── */
+/* ── Result Page — Layout & Shell ──
+   Design tokens: globals.css :root --tm-* */
 
+/* ─────────────────────────────
+   Page Shell
+───────────────────────────── */
 .screen {
   min-height: 100dvh;
   background: #ffffff;
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  color: #1f2329;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont,
+    'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+  color: var(--tm-ink-800, #1a1d21);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Sticky header */
+/* ─────────────────────────────
+   Sticky Header
+───────────────────────────── */
 .header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 13px 10px 11px;
-  max-width: 800px;
-  margin: 0 auto;
+  gap: 8px;
+  padding: 12px 14px 11px;
   position: sticky;
   top: 0;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(255,255,255,.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   z-index: 100;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.055);
+  border-bottom: 1px solid rgba(0,0,0,.06);
 }
+
 .backBtn {
   border: none;
   background: none;
   cursor: pointer;
-  color: #374151;
-  padding: 5px;
+  color: var(--tm-ink-600, #374151);
+  padding: 7px;
   display: flex;
   align-items: center;
-  border-radius: 8px;
-  transition: background 0.14s;
+  border-radius: 10px;
+  transition: background .14s;
   -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
 }
-.backBtn:hover { background: #f3f4f6; }
+.backBtn:hover { background: var(--tm-ink-50, #f7f9fa); }
+.backBtn:focus-visible {
+  outline: 2px solid var(--tm-brand, #28c5f0);
+  outline-offset: 2px;
+}
+
 .headerWordmark {
   font-family: var(--font-mungyeong), sans-serif;
   font-size: 20px;
   font-weight: 400;
   letter-spacing: 0;
+  line-height: 1;
+  flex-shrink: 0;
 }
-.wTrip { color: #374151; }
-.wMoa  { color: #28c5f0; }
+.wTrip { color: var(--tm-ink-600, #374151); }
+.wMoa  { color: var(--tm-brand, #28c5f0); }
 
-/* Chat scroll container */
+/* ─────────────────────────────
+   Chat Content Area
+───────────────────────────── */
 .chatWrap {
-  max-width: 760px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 22px 30px 52px;
+  padding: 24px 20px 60px;
+}
+@media (min-width: 480px) {
+  .chatWrap { padding: 28px 28px 72px; }
+}
+@media (min-width: 680px) {
+  .chatWrap { padding: 32px 40px 80px; }
 }
 
-/* Error state */
+/* ─────────────────────────────
+   Error / Empty states
+───────────────────────────── */
 .errorMsg {
-  background: #fef2f2;
-  color: #991b1b;
-  padding: 13px 15px;
-  border-radius: 12px;
+  background: var(--tm-red-bg, #fef2f2);
+  color: var(--tm-red-text, #991b1b);
+  padding: 14px 16px;
+  border-radius: var(--tm-r-md, 12px);
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.6;
   margin-bottom: 16px;
-  border-left: 3px solid #f87171;
+  border-left: 3px solid var(--tm-red, #ef4444);
 }
 
-/* No-query empty state */
 .empty {
-  color: #9aa0a6;
-  font-size: 14px;
-  padding: 16px 0;
+  color: var(--tm-ink-300, #9ca3af);
+  font-size: 15px;
+  padding: 20px 0;
+  line-height: 1.65;
 }
 .inlineLink {
-  color: #28c5f0;
+  color: var(--tm-brand, #28c5f0);
   font-weight: 600;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  font-size: inherit;
-  font-family: inherit;
+  background: none; border: none;
+  cursor: pointer; padding: 0;
+  font-size: inherit; font-family: inherit;
   text-decoration: underline;
 }
 
-/* Suspense fallback */
+/* ─────────────────────────────
+   Suspense Fallback
+───────────────────────────── */
 .suspenseFallback {
   display: flex;
   align-items: center;
-  color: #9aa0a6;
+  justify-content: center;
+  min-height: 60dvh;
+  color: var(--tm-ink-300, #9ca3af);
   font-size: 14px;
-  padding: 40px 16px;
-  max-width: 760px;
-  margin: 0 auto;
 }
 
-.bottomPad { height: 100px; }
+.bottomPad { height: 120px; }
 
-/* ── 하단 고정 검색바 ── */
+/* ─────────────────────────────
+   Fixed Bottom Search Bar
+───────────────────────────── */
 .searchBarWrap {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  max-width: 767px;
+  bottom: 0; left: 0; right: 0;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 12px 20px calc(16px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(to top, rgba(255,255,255,1) 40%, rgba(255,255,255,0));
+  padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to top,
+    rgba(255,255,255,1) 55%,
+    rgba(255,255,255,0));
   z-index: 99;
   box-sizing: border-box;
 }
+@media (min-width: 480px) {
+  .searchBarWrap { padding-left: 24px; padding-right: 24px; }
+}
+
 .searchBar {
   display: flex;
   align-items: center;
   gap: 8px;
-  border-radius: 999px;
-  padding: 9px 8px 9px 16px;
-  background: #fff;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  border-radius: var(--tm-r-full, 999px);
+  padding: 10px 8px 10px 16px;
+  background: white;
+  box-shadow: 0 2px 16px rgba(0,0,0,.11), 0 0 0 1px rgba(0,0,0,.05);
   box-sizing: border-box;
   width: 100%;
 }
+
 .searchIcon {
   flex-shrink: 0;
-  color: #9aa0a6;
+  color: var(--tm-ink-300, #9ca3af);
 }
 .searchInput {
   flex: 1 1 auto;
   min-width: 0;
-  border: none;
-  outline: none;
-  font-size: 15px;
-  color: #1f2937;
+  border: none; outline: none;
+  font-size: var(--tm-t-base, 15px);
+  color: var(--tm-ink-800, #1a1d21);
   background: transparent;
   font-family: inherit;
 }
-.searchInput::placeholder { color: #9aa0a6; }
+.searchInput::placeholder { color: var(--tm-ink-300, #9ca3af); }
+
 .submitBtn {
   flex-shrink: 0;
-  width: 38px;
-  height: 38px;
+  width: 38px; height: 38px;
   border-radius: 50%;
   border: none;
-  background: linear-gradient(135deg, #87DFFF 0%, #28c5f0 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: linear-gradient(135deg, #87dfff 0%, var(--tm-brand, #28c5f0) 100%);
+  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  transition: transform 0.1s, opacity 0.15s;
+  transition: transform .12s, opacity .15s, box-shadow .15s;
+  box-shadow: 0 2px 8px rgba(40,197,240,.35);
 }
-.submitBtn:active { transform: scale(0.92); }
-.submitBtn:disabled { opacity: 0.4; cursor: default; }
+.submitBtn:hover:not(:disabled) {
+  box-shadow: 0 4px 14px rgba(40,197,240,.45);
+  transform: scale(1.04);
+}
+.submitBtn:active { transform: scale(.92); }
+.submitBtn:disabled { opacity: .38; cursor: default; box-shadow: none; }
