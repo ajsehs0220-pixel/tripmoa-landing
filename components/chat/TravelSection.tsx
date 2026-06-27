@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import styles from './chat.module.css';
 import RenderContent from './RenderContent';
+import ContentWithPhotos from './ContentWithPhotos';
 import PhotoGallery from './PhotoGallery';
+import ReviewList from './ReviewList';
+import { matchPlace } from './placeUtils';
 import type { Section, Place } from './types';
 
 const DAY_PATTERN = /^(day\s*\d+|\d+일차)/i;
@@ -15,16 +17,6 @@ interface Props {
   index?: number;
 }
 
-async function fetchPlacePhoto(name: string): Promise<string | null> {
-  try {
-    const res = await fetch(`/api/place-photo?name=${encodeURIComponent(name)}`);
-    const data = await res.json();
-    return data.url ?? null;
-  } catch {
-    return null;
-  }
-}
-
 export default function TravelSection({ section, places, onRefClick, index = 0 }: Props) {
   const isDaySection = DAY_PATTERN.test(section.title.trim());
   const hasTable = !!(
@@ -33,43 +25,6 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
     Array.isArray(section.table.rows) &&
     section.table.rows.length > 0
   );
-
-  const [dayPhotos, setDayPhotos] = useState<{ url: string; alt: string }[]>([]);
-
-  useEffect(() => {
-    if (!isDaySection) return;
-
-    const m = section.title.trim().match(/(\d+)/);
-    if (!m) return;
-    const dayNum = Number(m[1]);
-
-    const dayPlaces = places.filter((p) => p.day === dayNum).slice(0, 6);
-    if (dayPlaces.length === 0) return;
-
-    let cancelled = false;
-
-    Promise.all(
-      dayPlaces.map(async (p): Promise<{ url: string; alt: string }[]> => {
-        if (p.photo_urls && p.photo_urls.length > 0) {
-          return p.photo_urls.map((url) => ({ url, alt: p.name }));
-        }
-        const url = await fetchPlacePhoto(p.name);
-        return url ? [{ url, alt: p.name }] : [];
-      })
-    ).then((results) => {
-      if (cancelled) return;
-      const seen = new Set<string>();
-      setDayPhotos(
-        results.flat().filter((r) => {
-          if (seen.has(r.url)) return false;
-          seen.add(r.url);
-          return true;
-        })
-      );
-    });
-
-    return () => { cancelled = true; };
-  }, [isDaySection, section.title, places]);
 
   const staggerStyle = { '--section-i': index } as React.CSSProperties;
 
@@ -84,9 +39,7 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
         <div className={styles.recTextList}>
           {section.table!.rows.map((row, ri) => {
             const [label, ...descCells] = row;
-            const matched = places.find(
-              (p) => p.name === label || label.includes(p.name) || p.name.includes(label)
-            );
+            const matched = matchPlace(label, places);
             return (
               <div key={ri} className={styles.recTextItem}>
                 <p className={styles.recTextName}>{ri + 1}. {label}</p>
@@ -96,17 +49,22 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
                   </p>
                 ))}
                 {matched?.photo_urls && matched.photo_urls.length > 0 && (
-                  <PhotoGallery urls={matched.photo_urls} alt={label} />
+                  <PhotoGallery urls={matched.photo_urls.slice(0, 3)} alt={label} />
                 )}
               </div>
             );
           })}
         </div>
         {section.content && (
-          <p className={styles.sectionConclusion}>
-            <RenderContent content={section.content} onRefClick={onRefClick} />
-          </p>
+          <div className={styles.sectionConclusion}>
+            <ContentWithPhotos
+              content={section.content}
+              places={places}
+              onRefClick={onRefClick}
+            />
+          </div>
         )}
+        <ReviewList reviews={section.reviews} onRefClick={onRefClick} />
       </div>
     );
   }
@@ -120,22 +78,12 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
           <h3 className={styles.sectionDayTitle}>{section.title}</h3>
           <div className={styles.sectionDayRule} aria-hidden="true" />
         </div>
-        {dayPhotos.length > 0 && (
-          <div className={styles.dayCarousel}>
-            {dayPhotos.map((img, i) => (
-              <img
-                key={i}
-                className={styles.dayCarouselImg}
-                src={img.url}
-                alt={img.alt}
-                loading="lazy"
-              />
-            ))}
-          </div>
-        )}
-        <p className={styles.sectionContent}>
-          <RenderContent content={section.content} onRefClick={onRefClick} />
-        </p>
+        <ContentWithPhotos
+          content={section.content}
+          places={places}
+          onRefClick={onRefClick}
+        />
+        <ReviewList reviews={section.reviews} onRefClick={onRefClick} />
       </div>
     );
   }
@@ -147,9 +95,12 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
         <span className={styles.sectionIcon}>{section.icon}</span>
         {section.title}
       </h3>
-      <p className={styles.sectionContent}>
-        <RenderContent content={section.content} onRefClick={onRefClick} />
-      </p>
+      <ContentWithPhotos
+        content={section.content}
+        places={places}
+        onRefClick={onRefClick}
+      />
+      <ReviewList reviews={section.reviews} onRefClick={onRefClick} />
     </div>
   );
 }

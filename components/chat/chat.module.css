@@ -331,6 +331,27 @@
   white-space: pre-wrap;
   word-break: keep-all;
 }
+
+/* Content blocks with inline photos */
+.contentWithPhotos {
+  margin-top: 14px;
+}
+.contentLineBlock {
+  margin-bottom: 12px;
+}
+.contentLineBlock:last-child {
+  margin-bottom: 0;
+}
+.contentLineSpacer {
+  height: 8px;
+}
+.sectionContentLine {
+  font-size: var(--tm-t-base, 15px);
+  line-height: var(--tm-lh-relaxed, 1.82);
+  color: var(--tm-ink-600, #374151);
+  margin: 0;
+  word-break: keep-all;
+}
 .sectionConclusion {
   font-size: var(--tm-t-base, 15px);
   line-height: var(--tm-lh-relaxed, 1.82);
@@ -688,6 +709,48 @@
   object-fit: cover;
   border-radius: 16px;
   display: block;
+}
+
+/* ─────────────────────────────
+   Section Reviews
+───────────────────────────── */
+.reviewList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+.reviewCard {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: var(--tm-r-md, 12px);
+  border-left: 3px solid transparent;
+}
+.reviewPositive {
+  background: var(--tm-brand-50, #ebf9ff);
+  border-left-color: var(--tm-brand, #28c5f0);
+}
+.reviewNegative {
+  background: var(--tm-amber-bg, #fffbeb);
+  border-left-color: var(--tm-amber, #f59e0b);
+}
+.reviewText {
+  font-size: var(--tm-t-sm, 13px);
+  line-height: var(--tm-lh-relaxed, 1.82);
+  color: var(--tm-ink-700, #2a2e34);
+  margin: 0 0 8px;
+  word-break: keep-all;
+}
+.reviewText::before { content: '\201C'; }
+.reviewText::after  { content: '\201D'; }
+.reviewMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reviewDate {
+  font-size: 11px;
+  color: var(--tm-ink-400, #6b7280);
 }
 
 /* ─────────────────────────────
