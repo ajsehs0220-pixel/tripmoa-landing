@@ -1,5 +1,17 @@
 export type TableData = { headers: string[]; rows: string[][] };
-export type Section = { icon: string; title: string; content: string; table: TableData | null };
+export type Review = {
+  text: string;
+  sentiment: 'positive' | 'negative';
+  date?: string;
+  ref?: number;
+};
+export type Section = {
+  icon: string;
+  title: string;
+  content: string;
+  reviews?: Review[];
+  table: TableData | null;
+};
 export type Place = {
   day: number | null;
   name: string;
