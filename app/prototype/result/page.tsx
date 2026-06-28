@@ -8,6 +8,7 @@ import UserMessage from '@/components/chat/UserMessage';
 import LoadingMessage from '@/components/chat/LoadingMessage';
 import AssistantMessage from '@/components/chat/AssistantMessage';
 import type { SearchResponse, Place } from '@/components/chat/types';
+import { useRecentViews } from '@/components/prototype/RecentViewContext';
 
 function trackSourceClick(url: string) {
   if (typeof window !== 'undefined' && (window as any).gtag) {
@@ -34,6 +35,7 @@ function ResultInner() {
   const [result, setResult] = useState<SearchResponse | null>(null);
   const [genTime, setGenTime] = useState(0);
   const startRef = useRef<number>(0);
+  const { addRecentView } = useRecentViews();
 
   useEffect(() => {
     if (!query) { setLoading(false); return; }
@@ -46,6 +48,14 @@ function ResultInner() {
       .then((data) => {
         setResult(data);
         setGenTime((Date.now() - startRef.current) / 1000);
+
+        // 최근 본 정보 기록 — 검색어+도시 조합을 id로 사용 (같은 검색은 최신으로 끌어올림)
+        addRecentView({
+          id: `search_${city}_${query}`,
+          title: query,
+          image: null,
+          path: `/prototype/result?${new URLSearchParams({ q: query, ...(city ? { city } : {}) }).toString()}`,
+        });
       })
       .catch((e) => setError(e instanceof Error ? e.message : String(e)))
       .finally(() => setLoading(false));

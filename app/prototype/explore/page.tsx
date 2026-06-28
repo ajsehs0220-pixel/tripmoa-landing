@@ -7,6 +7,7 @@ import BottomNav from '@/components/prototype/BottomNav';
 import { getExploreMock, ExploreCard, ExploreResult } from '@/lib/exploreMock';
 import { useToast } from '@/components/prototype/Toast';
 import { useFavorites } from '@/components/prototype/FavoritesContext';
+import { useRecentViews } from '@/components/prototype/RecentViewContext';
 
 // ── 단계 데이터 ──────────────────────────────────────────────
 
@@ -74,6 +75,7 @@ export default function ExplorePage() {
   const router = useRouter();
   const { showToast } = useToast();
   const { isFavorited, toggleFavorite } = useFavorites();
+  const { addRecentView } = useRecentViews();
   const [step, setStep] = useState(0);
   const [phase, setPhase] = useState<'steps' | 'loading' | 'result'>('steps');
   const [selections, setSelections] = useState<Selections>(INITIAL_SELECTIONS);
@@ -213,6 +215,12 @@ export default function ExplorePage() {
                     key={card.id}
                     className={styles.card}
                     onClick={() => {
+                      addRecentView({
+                        id: card.id,
+                        title: card.title,
+                        image: card.image,
+                        path: card.link ?? '',
+                      });
                       if (card.link) window.open(card.link, '_blank', 'noopener,noreferrer');
                     }}
                     role="link"

@@ -5,122 +5,294 @@
   background: #f7f8fa;
   max-width: 767px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 24px;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   color: #1f2329;
 }
 
+/* 헤더: 로고 + 닫기 */
 .header {
-  padding: 24px 0 16px;
-}
-.headerTitle {
-  font-size: 24px;
-  font-weight: 900;
-  color: #1a1d21;
-  letter-spacing: -0.5px;
-}
-
-/* 프로필 */
-.profileSection {
   display: flex;
   align-items: center;
-  gap: 14px;
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 18px 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  justify-content: space-between;
+  padding: 20px 0 8px;
 }
-.profileInfo { flex: 1; min-width: 0; }
-.profileName {
-  font-size: 17px;
-  font-weight: 800;
-  color: #1a1d21;
+.headerWordmark {
+  font-size: 19px;
+  font-weight: 900;
   letter-spacing: -0.3px;
 }
-.profileSub {
-  font-size: 12px;
-  color: #9aa0a6;
-  margin-top: 2px;
-  line-height: 1.4;
-}
-.loginChip {
-  background: #28c5f0;
-  color: #ffffff;
+.wTrip { color: #1a1d21; }
+.wMoa { color: #64D4F5; }
+.closeBtn {
+  background: none;
   border: none;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 8px 16px;
+  padding: 4px;
   cursor: pointer;
-  font-family: inherit;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: opacity 0.15s;
+  color: #1a1d21;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.loginChip:active { opacity: 0.8; }
+
+/* MY 타이틀 영역 */
+.titleSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0 22px;
+  border-bottom: 1px solid #1f2329;
+  margin-bottom: 22px;
+}
+.titleLeft { flex: 1; min-width: 0; }
+.titleMy {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: #1a1d21;
+}
+.titleSub {
+  font-size: 13.5px;
+  color: #8a9099;
+  margin-top: 4px;
+}
+.profileLoginBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.profileAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #eef0f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.loginLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64D4F5;
+}
 
 /* 섹션 공통 */
-.section { margin-bottom: 20px; }
+.section { margin-bottom: 26px; }
+.sectionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
 .sectionTitle {
-  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15.5px;
   font-weight: 800;
-  color: #5a6068;
-  margin-bottom: 10px;
+  color: #1a1d21;
   letter-spacing: -0.2px;
+}
+.seeAll {
+  font-size: 12.5px;
+  color: #9aa0a6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 /* 진행중인 여행 카드 */
 .tripCard {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  gap: 14px;
   background: #ffffff;
-  border-radius: 16px;
+  border: 1.5px solid #64D4F5;
+  border-radius: 18px;
   padding: 14px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 .tripThumb {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
+  width: 92px;
+  height: 92px;
+  border-radius: 14px;
   object-fit: cover;
   flex-shrink: 0;
+  align-self: stretch;
+  height: auto;
 }
-.tripBody {
+.tripRight {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.tripTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 .tripTitle {
-  font-size: 14px;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #1a1d21;
+  white-space: nowrap;
+}
+.tripDate { font-size: 11.5px; color: #9aa0a6; flex-shrink: 0; }
+.progressBarTrack {
+  flex: 1;
+  min-width: 50px;
+  height: 4px;
+  border-radius: 999px;
+  background: #e9ecef;
+  overflow: hidden;
+}
+.progressBarFill {
+  height: 100%;
+  background: #64D4F5;
+  border-radius: 999px;
+}
+.tripChatBubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  background: #f0fbff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  flex: 1;
+}
+.tripChatIcon { flex-shrink: 0; color: #64D4F5; margin-top: 1px; }
+.tripChatText {
+  font-size: 12.5px;
+  color: #5a6068;
+  line-height: 1.4;
+  min-width: 0;
+}
+.tripChatLabel { color: #9aa0a6; margin-right: 4px; }
+.tripChatQuote {
   font-weight: 700;
   color: #1a1d21;
+  display: block;
+  margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.tripDate { font-size: 11px; color: #9aa0a6; margin-top: 3px; }
-.updateBtn {
-  background: #eafaff;
-  color: #0c9ed1;
+.tripActionRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+.continueChatBtn {
+  background: #64D4F5;
+  color: #ffffff;
   border: none;
-  border-radius: 10px;
-  font-size: 13px;
+  border-radius: 999px;
+  font-size: 12.5px;
   font-weight: 700;
-  padding: 8px 14px;
+  padding: 8px 16px;
   cursor: pointer;
   font-family: inherit;
-  flex-shrink: 0;
-  transition: background 0.12s;
+  transition: opacity 0.15s;
 }
-.updateBtn:active { background: #d0f4ff; }
+.continueChatBtn:active { opacity: 0.85; }
+
+/* 최근 본 정보 */
+.recentScroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.recentCard {
+  flex: 0 0 auto;
+  width: 104px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+.recentImgWrap {
+  width: 104px;
+  height: 104px;
+  border-radius: 14px;
+  border: 1.5px solid #64D4F5;
+  overflow: hidden;
+  background: #eef1f4;
+}
+.recentImg { width: 100%; height: 100%; object-fit: cover; display: block; }
+.recentImgPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b0d8ea;
+}
+.recentTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #3a3f45;
+  margin-top: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.emptyBox {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px 16px;
+  text-align: center;
+  color: #b0b8c2;
+  font-size: 13px;
+}
+
+/* 내 탐색 */
+.exploreBox {
+  background: #ffffff;
+  border: 1.5px solid #64D4F5;
+  border-radius: 16px;
+  padding: 16px;
+}
+.exploreLabel {
+  font-size: 12.5px;
+  color: #9aa0a6;
+  margin-bottom: 10px;
+}
+.chipsWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  background: #eafaff;
+  color: #0c9ed1;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 999px;
+}
 
 /* 메뉴 리스트 */
 .menuList {
   background: #ffffff;
-  border-radius: 18px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 .menuItem {
   width: 100%;
@@ -138,39 +310,8 @@
 }
 .menuItem:last-child { border-bottom: none; }
 .menuItem:active { background: #f7f8fa; }
-.menuEmoji { font-size: 20px; flex-shrink: 0; }
+.menuIcon { flex-shrink: 0; color: #5a6068; display: flex; }
 .menuLabel { flex: 1; font-size: 15px; font-weight: 600; color: #3a3f45; }
-
-/* 인스타그램 박스 */
-.instaBox {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 18px 16px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  text-decoration: none;
-  transition: background 0.12s;
-}
-.instaBox:active { background: #f7f8fa; }
-.instaIconWrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  flex-shrink: 0;
-}
-.instaBody { flex: 1; min-width: 0; }
-.instaTitle {
-  font-size: 15px;
-  font-weight: 700;
-  color: #1a1d21;
-}
-.instaSub { font-size: 12px; color: #9aa0a6; margin-top: 2px; }
+.menuChevron { color: #b0b8c2; flex-shrink: 0; }
 
 .bottomPad { height: 80px; }
