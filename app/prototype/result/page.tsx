@@ -16,6 +16,8 @@ type ChatMessage = {
   genTime: number;
   error: string | null;
   status: 'loading' | 'done' | 'error';
+  /** sessionStorage에서 복원된 메시지인지 (타이핑 효과 생략용) */
+  restored?: boolean;
 };
 
 function trackSourceClick(url: string) {
@@ -77,6 +79,7 @@ function MessageTurn({
           activeDay={activeDay}
           setActiveDay={setActiveDay}
           messageId={msg.id}
+          skipIntro={msg.restored}
           onRefClick={(id) => onRefClick(msg.id, id)}
           onFollowUpClick={onFollowUpClick}
           onSourceClick={onSourceClick}
@@ -122,12 +125,19 @@ function ResultInner() {
 
       try {
         const data = await search({ query: trimmed, city, match_count: 20 });
+        // places 배열에 null이 섞여 들어올 수 있어 타입을 맞추기 위해 제거
+        const cleanedResult: SearchResponse = {
+          ...data,
+          places: Array.isArray(data.places)
+            ? data.places.filter((p): p is NonNullable<typeof p> => p !== null)
+            : data.places,
+        };
         setMessages((prev) =>
           prev.map((m) =>
             m.id === msgId
               ? {
                   ...m,
-                  result: data,
+                  result: cleanedResult,
                   genTime: (Date.now() - start) / 1000,
                   status: 'done' as const,
                 }
@@ -163,7 +173,8 @@ function ResultInner() {
       if (saved) {
         const parsed = JSON.parse(saved) as ChatMessage[];
         if (parsed.length > 0) {
-          setMessages(parsed);
+          // 복원된 메시지는 타이핑 효과 없이 바로 전체 표시
+          setMessages(parsed.map((m) => ({ ...m, restored: true })));
           initialSearchDone.current = true;
           return;
         }
