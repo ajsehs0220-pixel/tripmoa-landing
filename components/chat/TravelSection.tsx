@@ -17,8 +17,13 @@ interface Props {
   index?: number;
 }
 
+function hasPlacesDetail(section: Section): boolean {
+  return (section.places_detail?.length ?? 0) > 0;
+}
+
 export default function TravelSection({ section, places, onRefClick, index = 0 }: Props) {
   const isDaySection = DAY_PATTERN.test(section.title.trim());
+  const usePlaceDetails = hasPlacesDetail(section);
   const hasTable = !!(
     section.table &&
     Array.isArray(section.table.headers) &&
@@ -27,13 +32,18 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
   );
 
   const staggerStyle = { '--section-i': index } as React.CSSProperties;
+  const contentProps = {
+    content: section.content,
+    places,
+    placesDetail: section.places_detail,
+    onRefClick,
+  };
 
-  // ── Recommendation text list (table section) ──
   if (hasTable) {
     return (
       <div className={styles.sectionTableBlock} style={staggerStyle}>
         <h3 className={styles.sectionTitle}>
-          <span className={styles.sectionIcon}>{section.icon}</span>
+          {section.icon ? <span className={styles.sectionIcon}>{section.icon}</span> : null}
           {section.title}
         </h3>
         <div className={styles.recTextList}>
@@ -57,19 +67,16 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
         </div>
         {section.content && (
           <div className={styles.sectionConclusion}>
-            <ContentWithPhotos
-              content={section.content}
-              places={places}
-              onRefClick={onRefClick}
-            />
+            <ContentWithPhotos {...contentProps} />
           </div>
         )}
-        <ReviewList reviews={section.reviews} onRefClick={onRefClick} />
+        {!usePlaceDetails && (
+          <ReviewList reviews={section.reviews} onRefClick={onRefClick} />
+        )}
       </div>
     );
   }
 
-  // ── Day section ──
   if (isDaySection) {
     return (
       <div className={styles.sectionDayBlock} style={staggerStyle}>
@@ -78,29 +85,24 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
           <h3 className={styles.sectionDayTitle}>{section.title}</h3>
           <div className={styles.sectionDayRule} aria-hidden="true" />
         </div>
-        <ContentWithPhotos
-          content={section.content}
-          places={places}
-          onRefClick={onRefClick}
-        />
-        <ReviewList reviews={section.reviews} onRefClick={onRefClick} />
+        <ContentWithPhotos {...contentProps} />
+        {!usePlaceDetails && (
+          <ReviewList reviews={section.reviews} onRefClick={onRefClick} />
+        )}
       </div>
     );
   }
 
-  // ── Plain section ──
   return (
     <div className={styles.sectionPlainBlock} style={staggerStyle}>
       <h3 className={styles.sectionTitle}>
-        <span className={styles.sectionIcon}>{section.icon}</span>
+        {section.icon ? <span className={styles.sectionIcon}>{section.icon}</span> : null}
         {section.title}
       </h3>
-      <ContentWithPhotos
-        content={section.content}
-        places={places}
-        onRefClick={onRefClick}
-      />
-      <ReviewList reviews={section.reviews} onRefClick={onRefClick} />
+      <ContentWithPhotos {...contentProps} />
+      {!usePlaceDetails && (
+        <ReviewList reviews={section.reviews} onRefClick={onRefClick} />
+      )}
     </div>
   );
 }

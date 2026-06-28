@@ -106,10 +106,3 @@
 .heartBtn:active { transform: scale(0.85); }
 
 .bottomPad { height: 80px; }
-
-.emptyText {
-  text-align: center;
-  color: #9aa0a6;
-  font-size: 14px;
-  margin-top: 60px;
-}

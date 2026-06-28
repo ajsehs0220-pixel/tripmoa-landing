@@ -3,26 +3,28 @@
 import { useState, useEffect } from 'react';
 import styles from './chat.module.css';
 import type { Source } from './types';
-
-function sourceBadge(channel: string): string {
-  if (channel?.includes('카페')) return '네이버 카페';
-  if (channel?.includes('블로그')) return '네이버 블로그';
-  return channel || '웹';
-}
+import { formatSourceChannel } from './sourceUtils';
 
 interface Props {
   sources: Source[];
   onSourceClick: (url: string) => void;
+  /** 여러 턴 채팅 시 출처 id·아코디언 열기 구분용 */
+  messageId?: string;
 }
 
-export default function SourceAccordion({ sources, onSourceClick }: Props) {
+export default function SourceAccordion({ sources, onSourceClick, messageId }: Props) {
   const [open, setOpen] = useState(false);
+  const sourceIdPrefix = messageId ? `${messageId}-` : '';
 
   useEffect(() => {
-    const handler = () => setOpen(true);
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ messageId?: string }>).detail;
+      if (detail?.messageId && messageId && detail.messageId !== messageId) return;
+      setOpen(true);
+    };
     window.addEventListener('tripmoa:openSources', handler);
     return () => window.removeEventListener('tripmoa:openSources', handler);
-  }, []);
+  }, [messageId]);
 
   if (sources.length === 0) return null;
 
@@ -56,11 +58,11 @@ export default function SourceAccordion({ sources, onSourceClick }: Props) {
             {sources.map((s) => (
               <div
                 key={s.id}
-                id={`source-${s.id}`}
+                id={`source-${sourceIdPrefix}${s.id}`}
                 className={styles.sourceCard}
               >
                 <span className={styles.sourceCardChannel}>
-                  {sourceBadge(s.channel)}
+                  {formatSourceChannel(s.channel)}
                 </span>
                 <p className={styles.sourceCardTitle}>{s.title}</p>
                 <div className={styles.sourceCardMeta}>

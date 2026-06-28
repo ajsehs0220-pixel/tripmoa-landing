@@ -68,6 +68,17 @@
   margin: 0 auto;
   padding: 24px 20px 60px;
 }
+
+/* 한 턴(질문+답변) 구분 */
+.chatTurn {
+  margin-bottom: 40px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--tm-ink-100, #f0f2f5);
+}
+.chatTurn:last-of-type {
+  border-bottom: none;
+  margin-bottom: 24px;
+}
 @media (min-width: 480px) {
   .chatWrap { padding: 28px 28px 72px; }
 }

@@ -29,7 +29,7 @@ export default function HomePage() {
 return (
   <main className={styles.screen}>
     {/* 배경 장식: 비행기 + 구름 */}
-    <img src="/home_sky-deco.png" alt="" className={styles.skyDeco} />
+    <img src="/sky-deco.png" alt="" className={styles.skyDeco} />
 
     {/* 로고 */}
     <div className={styles.logoWrap}>

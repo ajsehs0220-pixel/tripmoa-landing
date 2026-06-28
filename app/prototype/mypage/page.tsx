@@ -1,247 +1,91 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import styles from './mypage.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
 import { useToast } from '@/components/prototype/Toast';
-import { useRecentViews } from '@/components/prototype/RecentViewContext';
-
-// ── Mock 데이터 (진행중인 여행은 백엔드 대화이력 기능 없어 더미 유지) ──
 
 const DUMMY_TRIP = {
-  title: '오사카 여행 정보 탐색 중',
+  title: '오사카 2박 3일 여행',
   thumbnail: '/mypage_thumbnail.png',
-  lastEdited: '2시간 전',
-  progress: 45,
-  lastChat: '교토 버스투어 후기 알려줘!',
 };
 
-// 내 탐색 취향 칩 — 수정 기능 미구현(인증/저장 API 없음), 더미 표시용
-const TRAVEL_TAGS = ['오사카', '20대', '친구와', '3명이서', '핫플', '가성비'];
-
 const MENU_ITEMS = [
-  {
-    label: '공지사항',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 11l18-5v12L3 14v-3z" />
-        <path d="M11 16l1 5h2l-1-5" />
-      </svg>
-    ),
-  },
-  {
-    label: '계정관리',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
-      </svg>
-    ),
-  },
-  {
-    label: '트립모아 인스타그램',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="5" />
-        <circle cx="12" cy="12" r="4" />
-        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-      </svg>
-    ),
-    href: 'https://www.instagram.com/tripmoa.kr/',
-  },
+  { label: '내 여행 기록', emoji: '🗺️' },
+  { label: '알림 설정', emoji: '🔔' },
+  { label: '앱 설정', emoji: '⚙️' },
+  { label: '고객센터', emoji: '💬' },
 ];
 
 export default function MyPage() {
-  const router = useRouter();
   const { showToast } = useToast();
-  const { recentViews } = useRecentViews();
-
-  const recentTop3 = recentViews.slice(0, 3);
 
   return (
     <main className={styles.screen}>
-      {/* 헤더: 로고 + 닫기 */}
+      {/* 헤더 */}
       <div className={styles.header}>
-        <span className={styles.headerWordmark}>
-          <span className={styles.wTrip}>Trip</span>
-          <span className={styles.wMoa}> MOA</span>
-        </span>
-        <button
-          className={styles.closeBtn}
-          onClick={() => router.push('/prototype/home')}
-          aria-label="닫기"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
+        <h1 className={styles.headerTitle}>My Page</h1>
       </div>
 
-      {/* MY 타이틀 + 프로필/로그인 */}
-      <div className={styles.titleSection}>
-        <div className={styles.titleLeft}>
-          <p className={styles.titleMy}>MY</p>
-          <p className={styles.titleSub}>나만의 여행을 한곳에서 관리해보세요</p>
+      {/* 프로필 영역 */}
+      <div className={styles.profileSection}>
+        <div className={styles.profileAvatar}>
+          <img src="/persona.svg" alt="프로필" width="72" height="72" />
         </div>
-        <button
-          className={styles.profileLoginBtn}
-          onClick={() => showToast('로그인 기능은 준비 중입니다')}
-          aria-label="로그인"
-        >
-          <span className={styles.profileAvatar}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#b0b8c2" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
-            </svg>
-          </span>
-          <span className={styles.loginLabel}>로그인</span>
-        </button>
+        <div className={styles.profileInfo}>
+          <p className={styles.profileName}>지수님</p>
+        </div>
+        <button className={styles.loginChip} onClick={() => showToast()}>로그아웃</button>
       </div>
 
       {/* 진행중인 여행 */}
       <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>진행중인 여행</h2>
         <div className={styles.tripCard}>
           <img src={DUMMY_TRIP.thumbnail} alt={DUMMY_TRIP.title} className={styles.tripThumb} />
-          <div className={styles.tripRight}>
-            <div className={styles.tripTitleRow}>
-              <p className={styles.tripTitle}>{DUMMY_TRIP.title}</p>
-              <p className={styles.tripDate}>마지막 수정 {DUMMY_TRIP.lastEdited}</p>
-              <div className={styles.progressBarTrack}>
-                <div className={styles.progressBarFill} style={{ width: `${DUMMY_TRIP.progress}%` }} />
-              </div>
-            </div>
-
-            <div className={styles.tripChatBubble}>
-              <span className={styles.tripChatIcon}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                </svg>
-              </span>
-              <span className={styles.tripChatText}>
-                <span className={styles.tripChatLabel}>최근대화</span>
-                <span className={styles.tripChatQuote}>&ldquo;{DUMMY_TRIP.lastChat}&rdquo;</span>
-              </span>
-            </div>
-
-            <div className={styles.tripActionRow}>
-              <button
-                className={styles.continueChatBtn}
-                onClick={() => showToast('로그인 기능은 준비 중입니다')}
-              >
-                채팅이어하기
-              </button>
-            </div>
+          <div className={styles.tripBody}>
+            <p className={styles.tripTitle}>{DUMMY_TRIP.title}</p>
+            <p className={styles.tripDate}>마지막 수정 2시간 전</p>
           </div>
+          <button className={styles.updateBtn} onClick={() => showToast()}>채팅이어하기</button>
         </div>
       </section>
 
-      {/* 최근 본 정보 — RecentViewContext 실제 연동 */}
-      <section className={styles.section}>
-        <div className={styles.sectionRow}>
-          <h2 className={styles.sectionTitle}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 7v5l3 3" />
-            </svg>
-            최근 본 정보
-          </h2>
-          {recentTop3.length > 0 && (
-            <button className={styles.seeAll} onClick={() => router.push('/prototype/mypage/recent')}>
-              전체보기
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 18l6-6-6-6" />
-              </svg>
-            </button>
-          )}
-        </div>
-
-        {recentTop3.length === 0 ? (
-          <div className={styles.emptyBox}>아직 본 정보가 없어요</div>
-        ) : (
-          <div className={styles.recentScroll}>
-            {recentTop3.map((item) => (
-              <button
-                key={item.id}
-                className={styles.recentCard}
-                onClick={() => {
-                  if (!item.path) return;
-                  if (item.path.startsWith('http')) {
-                    window.open(item.path, '_blank', 'noopener,noreferrer');
-                  } else {
-                    router.push(item.path);
-                  }
-                }}
-              >
-                <div className={styles.recentImgWrap}>
-                  {item.image ? (
-                    <img src={item.image} alt={item.title} className={styles.recentImg} />
-                  ) : (
-                    <div className={styles.recentImgPlaceholder}>
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                        <circle cx="11" cy="11" r="7" />
-                        <line x1="16.5" y1="16.5" x2="21" y2="21" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-                <p className={styles.recentTitle}>{item.title}</p>
-              </button>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* 내 탐색 — 취향 칩 (더미, 수정 기능 미구현) */}
-      <section className={styles.section}>
-        <div className={styles.sectionRow}>
-          <h2 className={styles.sectionTitle}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="7" />
-              <line x1="16.5" y1="16.5" x2="21" y2="21" />
-            </svg>
-            내 탐색
-          </h2>
-          <button className={styles.seeAll} onClick={() => showToast('수정 기능은 준비 중입니다')}>
-            수정하기
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-          </button>
-        </div>
-        <div className={styles.exploreBox}>
-          <p className={styles.exploreLabel}>나의 여행 취향</p>
-          <div className={styles.chipsWrap}>
-            {TRAVEL_TAGS.map((tag) => (
-              <span key={tag} className={styles.chip}>{tag}</span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 메뉴 리스트 */}
+      {/* 메뉴 목록 */}
       <section className={styles.section}>
         <div className={styles.menuList}>
-          {MENU_ITEMS.map(({ label, icon, href }) => (
-            <button
-              key={label}
-              className={styles.menuItem}
-              onClick={() => {
-                if (href) {
-                  window.open(href, '_blank', 'noopener,noreferrer');
-                } else {
-                  showToast('준비 중인 기능입니다');
-                }
-              }}
-            >
-              <span className={styles.menuIcon}>{icon}</span>
+          {MENU_ITEMS.map(({ label, emoji }) => (
+            <button key={label} className={styles.menuItem} onClick={() => showToast()}>
+              <span className={styles.menuEmoji}>{emoji}</span>
               <span className={styles.menuLabel}>{label}</span>
-              <svg className={styles.menuChevron} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b0b8c2"
                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 18l6-6-6-6" />
               </svg>
             </button>
           ))}
         </div>
+      </section>
+
+      {/* 인스타그램 링크 박스 */}
+      <section className={styles.section}>
+        <a
+          href="https://www.instagram.com/tripmoa.kr/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.instaBox}
+        >
+          <div className={styles.instaIconWrap}>
+            <img src="/instagram.svg" alt="Instagram" width="44" height="44" />
+          </div>
+          <div className={styles.instaBody}>
+            <p className={styles.instaTitle}>Trip MOA 공식계정</p>
+            <p className={styles.instaSub}>@tripmoa.kr · 팔로우하고 여행정보 추천받기</p>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b0b8c2"
+            strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </a>
       </section>
 
       <div className={styles.bottomPad} />

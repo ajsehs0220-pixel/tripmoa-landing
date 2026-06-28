@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import styles from './chat.module.css';
 import MapLoader from '@/components/MapLoader';
 import type { Place } from './types';
@@ -27,6 +27,50 @@ export default function MapSection({
   const mapInstanceRef = useRef<any>(null);
   const stripRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+
+  const showStripNav = visiblePlaces.length > 1;
+  const visiblePlacesKey = useMemo(
+    () => visiblePlaces.map((p) => `${p.name}:${p.lat}:${p.lng}`).join('|'),
+    [visiblePlaces]
+  );
+
+  const updateStripNav = useCallback(() => {
+    const el = stripRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanPrev(scrollLeft > 2);
+    setCanNext(scrollLeft < scrollWidth - clientWidth - 2);
+  }, []);
+
+  useEffect(() => {
+    const el = stripRef.current;
+    if (!el) return;
+    updateStripNav();
+    el.addEventListener('scroll', updateStripNav, { passive: true });
+    const ro = new ResizeObserver(updateStripNav);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener('scroll', updateStripNav);
+      ro.disconnect();
+    };
+  }, [updateStripNav, visiblePlacesKey]);
+
+  useEffect(() => {
+    setSelectedIdx(null);
+    cardRefs.current = [];
+    stripRef.current?.scrollTo({ left: 0 });
+  }, [visiblePlacesKey]);
+
+  const scrollStrip = (dir: -1 | 1) => {
+    const el = stripRef.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>('[data-place-card]');
+    const gap = 10;
+    const amount = card ? card.offsetWidth + gap : 168;
+    el.scrollBy({ left: dir * amount, behavior: 'smooth' });
+  };
 
   const handleMapLoad = useCallback((map: unknown) => {
     mapInstanceRef.current = map;
@@ -106,39 +150,73 @@ export default function MapSection({
       </div>
 
       {/* Place cards — below the map */}
-      <div className={styles.placeStrip} ref={stripRef}>
-        {visiblePlaces.map((p, i) => (
-          <div
-            key={i}
-            ref={(el) => { cardRefs.current[i] = el; }}
-            className={`${styles.placeStripCard} ${selectedIdx === i ? styles.placeStripCardActive : ''}`}
-            onClick={() => handleCardClick(p, i)}
-            role="button"
-            tabIndex={0}
-            aria-label={`${p.name} 선택`}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleCardClick(p, i); }}
+      <div className={styles.placeStripWrap}>
+        {showStripNav && (
+          <button
+            type="button"
+            className={`${styles.placeStripNav} ${styles.placeStripNavPrev}`}
+            onClick={() => scrollStrip(-1)}
+            disabled={!canPrev}
+            aria-label="이전 장소"
           >
-            {p.photo_urls?.[0] ? (
-              <img
-                className={styles.placeStripImg}
-                src={p.photo_urls[0]}
-                alt={p.name}
-                loading="lazy"
-              />
-            ) : (
-              <div className={styles.placeStripImgPlaceholder}>
-                <span>{i + 1}</span>
-              </div>
-            )}
-            <div className={styles.placeStripInfo}>
-              <span className={styles.placeStripNum}>{i + 1}</span>
-              <span className={styles.placeStripName}>{p.name}</span>
-              {p.description && (
-                <span className={styles.placeStripDesc}>{p.description}</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        )}
+
+        <div className={styles.placeStrip} ref={stripRef}>
+          {visiblePlaces.map((p, i) => (
+            <div
+              key={`${p.name}-${i}`}
+              data-place-card
+              ref={(el) => { cardRefs.current[i] = el; }}
+              className={`${styles.placeStripCard} ${selectedIdx === i ? styles.placeStripCardActive : ''}`}
+              onClick={() => handleCardClick(p, i)}
+              role="button"
+              tabIndex={0}
+              aria-label={`${p.name} 선택`}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleCardClick(p, i); }}
+            >
+              {p.photo_urls?.[0] ? (
+                <img
+                  className={styles.placeStripImg}
+                  src={p.photo_urls[0]}
+                  alt={p.name}
+                  loading="lazy"
+                />
+              ) : (
+                <div className={styles.placeStripImgPlaceholder}>
+                  <span>{i + 1}</span>
+                </div>
               )}
+              <div className={styles.placeStripInfo}>
+                <span className={styles.placeStripNum}>{i + 1}</span>
+                <span className={styles.placeStripName}>{p.name}</span>
+                {p.rating != null && (
+                  <span className={styles.placeStripRating}>★ {p.rating.toFixed(1)}</span>
+                )}
+                {p.description && (
+                  <span className={styles.placeStripDesc}>{p.description}</span>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {showStripNav && (
+          <button
+            type="button"
+            className={`${styles.placeStripNav} ${styles.placeStripNavNext}`}
+            onClick={() => scrollStrip(1)}
+            disabled={!canNext}
+            aria-label="다음 장소"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        )}
       </div>
     </div>
   );
