@@ -6,12 +6,12 @@ import BottomNav from '@/components/prototype/BottomNav';
 import { useFavorites } from '@/components/prototype/FavoritesContext';
 
 const BADGE_STYLES: Record<string, { bg: string; color: string }> = {
-  'SNS스팟':   { bg: '#eafaff', color: '#0c9ed1' },
-  '맛집':      { bg: '#fff4e6', color: '#e27000' },
-  '찜한목록':  { bg: '#fff0f3', color: '#d63384' },
-  '갤러리':    { bg: '#f0f0ff', color: '#6f86f5' },
-  '추천일정':  { bg: '#e9f7ec', color: '#2e9e4f' },
-  '숙소':      { bg: '#f0f7ff', color: '#0066cc' },
+  'SNS스팟':   { bg: '#EFFBFE', color: '#6E6D6D' },
+  '맛집':      { bg: '#EFFBFE', color: '#6E6D6D' },
+  '찜한목록':  { bg: '#EFFBFE', color: '#6E6D6D' },
+  '갤러리':    { bg: '#EFFBFE', color: '#6E6D6D' },
+  '추천일정':  { bg: '#EFFBFE', color: '#6E6D6D' },
+  '숙소':      { bg: '#EFFBFE', color: '#6E6D6D' },
 };
 
 export default function FavoritesPage() {
