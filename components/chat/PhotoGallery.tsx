@@ -40,7 +40,7 @@ export default function PhotoGallery({ urls, alt }: Props) {
   const scrollBySlide = (dir: -1 | 1) => {
     const el = stripRef.current;
     if (!el) return;
-    const slide = el.querySelector<HTMLElement>(`[data-photo-slide]`);
+    const slide = el.querySelector<HTMLElement>('[data-photo-slide]');
     const gap = 8;
     const amount = slide ? slide.offsetWidth + gap : el.clientWidth * 0.78;
     el.scrollBy({ left: dir * amount, behavior: 'smooth' });

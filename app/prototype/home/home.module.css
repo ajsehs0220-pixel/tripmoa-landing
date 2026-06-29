@@ -8,7 +8,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  padding: 0 24px;
+  padding: 0 20px;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   position: relative;
   overflow: hidden;
@@ -19,7 +19,7 @@
 /* 비행기 + 구름 일러스트 (배경 장식) */
 .skyDeco {
   position: absolute;
-  top: 150px;
+  top: 169px;
   right: -40px;
   width: 220px;
   height: auto;
@@ -46,7 +46,7 @@
 }
 .wordmark {
   font-family: var(--font-mungyeong), 'Pretendard', sans-serif;
-  font-size: 40px;
+  font-size: 36px;
   font-weight: 800;
   letter-spacing: -1px;
   line-height: 1;
@@ -56,7 +56,7 @@
 
 /* 헤드라인 (중앙) */
 .headline {
-  margin-top: 80px;
+  margin-top: 110px;
   text-align: center;
   font-family: 'Pretendard', sans-serif;
   font-size: 32px;
@@ -113,22 +113,25 @@
 }
 .chip:hover { background: #e4e6e9; }
 .chip:active { background: #d6d9dd; }
+
 .chipActive {
-  background: #64d4f5;
+  background: #64D4F5;
   color: #ffffff;
 }
+.chipActive:hover { background: #4ec3e6; }
+.chipActive:active { background: #64D4F5; }
 
 /* ── 하단 고정 검색바 ── */
 .searchBarWrap {
   position: fixed;
-  bottom: 0;
+  bottom: 60;
   left: 0;
   right: 0;
   max-width: 767px;
   margin: 0 auto;
   padding: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(to top, rgba(255,255,255,1) 40%, rgba(255,255,255,0));
-  z-index: 99;
+  z-index: 101;
   box-sizing: border-box;
 }
 .searchBar {

@@ -12,18 +12,30 @@ interface Props {
   messageId?: string;
 }
 
-export default function SourceAccordion({ sources, onSourceClick, messageId }: Props) {
+export default function SourceAccordion({
+  sources,
+  onSourceClick,
+  messageId,
+}: Props) {
   const [open, setOpen] = useState(false);
   const sourceIdPrefix = messageId ? `${messageId}-` : '';
 
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent<{ messageId?: string }>).detail;
-      if (detail?.messageId && messageId && detail.messageId !== messageId) return;
+
+      if (detail?.messageId && messageId && detail.messageId !== messageId) {
+        return;
+      }
+
       setOpen(true);
     };
+
     window.addEventListener('tripmoa:openSources', handler);
-    return () => window.removeEventListener('tripmoa:openSources', handler);
+
+    return () => {
+      window.removeEventListener('tripmoa:openSources', handler);
+    };
   }, [messageId]);
 
   if (sources.length === 0) return null;
@@ -39,10 +51,15 @@ export default function SourceAccordion({ sources, onSourceClick, messageId }: P
       >
         <span className={styles.sourceToggleLeft}>
           참고 후기{' '}
-          <span className={styles.sourceCount}>({sources.length}건)</span>
+          <span className={styles.sourceCount}>
+            ({sources.length}건)
+          </span>
         </span>
+
         <span
-          className={`${styles.sourceChevron} ${open ? styles.sourceChevronOpen : ''}`}
+          className={`${styles.sourceChevron} ${
+            open ? styles.sourceChevronOpen : ''
+          }`}
           aria-hidden="true"
         >
           ▼
@@ -51,38 +68,49 @@ export default function SourceAccordion({ sources, onSourceClick, messageId }: P
 
       <div
         id="source-list"
-        className={`${styles.sourceListWrap} ${open ? styles.sourceListWrapOpen : ''}`}
+        className={`${styles.sourceListWrap} ${
+          open ? styles.sourceListWrapOpen : ''
+        }`}
       >
         <div className={styles.sourceListInner}>
-          <div className={styles.sourceGrid}>
+          <div className={styles.sourceList}>
             {sources.map((s) => (
               <div
                 key={s.id}
                 id={`source-${sourceIdPrefix}${s.id}`}
-                className={styles.sourceCard}
+                className={styles.sourceRow}
               >
-                <span className={styles.sourceCardChannel}>
-                  {formatSourceChannel(s.channel)}
-                </span>
-                <p className={styles.sourceCardTitle}>{s.title}</p>
-                <div className={styles.sourceCardMeta}>
+                <div className={styles.sourceRowMeta}>
+                  <span className={styles.sourceRowChannel}>
+                    {formatSourceChannel(s.channel)}
+                  </span>
+
                   {s.date && (
-                    <span className={styles.sourceCardDate}>{s.date}</span>
-                  )}
-                  {s.link ? (
-                    <a
-                      className={styles.sourceCardLink}
-                      href={s.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => onSourceClick(s.link)}
-                    >
-                      🔗 원문 보기
-                    </a>
-                  ) : (
-                    <span className={styles.sourceCardDate}>링크 없음</span>
+                    <span className={styles.sourceRowDate}>
+                      {s.date}
+                    </span>
                   )}
                 </div>
+
+                <p className={styles.sourceRowTitle}>
+                  {s.title}
+                </p>
+
+                {s.link ? (
+                  <a
+                    className={styles.sourceRowLink}
+                    href={s.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => onSourceClick(s.link)}
+                  >
+                    원문 보기 →
+                  </a>
+                ) : (
+                  <span className={styles.sourceRowLinkDisabled}>
+                    링크 없음
+                  </span>
+                )}
               </div>
             ))}
           </div>

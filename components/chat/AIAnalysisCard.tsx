@@ -5,10 +5,9 @@ import styles from './chat.module.css';
 interface Props {
   reviewCount: number;
   placeCount: number;
-  genTime: number;
 }
 
-export default function AIAnalysisCard({ reviewCount, placeCount, genTime }: Props) {
+export default function AIAnalysisCard({ reviewCount, placeCount }: Props) {
   const confidence = Math.min(98, 72 + Math.floor(reviewCount * 0.18));
 
   return (
@@ -31,11 +30,6 @@ export default function AIAnalysisCard({ reviewCount, placeCount, genTime }: Pro
         <div className={styles.analysisStat}>
           <span className={styles.statNum}>{placeCount}</span>
           <span className={styles.statLabel}>분석 장소</span>
-        </div>
-        <div className={styles.analysisDivider} />
-        <div className={styles.analysisStat}>
-          <span className={styles.statNum}>{genTime.toFixed(1)}s</span>
-          <span className={styles.statLabel}>분석 시간</span>
         </div>
       </div>
     </div>

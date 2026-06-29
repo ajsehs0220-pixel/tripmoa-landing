@@ -73,7 +73,6 @@
 .chatTurn {
   margin-bottom: 40px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--tm-ink-100, #f0f2f5);
 }
 .chatTurn:last-of-type {
   border-bottom: none;

@@ -5,7 +5,7 @@
   background: #ffffff;
   max-width: 767px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 20px;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   color: #1f2329;
   position: relative;
@@ -28,14 +28,14 @@
   border: none;
   background: none;
   cursor: pointer;
-  color: #4a4a4a;
+  color: #5B5353;
   padding: 4px;
   display: flex;
   flex-shrink: 0;
 }
 .headerWordmark { 
   font-size: 18px; 
-  font-weight: 800; 
+  font-weight: 400; 
   letter-spacing: -.5px; 
   font-family: var(--font-mungyeong) , sans-serif; 
 }
@@ -66,14 +66,14 @@
 }
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, #28c5f0, #005f80);
+  background: linear-gradient(90deg, #64D4F5, #005f80);
   border-radius: 999px;
   transition: width 0.3s ease;
 }
 .progressCount {
   font-size: 13px;
   font-weight: 700;
-  color: #28c5f0;
+  color: #64D4F5;
   min-width: 28px;
   text-align: right;
 }
@@ -99,7 +99,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 .cityCard {
   border: 1.5px solid transparent;
@@ -107,7 +107,6 @@
   padding: 0;
   display: flex;
   align-items: stretch;
-  /* height: 132px; ← 이 줄 삭제 */
   height: 180px;
   cursor: pointer;
   background: #fff;
@@ -145,51 +144,67 @@
   min-width: 0;
 }
 .cityCardTitle {
-  font-size: 21px;
+  font-size: 19px;
   font-weight: 800;
-  color: #000;
+  color: #1a1d21;
   letter-spacing: -.3px;
   line-height: 1.3;
 }
 .cityCardTitleEn {
-  font-size: 20px;
+  font-size: 13px;
   font-weight: 600;
-  color: #000;
+  color: #b0b8c2;
   margin-left: 4px;
 }
 .cityCardDesc {
   font-size: 13px;
-  color: #000;
+  color: #8a9099;
   line-height: 1.4;
   margin-top: 4px;
 }
 .cityCardCta {
-  font-size: 13px;
-  font-weight: 400;
+  font-size: 12px;
+  font-weight: 600;
   color: #000;
   align-self: flex-end;
   white-space: nowrap;
 }
+.cityCardTitleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.cityCardHeartBtn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 2px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cityCardHeartBtn svg {
+  transition: transform 0.15s;
+}
+.cityCardHeartBtn:active svg {
+  transform: scale(0.85);
+}
  
 /* ── Coming Soon 도시 섹션 ── */
-.comingSoonHeading {
-  font-size: 15px;
-  font-weight: 800;
-  color: #b0b8c2;
-  margin: 4px 0 14px;
-  letter-spacing: -.2px;
-}
 .comingSoonList {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   margin-bottom: 24px;
 }
 .comingSoonCard {
   position: relative;
-  border-radius: 18px;
+  border-radius: 10px;
   overflow: hidden;
-  height: 110px;
+  width: 100%;
+  aspect-ratio: 400 / 180; 
 }
 .comingSoonImg {
   width: 100%;
@@ -199,6 +214,7 @@
   filter: grayscale(0.15) brightness(0.78);
 }
 .comingSoonOverlay {
+  background: rgba(0, 0, 0, 0.35);
   position: absolute;
   inset: 0;
   display: flex;
@@ -206,22 +222,39 @@
   justify-content: center;
 }
 .comingSoonTag {
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 21px;
+  font-weight: 700;
   color: #fff;
   letter-spacing: -.2px;
-  background: rgba(0, 0, 0, 0.32);
   padding: 6px 16px;
   border-radius: 999px;
 }
 .comingSoonName {
-  position: absolute;
-  left: 16px;
-  bottom: 12px;
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  display: block;
+  margin-top: 5px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #000;       
+  text-shadow: none; 
+}
+
+/* button 리셋 (div → button으로 바뀌어서 필요) */
+.comingSoonItem {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+/* 선택됐을 때 city카드처럼 그림자 */
+.comingSoonCardActive {
+  box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.25);
+  border: 0.5px solid #D9D9D9;
 }
  
 /* ── STEP 1~5: 객관식 ── */
@@ -236,29 +269,51 @@
   margin-bottom: 24px;
 }
 .optionGrid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 .optionBtn {
-  border: 1.5px solid #d5dae0;
+  border: 0.5px solid #D9D9D9;  
   background: #fff;
-  color: #3a3f45;
+  color: #000000;
   font-size: 16px;
   font-weight: 600;
   padding: 13px 22px;
-  border-radius: 999px;
+  height: 90px;
+  border-radius: 10px;
   cursor: pointer;
+  box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.10);
   transition: border-color 0.15s, background 0.15s, color 0.15s;
   font-family: inherit;
-  white-space: nowrap;
 }
-.optionBtn:hover { border-color: #28c5f0; background: #f0fbfe; }
+.optionBtn:hover { background: #f0fbfe; }
 .optionBtn:active { transform: scale(0.96); }
 .optionBtnActive {
-  border-color: #28c5f0;
+  border-color: #64D4F5;
   background: #eafaff;
   color: #0c9ed1;
+}
+/* STEP 2~5: 4열 그리드 (정사각형 박스) */
+.optionGrid4col {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.optionGrid4col .optionBtn {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  padding: 8px 4px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 0.5px solid #D9D9D9;
+  box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: normal;
+  word-break: keep-all;
 }
  
 /* ── 로딩 화면 ── */
@@ -283,29 +338,48 @@
 .loadingDim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 45%, rgba(0,0,0,0.35) 100%);
+  background: rgba(0, 0, 0, 0.35);
   z-index: 1;
 }
 .loadingRing {
   position: relative;
   z-index: 2;
-  width: 190px;
-  height: 190px;
+  width: 180px;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid rgba(255, 255, 255, 0.85);
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.30);
   backdrop-filter: blur(1px);
 }
+
+.loadingRing::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.9) 100%
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+  animation: ringSpin 2.5s linear infinite;
+}
+
+@keyframes ringSpin {
+  to { transform: rotate(360deg); }
+}
 .loadingCityName {
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.5px;
   text-transform: uppercase;
   text-align: center;
+  font-family: 'RecipeKoreaOTF', sans-serif;
 }
 .loadingTextWrap {
   position: relative;
@@ -345,25 +419,26 @@
 .searchBar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  border: 1px solid #e3e6ea;
-  border-radius: 16px;
-  padding: 10px 12px 10px 18px;
-  margin-bottom: 16px;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 9px 8px 9px 16px;
   background: #fff;
-  box-shadow: 0 1px 2px rgba(0,0,0,.02);
-  transition: border-color .15s, box-shadow .15s;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
 }
 .searchBar:focus-within {
-  border-color: #28c5f0;
-  box-shadow: 0 0 0 3px rgba(40,197,240,.12);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
-.searchIcon { flex-shrink: 0; color: #6b7280; }
+.searchIcon {
+  flex-shrink: 0;
+  color: #9aa0a6;
+}
 .searchInput {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   border: none;
   outline: none;
-  font-size: 16px;
+  font-size: 15px;
   color: #1f2937;
   background: transparent;
   font-family: inherit;
@@ -371,19 +446,19 @@
 .searchInput::placeholder { color: #9aa0a6; }
 .submitBtn {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   border: none;
-  background: linear-gradient(135deg, #6f86f5 0%, #8b7cf6 100%);
+  background: linear-gradient(135deg, #87DFFF 0%, #64D4F5 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform .1s, opacity .15s;
+  transition: transform 0.1s, opacity 0.15s;
 }
-.submitBtn:active { transform: scale(.92); }
-.submitBtn:disabled { opacity: .4; cursor: default; }
+.submitBtn:active { transform: scale(0.92); }
+.submitBtn:disabled { opacity: 0.4; cursor: default; }
  
 .tagsWrap {
   display: flex;
@@ -396,14 +471,13 @@
   font-weight: 700;
   color: #5a6068;
 }
-.section { margin-bottom: 28px; }
+.section { margin-bottom: 32px; }
 .sectionTitle {
   font-size: 17px;
   font-weight: 800;
   color: #1a1d21;
-  margin-bottom: 14px;
+  margin-bottom: 5px;
   padding-bottom: 8px;
-  border-bottom: 2px solid #eceef1;
 }
 .cardRow {
   display: flex;
@@ -416,10 +490,11 @@
 .card {
   flex: 0 0 200px;
   border: 1px solid #e6e8eb;
-  border-radius: 16px;
+  border-radius: 5px;
   overflow: hidden;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  
 }
 .cardImg {
   width: 100%;
@@ -430,7 +505,7 @@
 }
 .cardBody { padding: 10px 12px 12px; }
 .cardTag {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 700;
   color: #0c9ed1;
   background: #eafaff;
@@ -453,5 +528,27 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.cardImgWrap {
+  position: relative;
+}
+.cardHeartBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(2px);
+  transition: transform 0.1s;
+}
+.cardHeartBtn:active {
+  transform: scale(0.88);
+}
  
-.bottomPad { height: 80px; }
+.bottomPad { height: 50px; }

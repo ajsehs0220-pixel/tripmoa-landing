@@ -19,7 +19,6 @@ export function IconCopy() {
 export function IconThumbUp({ filled }: { filled?: boolean }) {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      {/* 왼쪽 손목 + 오른쪽 엄지척 (참고 UI 스타일) */}
       <path
         d="M7 11v8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1z"
         stroke="currentColor"

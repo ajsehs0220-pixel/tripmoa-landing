@@ -26,24 +26,24 @@ export default function HomePage() {
     setCity((prev) => (prev === c ? null : c));
   }
 
-return (
-  <main className={styles.screen}>
-    {/* 배경 장식: 비행기 + 구름 */}
-    <img src="/sky-deco.png" alt="" className={styles.skyDeco} />
+  return (
+    <main className={styles.screen}>
+      {/* 배경 장식: 비행기 + 구름 */}
+      <img src="/home_sky-deco.png" alt="" className={styles.skyDeco} />
 
-    {/* 로고 */}
-    <div className={styles.logoWrap}>
-      <img
-        src="/moaLogo.png"
-        alt="트립모아"
-        className={styles.logoImg}
-        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-      />
-      <div className={styles.wordmark}>
-        <span className={styles.wordmarkTrip}>Trip</span>
-        <span className={styles.wordmarkMoa}>MOA</span>
+      {/* 로고 */}
+      <div className={styles.logoWrap}>
+        <img
+          src="/moaLogo.png"
+          alt="트립모아"
+          className={styles.logoImg}
+          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+        />
+        <div className={styles.wordmark}>
+          <span className={styles.wordmarkTrip}>Trip</span>
+          <span className={styles.wordmarkMoa}>MOA</span>
+        </div>
       </div>
-    </div>
 
       {/* 헤드라인 */}
       <h1 className={styles.headline}>
@@ -56,40 +56,42 @@ return (
 
       <div className={styles.spacer} />
 
-      {/* 도시 칩 (선택적 단축키) */}
-      <div className={styles.chips}>
-        {CITIES.map((c) => (
-          <button
-            key={c}
-            className={`${styles.chip} ${city === c ? styles.chipActive : ''}`}
-            onClick={() => toggleCity(c)}
-          >
-            {c}
+      {/* 도시 칩 + 검색바: 하나로 묶어서 같이 하단 고정 (키보드 올라와도 같이 따라 올라감) */}
+      <div className={styles.searchBarWrap}>
+        <div className={styles.chips}>
+          {CITIES.map((c) => (
+            <button
+              key={c}
+              className={`${styles.chip} ${city === c ? styles.chipActive : ''}`}
+              onClick={() => toggleCity(c)}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+
+        <div className={styles.searchBar}>
+          <svg className={styles.searchIcon} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="16.5" y1="16.5" x2="21" y2="21" />
+          </svg>
+          <input
+            className={styles.searchInput}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+            placeholder="예) 오사카 2박3일 맛집 여행"
+            enterKeyHint="search"
+          />
+          <button className={styles.submitBtn} onClick={handleSearch} disabled={!query.trim()} aria-label="검색">
+            {/* 스파클 아이콘 */}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+              <path d="M12 2.5l1.9 5.4a3 3 0 001.8 1.8l5.4 1.9-5.4 1.9a3 3 0 00-1.8 1.8L12 20.7l-1.9-5.4a3 3 0 00-1.8-1.8L2.9 11.6l5.4-1.9a3 3 0 001.8-1.8L12 2.5z" />
+            </svg>
           </button>
-        ))}
+        </div>
       </div>
 
-      {/* 검색바 */}
-      <div className={styles.searchBar}>
-        <svg className={styles.searchIcon} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-          <circle cx="11" cy="11" r="7" />
-          <line x1="16.5" y1="16.5" x2="21" y2="21" />
-        </svg>
-        <input
-          className={styles.searchInput}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
-          placeholder="예) 오사카 2박3일 맛집 여행"
-          enterKeyHint="search"
-        />
-        <button className={styles.submitBtn} onClick={handleSearch} disabled={!query.trim()} aria-label="검색">
-          {/* 스파클 아이콘 */}
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-            <path d="M12 2.5l1.9 5.4a3 3 0 001.8 1.8l5.4 1.9-5.4 1.9a3 3 0 00-1.8 1.8L12 20.7l-1.9-5.4a3 3 0 00-1.8-1.8L2.9 11.6l5.4-1.9a3 3 0 001.8-1.8L12 2.5z" />
-          </svg>
-        </button>
-      </div>
       <div className={styles.bottomPad} />
       <BottomNav />
     </main>
