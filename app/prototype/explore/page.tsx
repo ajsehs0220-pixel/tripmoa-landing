@@ -241,11 +241,12 @@ export default function ExplorePage() {
                             image: card.image,
                             category: card.tag,
                             date: new Date().toISOString().slice(0, 10).replace(/-/g, '.'),
+                            link: card.link ?? '',
                           });
                           showToast(favorited ? '찜 목록에서 제거했어요' : '찜 목록에 추가했어요');
                         }}
                       >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill={favorited ? '#28c5f0' : 'rgba(255,255,255,0.9)'}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill={favorited ? '#64D4F5' : 'rgba(255,255,255,0.9)'}>
                           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                         </svg>
                       </button>
@@ -345,11 +346,12 @@ export default function ExplorePage() {
                               image: CITY_IMAGES[city],
                               category: '찜한목록',
                               date: new Date().toISOString().slice(0, 10).replace(/-/g, '.'),
+                              link: '',
                             });
                             showToast(favorited ? '찜 목록에서 제거했어요' : '찜 목록에 추가했어요');
                           }}
                         >
-                          <svg width="22" height="22" viewBox="0 0 24 24" fill={favorited ? '#28c5f0' : 'none'} stroke={favorited ? '#28c5f0' : '#9aa0a6'} strokeWidth="1.8">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill={favorited ? '#64D4F5' : 'none'} stroke={favorited ? '#64D4F5' : '#9aa0a6'} strokeWidth="1.8">
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                           </svg>
                         </button>

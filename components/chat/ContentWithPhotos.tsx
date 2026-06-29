@@ -39,7 +39,7 @@ export default function ContentWithPhotos({
         return (
           <div key={i} className={styles.contentLineBlock}>
             <p className={styles.sectionContentLine}>
-              <RenderContent content={line} onRefClick={onRefClick} />
+              <RenderContent content={line} />
             </p>
             {matched?.photo_urls && matched.photo_urls.length > 0 && (
               <PhotoGallery urls={matched.photo_urls.slice(0, 3)} alt={matched.name} />

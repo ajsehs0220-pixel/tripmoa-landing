@@ -55,7 +55,7 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
                 <p className={styles.recTextName}>{ri + 1}. {label}</p>
                 {descCells.map((cell, ci) => (
                   <p key={ci} className={styles.recTextDesc}>
-                    <RenderContent content={cell} onRefClick={onRefClick} />
+                    <RenderContent content={cell} />
                   </p>
                 ))}
                 {matched?.photo_urls && matched.photo_urls.length > 0 && (

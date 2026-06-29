@@ -26,15 +26,12 @@ export default function ReviewList({ reviews, onRefClick }: Props) {
             }`}
           >
             <p className={styles.reviewText}>
-              <RenderContent content={review.text} onRefClick={onRefClick} />
+              <RenderContent content={review.text} />
             </p>
             <footer className={styles.reviewMeta}>
               {review.date && <span className={styles.reviewDate}>{review.date}</span>}
               {review.ref != null && !hasInlineRef && (
-                <RefBadge
-                  id={review.ref}
-                  onClick={() => onRefClick(review.ref!)}
-                />
+                <RefBadge id={review.ref} />
               )}
             </footer>
           </blockquote>

@@ -1,30 +1,21 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './archive.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
 import { useToast } from '@/components/prototype/Toast';
 import { useFavorites } from '@/components/prototype/FavoritesContext';
+import { useMemos, formatRelativeTime } from '@/components/prototype/MemosContext';
+import MemoModal from '@/components/prototype/MemoModal';
 
 // ── Mock 데이터 ──────────────────────────────────────────────
 
 const CATEGORY_COUNTS = [
   { label: '찜한목록', count: null as number | null, icon: 'heart', route: '/prototype/archive/favorites' },
-  { label: '사진', count: 8, icon: 'photo', route: null },
-  { label: '메모', count: 5, icon: 'memo', route: null },
+  { label: '사진', count: 0, icon: 'photo', route: null },
+  { label: '메모', count: null as number | null, icon: 'memo', route: '/prototype/archive/memos' },
   { label: '폴더', count: 3, icon: 'folder', route: null },
-];
-
-// 메모 카테고리는 기능 보류 → 더미 고정 유지
-const MEMOS_DUMMY = [
-  { id: 'm1', title: '구매해야 할 것', items: ['110V 돼지코'], date: '1일 전' },
-  { id: 'm2', title: '기억해야 할 것', items: ['비짓 재팬 등록하기'], date: '1일 전' },
-];
-
-// 사진 카테고리는 별도 기능 미구현 → 더미 고정 유지
-const PHOTO_DUMMY_ITEMS = [
-  { id: 'p1', title: '오사카 맛집', meta: '4시간 전 · 사진', icon: 'photo', image: 'https://placehold.co/200x200/f7931e/ffffff?text=Food' },
-  { id: 'p2', title: '오사카 디저트', meta: '4시간 전 · 사진', icon: 'photo', image: 'https://placehold.co/200x200/ff6b6b/ffffff?text=Dessert' },
 ];
 
 const MY_FOLDERS = [
@@ -102,20 +93,18 @@ export default function ArchivePage() {
   const router = useRouter();
   const { showToast } = useToast();
   const { favorites } = useFavorites();
+  const { memos } = useMemos();
+  const [memoModalOpen, setMemoModalOpen] = useState(false);
 
-  // 최근 추가한 항목: 찜한목록(실데이터, 최신순) + 사진(더미) 결합
-  const recentFavoriteItems = favorites.slice(0, 4).map((f) => ({
+  // 최근 추가한 항목: 찜한목록(실데이터, 최신순)
+  const recentItems = favorites.slice(0, 4).map((f) => ({
     id: f.id,
     title: f.title,
     meta: `${f.date} · 찜한목록`,
     icon: 'heart' as const,
     image: f.image,
-    route: '/prototype/archive/favorites',
+    route: '/prototype/archive/favorites' as string | null,
   }));
-  const recentItems = [
-    ...recentFavoriteItems,
-    ...PHOTO_DUMMY_ITEMS.map((p) => ({ ...p, route: null as string | null })),
-  ].slice(0, 4);
 
   return (
     <main className={styles.screen}>
@@ -138,7 +127,10 @@ export default function ArchivePage() {
       {/* 분류 카드 (연한 배경 박스 안 4칸) */}
       <div className={styles.catPanel}>
         {CATEGORY_COUNTS.map(({ label, count, icon, route }) => {
-          const displayCount = label === '찜한목록' ? favorites.length : count;
+          const displayCount =
+            label === '찜한목록' ? favorites.length :
+            label === '메모' ? memos.length :
+            count;
           return (
             <button
               key={label}
@@ -261,30 +253,55 @@ export default function ArchivePage() {
       <section className={styles.section}>
         <div className={styles.sectionRow}>
           <h2 className={styles.sectionTitle}>메모</h2>
-          <button className={styles.seeAll} onClick={() => showToast()}>
+          <button className={styles.seeAll} onClick={() => router.push('/prototype/archive/memos')}>
             더보기 <Icon name="chevron" className={styles.seeAllIcon} />
           </button>
         </div>
-        <div className={styles.scrollRow}>
-          {MEMOS_DUMMY.map((memo) => (
+        {memos.length === 0 ? (
+          <div
+            className={styles.recentEmptyBox}
+            role="button"
+            tabIndex={0}
+            onClick={() => setMemoModalOpen(true)}
+            onKeyDown={(e) => { if (e.key === 'Enter') setMemoModalOpen(true); }}
+            style={{ cursor: 'pointer' }}
+          >
+            아직 작성한 메모가 없어요. 눌러서 추가해보세요
+          </div>
+        ) : (
+          <div className={styles.scrollRow}>
+            {memos.slice(0, 4).map((memo) => (
+              <div
+                key={memo.id}
+                className={styles.memoCard}
+                role="button"
+                tabIndex={0}
+                onClick={() => router.push('/prototype/archive/memos')}
+                onKeyDown={(e) => { if (e.key === 'Enter') router.push('/prototype/archive/memos'); }}
+              >
+                <p className={styles.memoTitle}>{memo.title}</p>
+                <ul className={styles.memoList}>
+                  {memo.items.slice(0, 3).map((line, i) => (
+                    <li key={i}>{line}</li>
+                  ))}
+                </ul>
+                <p className={styles.memoDate}>{formatRelativeTime(memo.createdAt)}</p>
+              </div>
+            ))}
             <div
-              key={memo.id}
-              className={styles.memoCard}
+              className={`${styles.memoCard} ${styles.memoAddCard}`}
               role="button"
               tabIndex={0}
-              onClick={() => showToast()}
-              onKeyDown={(e) => { if (e.key === 'Enter') showToast(); }}
+              onClick={() => setMemoModalOpen(true)}
+              onKeyDown={(e) => { if (e.key === 'Enter') setMemoModalOpen(true); }}
             >
-              <p className={styles.memoTitle}>{memo.title}</p>
-              <ul className={styles.memoList}>
-                {memo.items.map((line, i) => (
-                  <li key={i}>{line}</li>
-                ))}
-              </ul>
-              <p className={styles.memoDate}>{memo.date}</p>
+              <div className={styles.memoAddIcon}>
+                <Icon name="plus" className={styles.memoAddPlus} />
+              </div>
+              <p className={styles.memoAddLabel}>새 메모</p>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
       </section>
 
       {/* 업로드 */}
@@ -294,6 +311,7 @@ export default function ArchivePage() {
       </button>
 
       <div className={styles.bottomPad} />
+      <MemoModal open={memoModalOpen} onClose={() => setMemoModalOpen(false)} />
       <BottomNav />
     </main>
   );

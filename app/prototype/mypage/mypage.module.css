@@ -123,7 +123,7 @@
   gap: 14px;
   background: #ffffff;
   border: 1px solid #64D4F5;
-  border-radius: 18px;
+  border-radius: 10px;
   padding: 7px 6px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
@@ -132,7 +132,7 @@
   max-width: 119px;
   aspect-ratio: 110 / 148;
   height: auto;
-  border-radius: 14px;
+  border-radius: 10px;
   object-fit: cover;
   flex-shrink: 0;
   align-self: stretch;
@@ -180,7 +180,7 @@
 .progressBarFill {
   height: 100%;
   background: #64D4F5;
-  border-radius: 0 5px 5px 0;
+  border-radius: 0 10px 10px 0;
 }
 .tripChatBubble {
   display: flex;
@@ -221,7 +221,7 @@
   background: #64D4F5;
   color: #ffffff;
   border: none;
-  border-radius: 15px;
+  border-radius: 10px;
   font-size: 12px;
   font-weight: 500;
   padding: 8px 16px;
@@ -277,7 +277,7 @@
 }
 .emptyBox {
   background: #ffffff;
-  border-radius: 14px;
+  border-radius: 10px;
   padding: 24px 16px;
   text-align: center;
   color: #b0b8c2;

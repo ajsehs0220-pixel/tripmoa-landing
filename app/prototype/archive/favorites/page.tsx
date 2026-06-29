@@ -41,7 +41,15 @@ export default function FavoritesPage() {
           {favorites.map((item) => {
             const badge = BADGE_STYLES[item.category] ?? { bg: '#f0f1f3', color: '#6b7280' };
             return (
-              <div key={item.id} className={styles.item}>
+              <div
+                key={item.id}
+                className={styles.item}
+                onClick={() => {
+                  if (item.link) window.open(item.link, '_blank', 'noopener,noreferrer');
+                }}
+                role="link"
+                tabIndex={0}
+              >
                 <img src={item.image ?? undefined} alt={item.title} className={styles.itemImg} />
                 <div className={styles.itemBody}>
                   <div className={styles.itemMeta}>
@@ -56,9 +64,12 @@ export default function FavoritesPage() {
                 <button
                   className={styles.heartBtn}
                   aria-label="찜 해제"
-                  onClick={() => removeFavorite(item.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeFavorite(item.id);
+                  }}
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#28c5f0" stroke="#28c5f0" strokeWidth="1.5">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#64D4F5" stroke="#64D4F5" strokeWidth="1.5">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
                 </button>

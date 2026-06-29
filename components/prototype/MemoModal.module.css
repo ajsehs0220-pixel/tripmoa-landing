@@ -1,0 +1,114 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sheet {
+  width: 100%;
+  max-width: 767px;
+  background: #ffffff;
+  border-radius: 24px 24px 0 0;
+  padding: 10px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: slideUp 0.2s ease-out;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: #e1e4e8;
+  margin: 4px auto 4px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.heading {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1a1d21;
+}
+.closeBtn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+}
+
+.titleInput {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1d21;
+  border: none;
+  border-bottom: 1.5px solid #eaf8fb;
+  padding: 10px 2px;
+  font-family: inherit;
+  outline: none;
+}
+.titleInput:focus {
+  border-bottom-color: #64D4F5;
+}
+.titleInput::placeholder {
+  color: #b0b8c2;
+  font-weight: 500;
+}
+
+.bodyInput {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1d21;
+  border: 1.5px solid #eaf8fb;
+  border-radius: 10px;
+  padding: 12px;
+  font-family: inherit;
+  outline: none;
+  resize: none;
+  line-height: 1.6;
+}
+.bodyInput:focus {
+  border-color: #64D4F5;
+}
+.bodyInput::placeholder {
+  color: #b0b8c2;
+}
+
+.saveBtn {
+  width: 100%;
+  background: #64D4F5;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 4px;
+}
+.saveBtn:active {
+  opacity: 0.85;
+}

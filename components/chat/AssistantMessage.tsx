@@ -123,7 +123,7 @@ export default function AssistantMessage({
           {result.summary && (
             <p className={styles.summaryText}>
               {skipIntro ? (
-                <RenderContent content={result.summary} onRefClick={onRefClick} />
+                <RenderContent content={result.summary} />
               ) : (
                 <TypewriterText
                   content={result.summary}
@@ -141,7 +141,7 @@ export default function AssistantMessage({
                 <p key={i} className={styles.inlineWarning}>
                   <span className={styles.inlineWarningIcon} aria-hidden="true">⚠️</span>
                   <span className={styles.inlineWarningBody}>
-                    <RenderContent content={w} onRefClick={onRefClick} />
+                    <RenderContent content={w} />
                   </span>
                 </p>
               ))}
