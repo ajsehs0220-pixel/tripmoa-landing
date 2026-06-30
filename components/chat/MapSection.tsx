@@ -11,7 +11,6 @@ interface Props {
   dayList: number[];
   activeDay: number | null;
   onDayChange: (day: number) => void;
-  query: string;
 }
 
 export default function MapSection({
@@ -20,7 +19,6 @@ export default function MapSection({
   dayList,
   activeDay,
   onDayChange,
-  query,
 }: Props) {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -102,14 +100,14 @@ export default function MapSection({
 
   return (
     <div className={styles.mapSection}>
-      {/* Search Capsule — above the map */}
-      <div className={styles.searchCapsule}>
-        <svg className={styles.searchCapsuleIcon} width="16" height="20" viewBox="0 0 16 20" fill="none">
-          <path d="M8 0C4.686 0 2 2.686 2 6c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z" fill="#EA4335"/>
-          <circle cx="8" cy="6" r="2.4" fill="white"/>
+      {/* Search query label — text only */}
+      <p className={styles.mapQueryLabel}>
+        <svg className={styles.mapQueryIcon} width="14" height="17" viewBox="0 0 16 20" fill="none" aria-hidden="true">
+          <path d="M8 0C4.686 0 2 2.686 2 6c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z" fill="currentColor" />
+          <circle cx="8" cy="6" r="2.4" fill="white" />
         </svg>
-        <span className={styles.searchCapsuleText}>{query}</span>
-      </div>
+        <strong>추천 장소</strong>
+      </p>
 
       {/* Map */}
       <div className={styles.mapStage}>

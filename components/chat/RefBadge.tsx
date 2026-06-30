@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './chat.module.css';
 import { useSourceLookup } from './SourceLookupContext';
-import { formatSourceChannel, truncateSourceTitle } from './sourceUtils';
+import { formatSourceChannel, truncateSourceTitle, displaySourceTitle } from './sourceUtils';
 
 interface Props {
   id: number;
@@ -12,26 +12,62 @@ interface Props {
 
 export default function RefBadge({ id, onClick }: Props) {
   const source = useSourceLookup(id);
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [pinned, setPinned] = useState(false);
+  const wrapRef = useRef<HTMLSpanElement>(null);
 
-  const tooltipVisible = showTooltip && !!source;
+  const showTooltip = !!source && (pinned || hovered);
+
+  useEffect(() => {
+    if (!pinned) return;
+    const close = (e: Event) => {
+      if (!wrapRef.current?.contains(e.target as Node)) {
+        setPinned(false);
+      }
+    };
+    document.addEventListener('touchstart', close, { passive: true });
+    document.addEventListener('click', close);
+    return () => {
+      document.removeEventListener('touchstart', close);
+      document.removeEventListener('click', close);
+    };
+  }, [pinned]);
+
+  const handleBadgeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (source) {
+      setPinned((p) => !p);
+      return;
+    }
+    onClick();
+  };
+
+  const handleTooltipClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setPinned(false);
+    setHovered(false);
+    onClick();
+  };
 
   return (
-    <span className={styles.refBadgeWrap}>
+    <span className={styles.refBadgeWrap} ref={wrapRef}>
       <button
         type="button"
         className={styles.refBadge}
-        onClick={onClick}
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
-        onFocus={() => setShowTooltip(true)}
-        onBlur={() => setShowTooltip(false)}
+        onClick={handleBadgeClick}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onFocus={() => setHovered(true)}
+        onBlur={() => setHovered(false)}
         aria-label={
           source
-            ? `${formatSourceChannel(source.channel)}: ${source.title}`
+            ? `${formatSourceChannel(source.channel)}: ${displaySourceTitle(source)}`
             : `출처 ${id}번 보기`
         }
-        aria-describedby={tooltipVisible ? `ref-tooltip-${id}` : undefined}
+        aria-expanded={pinned}
+        aria-describedby={showTooltip ? `ref-tooltip-${id}` : undefined}
       >
         🔗{id}
       </button>
@@ -39,17 +75,37 @@ export default function RefBadge({ id, onClick }: Props) {
       {source && (
         <span
           id={`ref-tooltip-${id}`}
-          className={`${styles.refTooltip} ${tooltipVisible ? styles.refTooltipVisible : ''}`}
-          role="tooltip"
+          role="button"
+          tabIndex={pinned ? 0 : -1}
+          className={`${styles.refTooltip} ${showTooltip ? styles.refTooltipVisible : ''}`}
+          onClick={handleTooltipClick}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setPinned(false);
+              setHovered(false);
+              onClick();
+            }
+          }}
         >
           <span className={styles.refTooltipChannel}>
             {formatSourceChannel(source.channel)}
           </span>
           <span className={styles.refTooltipTitle}>
-            {truncateSourceTitle(source.title)}
+            {truncateSourceTitle(displaySourceTitle(source))}
           </span>
-          {source.date && (
-            <span className={styles.refTooltipDate}>{source.date}</span>
+          {(source.date || source.is_ad) && (
+            <span className={styles.refTooltipMeta}>
+              {source.date && (
+                <span className={styles.refTooltipDate}>{source.date}</span>
+              )}
+              {source.is_ad && (
+                <span className={styles.refBadgeLabel}>협찬</span>
+              )}
+            </span>
+          )}
+          {pinned && (
+            <span className={styles.refTooltipHint}>탭하면 참고 후기로 이동</span>
           )}
         </span>
       )}

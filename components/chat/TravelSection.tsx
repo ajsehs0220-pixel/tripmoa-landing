@@ -5,24 +5,23 @@ import RenderContent from './RenderContent';
 import ContentWithPhotos from './ContentWithPhotos';
 import PhotoGallery from './PhotoGallery';
 import ReviewList from './ReviewList';
-import { matchPlace } from './placeUtils';
+import { formatSectionTitle, formatDaySectionTitle, isConclusionSection, isDaySectionTitle, isLodgingSection, matchPlace, keycapNumberEmoji, extractDayNumber } from './placeUtils';
 import type { Section, Place } from './types';
-
-const DAY_PATTERN = /^(day\s*\d+|\d+일차)/i;
 
 interface Props {
   section: Section;
   places: Place[];
   onRefClick: (id: number) => void;
   index?: number;
+  daySectionCount?: number;
 }
 
 function hasPlacesDetail(section: Section): boolean {
   return (section.places_detail?.length ?? 0) > 0;
 }
 
-export default function TravelSection({ section, places, onRefClick, index = 0 }: Props) {
-  const isDaySection = DAY_PATTERN.test(section.title.trim());
+export default function TravelSection({ section, places, onRefClick, index = 0, daySectionCount = 0 }: Props) {
+  const isDaySection = isDaySectionTitle(section.title);
   const usePlaceDetails = hasPlacesDetail(section);
   const hasTable = !!(
     section.table &&
@@ -32,19 +31,45 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
   );
 
   const staggerStyle = { '--section-i': index } as React.CSSProperties;
+  const displayTitle = formatSectionTitle(section.title, section.icon);
+  const isConclusion = isConclusionSection(section.title, section.icon);
+  const isSituationRec =
+    isConclusion && /상황별/i.test(displayTitle) && !/여행\s*팁/i.test(displayTitle);
+  const isLodging = isLodgingSection(section.title, section.icon);
+  const hideIcon = isLodging || /^💡/.test(displayTitle.trim());
+
+  const isTravelTip =
+    isConclusion && /여행\s*팁/i.test(displayTitle);
+
+  const isCompactTitle = isTravelTip || isSituationRec;
+
+  const blockClassName = [
+    styles.sectionPlainBlock,
+    isCompactTitle ? styles.sectionCompactTitleBlock : '',
+    isTravelTip ? styles.sectionTravelTipBlock : '',
+    isSituationRec ? styles.sectionSituationRecBlock : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   const contentProps = {
     content: section.content,
     places,
     placesDetail: section.places_detail,
     onRefClick,
+    sectionTitle: section.title,
+    variant: isConclusion ? ('conclusion' as const) : isDaySection ? ('itinerary' as const) : ('default' as const),
+    boldPlaceNames: isSituationRec,
   };
 
   if (hasTable) {
     return (
       <div className={styles.sectionTableBlock} style={staggerStyle}>
         <h3 className={styles.sectionTitle}>
-          {section.icon ? <span className={styles.sectionIcon}>{section.icon}</span> : null}
-          {section.title}
+          {section.icon && !hideIcon ? (
+            <span className={styles.sectionIcon}>{section.icon}</span>
+          ) : null}
+          {displayTitle}
         </h3>
         <div className={styles.recTextList}>
           {section.table!.rows.map((row, ri) => {
@@ -78,12 +103,16 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
   }
 
   if (isDaySection) {
+    const dayNum = extractDayNumber(section.title) ?? extractDayNumber(formatDaySectionTitle(section.title));
     return (
       <div className={styles.sectionDayBlock} style={staggerStyle}>
         <div className={styles.sectionDayHeader}>
-          <span className={styles.sectionDayPill}>{section.icon}</span>
-          <h3 className={styles.sectionDayTitle}>{section.title}</h3>
-          <div className={styles.sectionDayRule} aria-hidden="true" />
+          {dayNum != null && (
+            <span className={styles.sectionDayPill} aria-hidden="true">
+              {keycapNumberEmoji(dayNum)}
+            </span>
+          )}
+          <h3 className={styles.sectionDayTitle}>{formatDaySectionTitle(section.title)}</h3>
         </div>
         <ContentWithPhotos {...contentProps} />
         {!usePlaceDetails && (
@@ -94,12 +123,24 @@ export default function TravelSection({ section, places, onRefClick, index = 0 }
   }
 
   return (
-    <div className={styles.sectionPlainBlock} style={staggerStyle}>
+    <div className={blockClassName} style={staggerStyle}>
       <h3 className={styles.sectionTitle}>
-        {section.icon ? <span className={styles.sectionIcon}>{section.icon}</span> : null}
-        {section.title}
+        {isLodging ? (
+          <span className={styles.sectionIcon} aria-hidden="true">
+            {keycapNumberEmoji(daySectionCount + 1)}
+          </span>
+        ) : section.icon && !hideIcon ? (
+          <span className={styles.sectionIcon}>{section.icon}</span>
+        ) : null}
+        {displayTitle}
       </h3>
-      <ContentWithPhotos {...contentProps} />
+      {isConclusion ? (
+        <div className={styles.sectionConclusion}>
+          <ContentWithPhotos {...contentProps} />
+        </div>
+      ) : (
+        <ContentWithPhotos {...contentProps} />
+      )}
       {!usePlaceDetails && (
         <ReviewList reviews={section.reviews} onRefClick={onRefClick} />
       )}

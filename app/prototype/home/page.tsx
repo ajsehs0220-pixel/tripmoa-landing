@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './home.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
@@ -9,12 +9,21 @@ const CITIES = ['마쓰야마', '시즈오카', '오사카'];
 
 export default function HomePage() {
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [city, setCity] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (city) {
+      inputRef.current?.focus();
+    } else {
+      inputRef.current?.blur();
+    }
+  }, [city]);
+
   function handleSearch() {
     const q = query.trim();
-    if (!q) return;
+    if (!q || !city) return;
     // 결과 페이지로 이동 (쿼리/도시를 URL로 전달)
     const params = new URLSearchParams({ q });
     if (city) params.set('city', city);
@@ -70,20 +79,28 @@ export default function HomePage() {
           ))}
         </div>
 
-        <div className={styles.searchBar}>
+        <div className={`${styles.searchBar} ${!city ? styles.searchBarLocked : ''}`}>
           <svg className={styles.searchIcon} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
             <circle cx="11" cy="11" r="7" />
             <line x1="16.5" y1="16.5" x2="21" y2="21" />
           </svg>
           <input
+            ref={inputRef}
             className={styles.searchInput}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
-            placeholder="예) 오사카 2박3일 맛집 여행"
+            placeholder={city ? '예) 오사카 2박3일 맛집 여행' : '도시를 먼저 선택해주세요'}
             enterKeyHint="search"
+            disabled={!city}
+            aria-disabled={!city}
           />
-          <button className={styles.submitBtn} onClick={handleSearch} disabled={!query.trim()} aria-label="검색">
+          <button
+            className={styles.submitBtn}
+            onClick={handleSearch}
+            disabled={!city || !query.trim()}
+            aria-label="검색"
+          >
             {/* 스파클 아이콘 */}
             <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
               <path d="M12 2.5l1.9 5.4a3 3 0 001.8 1.8l5.4 1.9-5.4 1.9a3 3 0 00-1.8 1.8L12 20.7l-1.9-5.4a3 3 0 00-1.8-1.8L2.9 11.6l5.4-1.9a3 3 0 001.8-1.8L12 2.5z" />

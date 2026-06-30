@@ -124,7 +124,7 @@
 /* ── 하단 고정 검색바 ── */
 .searchBarWrap {
   position: fixed;
-  bottom: 60;
+  bottom: 60px;
   left: 0;
   right: 0;
   max-width: 767px;
@@ -149,6 +149,9 @@
   flex-shrink: 0;
   color: #9aa0a6;
 }
+.searchBarLocked {
+  opacity: 0.92;
+}
 .searchInput {
   flex: 1 1 auto;
   min-width: 0;
@@ -158,6 +161,10 @@
   color: #1f2937;
   background: transparent;
   font-family: inherit;
+}
+.searchInput:disabled {
+  cursor: default;
+  color: #9aa0a6;
 }
 .searchInput::placeholder { color: #9aa0a6; }
 .submitBtn {
