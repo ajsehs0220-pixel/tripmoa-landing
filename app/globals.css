@@ -19,7 +19,7 @@
 
   /* ── TripMOA Result UI Design System ── */
   /* Color — Brand */
-  --tm-brand:      #28C5F0;
+  --tm-brand:      #64D4F5;
   --tm-brand-dark: #0096C7;
   --tm-brand-dim:  #0070C0;
   --tm-brand-50:   #EBF9FF;
@@ -81,7 +81,7 @@
   --tm-el-2: 0 2px 8px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.04);
   --tm-el-3: 0 4px 16px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.05);
   --tm-el-4: 0 8px 32px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
-  --tm-el-brand: 0 4px 20px rgba(40,197,240,.22);
+  --tm-el-brand: 0 4px 20px rgba(100,212,245,.22);
 
   /* Spacing */
   --tm-sp-1: 4px;  --tm-sp-2: 8px;  --tm-sp-3: 12px; --tm-sp-4: 16px;

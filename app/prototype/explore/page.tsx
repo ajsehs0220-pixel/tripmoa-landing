@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './explore.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
+import PageHeader from '@/components/prototype/PageHeader';
 import { getExploreMock, ExploreCard, ExploreResult } from '@/lib/exploreMock';
 import { useToast } from '@/components/prototype/Toast';
 import { useFavorites } from '@/components/prototype/FavoritesContext';
@@ -16,7 +17,7 @@ type StepKey = 'city' | 'duration' | 'companion' | 'groupSize' | 'concept' | 'bu
 const STEP_KEYS: StepKey[] = ['city', 'duration', 'companion', 'groupSize', 'concept', 'budget'];
 
 const STEP_QUESTIONS: Array<null | { badge: string; title: string; options: string[] }> = [
-  null, // step 0: 도시 선택
+  null,
   { badge: 'STEP 1. 여행기간', title: '여행 기간은 어느 정도인가요?', options: ['3일 이하', '5일 이하', '일주일 이상', '3주 이상'] },
   { badge: 'STEP 2. 누구와?', title: '누구와 함께 가시나요?', options: ['나 혼자', '친구와', '아이와', '10대와', '연인과', '동료와', '부모님과', '조부모님과'] },
   { badge: 'STEP 3. 몇명이서?', title: '몇 명이서 가시나요?', options: ['1명~4명', '5명 이상', '10인 이하', '10인 이상', '단체'] },
@@ -82,7 +83,6 @@ export default function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedComingSoon, setSelectedComingSoon] = useState<string | null>(null);
 
-  // 로딩 → 결과 자동 전환 (4.5초)
   useEffect(() => {
     if (phase !== 'loading') return;
     const id = setTimeout(() => setPhase('result'), 4500);
@@ -119,7 +119,6 @@ export default function ExplorePage() {
     setSearchQuery('');
   }
 
-  // mock 결과화면의 재검색 바 → 실제 AI 검색 결과 페이지로 이동
   function handleSearch() {
     const q = searchQuery.trim();
     if (!q) return;
@@ -149,28 +148,14 @@ export default function ExplorePage() {
 
   // ── 결과 화면 (mock 카테고리 카드 + 재검색 바) ──────────────
   if (phase === 'result') {
-    // STEP 4(여행 컨셉) 선택값을 반영해 카드 우선순위가 조정된 풀을 가져옴.
-    // 컨셉이 없거나 매칭 안 되면 getExploreMock 내부에서 기본 풀로 자동 폴백.
     const result = getExploreMock(selections.city, selections.concept);
     const tags = STEP_KEYS.map((k) => selections[k]).filter(Boolean);
 
     return (
       <main className={styles.screen}>
-        <div className={styles.header}>
-          <div className={styles.headerLeft}>
-            <button className={styles.backBtn} onClick={handleReset} aria-label="처음으로">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            </button>
-            <span className={styles.headerWordmark}>
-              <span className={styles.wTrip}>Trip</span><span className={styles.wMoa}>MOA</span>
-            </span>
-          </div>
-        </div>
+        <PageHeader onBack={handleReset} backLabel="처음으로" />
 
-        {/* 재검색 바 — 입력 후 엔터/버튼 클릭 시 /prototype/result로 이동해 AI 요약 실행 */}
+        {/* 재검색 바 */}
         <div className={styles.searchBar}>
           <svg className={styles.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
             <circle cx="11" cy="11" r="7" />
@@ -241,12 +226,13 @@ export default function ExplorePage() {
                             image: card.image,
                             category: card.tag,
                             date: new Date().toISOString().slice(0, 10).replace(/-/g, '.'),
+                            link: card.link ?? '',
                           });
                           showToast(favorited ? '찜 목록에서 제거했어요' : '찜 목록에 추가했어요');
                         }}
                       >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill={favorited ? '#28c5f0' : 'rgba(255,255,255,0.9)'}>
-                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill={favorited ? '#64D4F5' : 'rgba(255,255,255,0.9)'}>
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.061.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                         </svg>
                       </button>
                     </div>
@@ -271,33 +257,13 @@ export default function ExplorePage() {
   // ── 단계 진행 화면 ────────────────────────────────────────
   return (
     <main className={styles.screen}>
-      {/* 헤더 (도시선택 단계) */}
-      {step === 0 && (
-        <div className={styles.header}>
-          <div className={styles.headerLeft}>
-            <span className={styles.headerWordmark}>
-              <span className={styles.wTrip}>Trip</span><span className={styles.wMoa}> MOA</span>
-            </span>
-          </div>
-        </div>
+      {step === 0 ? (
+        <PageHeader />
+      ) : (
+        <PageHeader onBack={handleBack} backLabel="이전" />
       )}
 
-      {/* 진행 바 + 뒤로가기 (step 1~5) */}
-      {step > 0 && (
-        <div className={styles.header}>
-          <div className={styles.headerLeft}>
-            <button className={styles.backBtn} onClick={handleBack} aria-label="이전">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            </button>
-            <span className={styles.headerWordmark}>
-              <span className={styles.wTrip}>Trip</span><span className={styles.wMoa}>MOA</span>
-            </span>
-          </div>
-        </div>
-      )}
+      {/* 진행 바 (step 1~5) */}
       {step > 0 && (
         <div className={styles.progressWrap}>
           <div className={styles.progressBar}>
@@ -345,11 +311,12 @@ export default function ExplorePage() {
                               image: CITY_IMAGES[city],
                               category: '찜한목록',
                               date: new Date().toISOString().slice(0, 10).replace(/-/g, '.'),
+                              link: '',
                             });
                             showToast(favorited ? '찜 목록에서 제거했어요' : '찜 목록에 추가했어요');
                           }}
                         >
-                          <svg width="22" height="22" viewBox="0 0 24 24" fill={favorited ? '#28c5f0' : 'none'} stroke={favorited ? '#28c5f0' : '#9aa0a6'} strokeWidth="1.8">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill={favorited ? '#64D4F5' : 'none'} stroke={favorited ? '#64D4F5' : '#9aa0a6'} strokeWidth="1.8">
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                           </svg>
                         </button>

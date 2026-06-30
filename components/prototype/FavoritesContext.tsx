@@ -16,6 +16,7 @@ export type FavoriteItem = {
   image: string | null;
   category: string; // 뱃지에 쓰이는 한글 카테고리 (예: 'SNS스팟', '맛집', '추천일정', '숙소' 등)
   date: string; // 'YYYY.MM.DD' 또는 ISO 문자열, 표시용
+  link: string; // 원문 링크 (클릭 시 이동)
 };
 
 type FavoritesContextType = {

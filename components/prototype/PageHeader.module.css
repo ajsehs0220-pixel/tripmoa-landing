@@ -1,0 +1,40 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 20px 0 8px;
+  min-height: 32px;
+}
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.headerWordmark {
+  font-family: var(--font-mungyeong), sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+}
+.wTrip { color: #5B5353; }
+.wMoa { color: #64D4F5; }
+.backBtn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #5B5353;
+  padding: 4px;
+  display: flex;
+  flex-shrink: 0;
+}
+.closeBtn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

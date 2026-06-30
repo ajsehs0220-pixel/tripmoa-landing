@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState, useRef } from "react";
 import { GoogleMap, MarkerF, InfoWindowF } from "@react-google-maps/api";
 
 const MAP_CONTAINER_STYLE = {
@@ -17,6 +17,17 @@ const DEFAULT_OPTIONS = {
   gestureHandling: "greedy",
 };
 
+const BASE_ZOOM = 12;
+const MIN_SIZE = 22;
+const MAX_SIZE = 56;
+
+function sizeForZoom(zoom, selected) {
+  const base = selected ? 46 : 38;
+  const scale = Math.pow(1.18, zoom - BASE_ZOOM); // 줌 1단계당 약 18%씩 변화
+  const size = Math.round(base * scale);
+  return Math.min(MAX_SIZE, Math.max(MIN_SIZE, size));
+}
+
 /**
  * @param {Array} locations - [{ name, lat, lng, image?, day? }]
  * @param {number|null} activeDay
@@ -25,6 +36,9 @@ const DEFAULT_OPTIONS = {
  * @param {Function} onMapLoad - called with the google.maps.Map instance when ready
  */
 export default function MapView({ locations = [], activeDay = null, selectedIndex = null, onMarkerSelect, onMapLoad }) {
+  const [zoom, setZoom] = useState(BASE_ZOOM);
+  const mapRef = useRef(null);
+
   const filtered = useMemo(() => {
     if (activeDay == null) return locations;
     return locations.filter((loc) => loc.day === activeDay);
@@ -44,6 +58,21 @@ export default function MapView({ locations = [], activeDay = null, selectedInde
     [onMarkerSelect, selectedIndex]
   );
 
+  const handleLoad = useCallback(
+    (map) => {
+      mapRef.current = map;
+      setZoom(map.getZoom());
+      onMapLoad?.(map);
+    },
+    [onMapLoad]
+  );
+
+  const handleZoomChanged = useCallback(() => {
+    if (mapRef.current) {
+      setZoom(mapRef.current.getZoom());
+    }
+  }, []);
+
   if (locations.length === 0) {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#888" }}>
@@ -56,15 +85,16 @@ export default function MapView({ locations = [], activeDay = null, selectedInde
     <GoogleMap
       mapContainerStyle={MAP_CONTAINER_STYLE}
       center={center}
-      zoom={12}
+      zoom={BASE_ZOOM}
       options={DEFAULT_OPTIONS}
-      onLoad={onMapLoad}
+      onLoad={handleLoad}
+      onZoomChanged={handleZoomChanged}
     >
       {filtered.map((loc, idx) => {
         const isSelected = idx === selectedIndex;
-        const size = isSelected ? 36 : 28;
+        const size = sizeForZoom(zoom, isSelected);
         const fill = isSelected ? "#28c5f0" : "#1f2329";
-        const r = size / 2 - 2;
+        const r = size / 2 - 1;
         return (
           <MarkerF
             key={`${loc.name}-${idx}`}
@@ -73,7 +103,7 @@ export default function MapView({ locations = [], activeDay = null, selectedInde
               url:
                 "data:image/svg+xml;charset=UTF-8," +
                 encodeURIComponent(
-                  `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="${fill}" stroke="#ffffff" stroke-width="2.5"/></svg>`
+                  `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="${fill}"/></svg>`
                 ),
               scaledSize: new window.google.maps.Size(size, size),
               anchor: new window.google.maps.Point(size / 2, size / 2),
@@ -81,7 +111,7 @@ export default function MapView({ locations = [], activeDay = null, selectedInde
             label={{
               text: String(idx + 1),
               color: "#fff",
-              fontSize: isSelected ? "13px" : "11px",
+              fontSize: `${Math.max(10, Math.round(size * 0.46))}px`,
               fontWeight: "bold",
             }}
             zIndex={isSelected ? 100 : 1}

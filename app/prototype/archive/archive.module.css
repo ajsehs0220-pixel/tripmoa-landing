@@ -10,22 +10,6 @@
   color: #1f2329;
 }
 
-/* 헤더: 로고 */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 0 8px;
-}
-.headerWordmark {
-  font-family: var(--font-mungyeong), sans-serif;
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: -0.3px;
-}
-.wTrip { color: #5B5353; }
-.wMoa { color: #64D4F5; margin-left: 2px; }
-
 /* 아카이브 타이틀 */
 .titleSection {
   display: flex;
@@ -214,7 +198,7 @@
 }
 .recentEmptyBox {
   background: #ffffff;
-  border-radius: 14px;
+  border-radius: 10px;
   padding: 28px 16px;
   text-align: center;
   color: #b0b8c2;
@@ -361,7 +345,7 @@
   position: relative;
   flex: 0 0 170px;
   background: url('/memo.svg') no-repeat center / cover;
-  border-radius: 16px;
+  border-radius: 10px;
   padding: 16px 16px 14px;
   display: flex;
   flex-direction: column;
@@ -369,6 +353,37 @@
   cursor: pointer;
   min-height: 150px;
   overflow: hidden;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+}
+
+/* 메모 새로 추가하는 카드 (새폴더 카드와 동일한 톤) */
+.memoAddCard {
+  background: #fafbfc;
+  border: 1.5px dashed #d5dae0;
+  align-items: center;
+  justify-content: center;
+}
+.memoAddIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f0f1f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9aa0a6;
+  margin-bottom: 4px;
+}
+.memoAddPlus {
+  width: 18px;
+  height: 18px;
+}
+.memoAddLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9aa0a6;
 }
 .memoTitle {
   font-size: 13px;

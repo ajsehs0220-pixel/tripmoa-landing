@@ -1,0 +1,176 @@
+.screen {
+  min-height: 100dvh;
+  background: #f7f8fa;
+  max-width: 767px;
+  margin: 0 auto;
+  padding: 0 20px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: #1f2329;
+}
+
+/* 헤더 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0 8px;
+  min-height: 32px;  /* 추가 */
+}
+.backBtn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #1a1d21;
+  display: flex;
+}
+.headerTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1a1d21;
+}
+.headerSpacer {
+  width: 22px;
+}
+
+/* 빈 상태 */
+.emptyBox {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 48px 16px;
+  text-align: center;
+}
+.emptyText {
+  font-size: 13.5px;
+  color: #b0b8c2;
+}
+
+/* 메모 리스트 */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.memoCard {
+  background: #eaf8fb;
+  border-radius: 10px;
+  padding: 16px 16px 14px;
+}
+.memoCardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.memoTitle {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1a1d21;
+}
+.deleteBtn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: #9aa0a6;
+}
+.memoList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4b5258;
+  margin-bottom: 10px;
+}
+.memoList li {
+  position: relative;
+  padding-left: 12px;
+}
+.memoList li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #4b5258;
+}
+.memoDate {
+  font-size: 11px;
+  color: #9aa0a6;
+}
+
+/* 작성 버튼 */
+.addBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #64D4F5;
+  border: none;
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  margin-bottom: 12px;
+}
+
+.bottomPad { height: 40px; }
+
+/* 삭제 확인 */
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 0 32px;
+}
+.confirmBox {
+  width: 100%;
+  max-width: 300px;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 22px 20px 16px;
+  text-align: center;
+}
+.confirmText {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #1a1d21;
+  margin-bottom: 18px;
+}
+.confirmRow {
+  display: flex;
+  gap: 8px;
+}
+.confirmCancel, .confirmDelete {
+  flex: 1;
+  border: none;
+  border-radius: 10px;
+  padding: 11px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+.confirmCancel {
+  background: #f0f1f3;
+  color: #4b5258;
+}
+.confirmDelete {
+  background: #ff5577;
+  color: #ffffff;
+}
