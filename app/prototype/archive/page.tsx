@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './archive.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
+import PageHeader from '@/components/prototype/PageHeader';
 import { useToast } from '@/components/prototype/Toast';
 import { useFavorites } from '@/components/prototype/FavoritesContext';
 import { useMemos, formatRelativeTime } from '@/components/prototype/MemosContext';
@@ -108,13 +109,7 @@ export default function ArchivePage() {
 
   return (
     <main className={styles.screen}>
-      {/* 헤더: 로고 */}
-      <div className={styles.header}>
-        <span className={styles.headerWordmark}>
-          <span className={styles.wTrip}>Trip</span>
-          <span className={styles.wMoa}> MOA</span>
-        </span>
-      </div>
+      <PageHeader />
 
       {/* 아카이브 타이틀 */}
       <div className={styles.titleSection}>

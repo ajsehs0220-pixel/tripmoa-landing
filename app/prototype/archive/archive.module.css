@@ -10,22 +10,6 @@
   color: #1f2329;
 }
 
-/* 헤더: 로고 */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 0 8px;
-}
-.headerWordmark {
-  font-family: var(--font-mungyeong), sans-serif;
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: -0.3px;
-}
-.wTrip { color: #5B5353; }
-.wMoa { color: #64D4F5; margin-left: 2px; }
-
 /* 아카이브 타이틀 */
 .titleSection {
   display: flex;

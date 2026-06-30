@@ -3,10 +3,9 @@
 import { useRouter } from 'next/navigation';
 import styles from './mypage.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
+import PageHeader from '@/components/prototype/PageHeader';
 import { useToast } from '@/components/prototype/Toast';
 import { useRecentViews } from '@/components/prototype/RecentViewContext';
-
-// ── Mock 데이터 (진행중인 여행은 백엔드 대화이력 기능 없어 더미 유지) ──
 
 const DUMMY_TRIP = {
   title: '오사카 여행 정보 탐색 중',
@@ -16,9 +15,8 @@ const DUMMY_TRIP = {
   lastChat: '교토 버스투어 후기 알려줘!',
 };
 
-// 내 탐색 취향 칩 — 수정 기능 미구현(인증/저장 API 없음), 더미 표시용
 const TRAVEL_TAGS = ['오사카', '20대', '친구와', '3명이서', '핫플', '가성비'];
-const CITY_TAGS = ['오사카', '시즈오카', '마쓰야마']; // 도시 키워드는 강조 색상으로 표시
+const CITY_TAGS = ['오사카', '시즈오카', '마쓰야마'];
 
 const MENU_ITEMS = [
   {
@@ -63,22 +61,7 @@ export default function MyPage() {
 
   return (
     <main className={styles.screen}>
-      {/* 헤더: 로고 + 닫기 */}
-      <div className={styles.header}>
-        <span className={styles.headerWordmark}>
-          <span className={styles.wTrip}>Trip</span>
-          <span className={styles.wMoa}> MOA</span>
-        </span>
-        <button
-          className={styles.closeBtn}
-          onClick={() => router.push('/prototype/home')}
-          aria-label="닫기"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
+      <PageHeader onClose={() => router.push('/prototype/home')} />
 
       {/* MY 타이틀 + 프로필/로그인 */}
       <div className={styles.titleSection}>
@@ -108,10 +91,12 @@ export default function MyPage() {
           <div className={styles.tripRight}>
             <div className={styles.tripTitleRow}>
               <p className={styles.tripTitle}>{DUMMY_TRIP.title}</p>
-              <p className={styles.tripDate}>마지막 수정 {DUMMY_TRIP.lastEdited}</p>
-            </div>
-            <div className={styles.progressBarTrack}>
-              <div className={styles.progressBarFill} style={{ width: `${DUMMY_TRIP.progress}%` }} />
+              <div className={styles.tripDateRow}>
+                <p className={styles.tripDate}>마지막 수정 {DUMMY_TRIP.lastEdited}</p>
+                <div className={styles.progressBarTrack}>
+                  <div className={styles.progressBarFill} style={{ width: `${DUMMY_TRIP.progress}%` }} />
+                </div>
+              </div>
             </div>
 
             <div className={styles.tripChatBubble}>
@@ -138,7 +123,7 @@ export default function MyPage() {
         </div>
       </section>
 
-      {/* 최근 본 정보 — RecentViewContext 실제 연동 */}
+      {/* 최근 본 정보 */}
       <section className={styles.section}>
         <div className={styles.sectionRow}>
           <h2 className={styles.sectionTitle}>
@@ -194,7 +179,7 @@ export default function MyPage() {
         )}
       </section>
 
-      {/* 내 탐색 — 취향 칩 (더미, 수정 기능 미구현) */}
+      {/* 내 탐색 */}
       <section className={styles.section}>
         <div className={styles.sectionRow}>
           <h2 className={styles.sectionTitle}>
