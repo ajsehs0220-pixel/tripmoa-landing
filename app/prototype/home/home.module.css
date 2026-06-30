@@ -160,6 +160,11 @@
   font-family: inherit;
 }
 .searchInput::placeholder { color: #9aa0a6; }
+.searchInput:disabled {
+  cursor: not-allowed;
+  color: #b0b6bd;
+}
+.searchInput:disabled::placeholder { color: #b0b6bd; }
 .submitBtn {
   flex-shrink: 0;
   width: 38px;

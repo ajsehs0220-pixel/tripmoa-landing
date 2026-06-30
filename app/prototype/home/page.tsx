@@ -14,10 +14,9 @@ export default function HomePage() {
 
   function handleSearch() {
     const q = query.trim();
-    if (!q) return;
+    if (!q || !city) return;
     // 결과 페이지로 이동 (쿼리/도시를 URL로 전달)
-    const params = new URLSearchParams({ q });
-    if (city) params.set('city', city);
+    const params = new URLSearchParams({ q, city });
     router.push(`/prototype/result?${params.toString()}`);
   }
 
@@ -80,10 +79,11 @@ export default function HomePage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
-            placeholder="예) 오사카 2박3일 맛집 여행"
+            placeholder={city ? '예) 오사카 2박3일 맛집 여행' : '먼저 도시를 선택해주세요'}
             enterKeyHint="search"
+            disabled={!city}
           />
-          <button className={styles.submitBtn} onClick={handleSearch} disabled={!query.trim()} aria-label="검색">
+          <button className={styles.submitBtn} onClick={handleSearch} disabled={!query.trim() || !city} aria-label="검색">
             {/* 스파클 아이콘 */}
             <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
               <path d="M12 2.5l1.9 5.4a3 3 0 001.8 1.8l5.4 1.9-5.4 1.9a3 3 0 00-1.8 1.8L12 20.7l-1.9-5.4a3 3 0 00-1.8-1.8L2.9 11.6l5.4-1.9a3 3 0 001.8-1.8L12 2.5z" />

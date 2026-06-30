@@ -15,6 +15,7 @@ import MessageToolbarBar from './MessageToolbarBar';
 import { IconCopy, IconThumbUp, IconShare } from './MessageToolbar';
 import { formatAnswerForCopy } from './formatAnswerForCopy';
 import { isDaySectionTitle } from './placeUtils';
+import { useChatLikes } from '@/components/prototype/ChatLikesContext';
 import type { SearchResponse, Place } from './types';
 
 interface Props {
@@ -48,7 +49,10 @@ export default function AssistantMessage({
   messageId,
   skipIntro = false,
 }: Props) {
-  const [liked, setLiked] = useState(false);
+  const { isLiked, toggleChatLike } = useChatLikes();
+  const likeId = messageId ?? `${query}-${city ?? ''}`; // messageId 없을 때 폴백
+  const liked = isLiked(likeId);
+
   const sections = Array.isArray(result.sections) ? result.sections : [];
   const daySectionCount = sections.filter((s) => isDaySectionTitle(s.title)).length;
   const sources = Array.isArray(result.sources) ? result.sources : [];
@@ -109,7 +113,12 @@ export default function AssistantMessage({
 
   const handleLike = () => {
     const next = !liked;
-    setLiked(next);
+    toggleChatLike({
+      id: likeId,
+      query,
+      summary: (result.summary ?? '').slice(0, 120),
+      city,
+    });
     if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
       (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'like_response', {
         liked: next,

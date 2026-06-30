@@ -18,22 +18,19 @@ export function IconCopy() {
 
 export function IconThumbUp({ filled }: { filled?: boolean }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M7 11v8a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12.5 10.5l2.54-5.37a2.41 2.41 0 0 1 2.4-2.09h1.67a2.41 2.41 0 0 1 2.4 2.09l.03.14-.03 1.08 1.09-2.14a1.6 1.6 0 0 1 1.44-.85h1.84a1.6 1.6 0 0 1 1.6 1.6v1.1a2 2 0 0 1-.16.76l-1.05 2.56a1.6 1.6 0 0 1-1.48 1.06H5.75"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill={filled ? 'currentColor' : 'none'}
-      />
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M7 22V11" />
+      <path d="M7 11l4.5-7.5a1.5 1.5 0 0 1 2.7.9V9h5.13a2 2 0 0 1 1.97 2.33l-1.2 7A2 2 0 0 1 18.13 20H10a3 3 0 0 1-3-3v-6z" />
     </svg>
   );
 }

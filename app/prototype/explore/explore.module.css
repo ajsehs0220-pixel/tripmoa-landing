@@ -522,3 +522,207 @@
 }
  
 .bottomPad { height: 50px; }
+/* ── 스크롤 방식 폼 레이아웃 추가 스타일 ── */
+/* 진행 바를 화면 상단에 고정 */
+.progressWrapSticky {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  z-index: 5;
+  padding-top: 4px;
+}
+
+/* 섹션 간 구분 + 여백 (STEP1~5가 스크롤로 나열되므로 간격 확보) */
+.questionStep {
+  padding: 24px 0 32px;
+  border-bottom: 1px solid #eceef1;
+}
+.questionStep:last-of-type {
+  border-bottom: none;
+}
+
+/* 지금까지 고른 답변 칩 (누르면 해당 섹션으로 스크롤) */
+.answerChip {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #5a6068;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.answerChip:active {
+  opacity: 0.6;
+}
+
+/* 하단 시작 버튼 */
+.startBtnWrap {
+  position: sticky;
+  bottom: 45px; 
+  padding: 12px 0;
+  background: linear-gradient(to top, #ffffff 70%, rgba(255,255,255,0));
+}
+.startBtn {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #87DFFF 0%, #64D4F5 100%);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+.startBtn:active {
+  transform: scale(0.98);
+}
+.startBtn:disabled {
+  background: #e6e8eb;
+  color: #b0b8c2;
+  cursor: default;
+}
+/* ── 스크롤 방식 폼 레이아웃 추가 스타일 ── */
+/* 진행 바를 화면 상단에 고정 */
+.progressWrapSticky {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  z-index: 5;
+  padding-top: 4px;
+}
+
+/* 섹션 간 구분 + 여백 (STEP1~5가 스크롤로 나열되므로 간격 확보) */
+.questionStep {
+  padding: 24px 0 32px;
+  border-bottom: 1px solid #eceef1;
+}
+.questionStep:first-of-type {
+  padding-top: 4px;
+}
+.questionStep:last-of-type {
+  border-bottom: none;
+}
+
+/* 지금까지 고른 답변 칩 (누르면 해당 섹션으로 스크롤) — 기존 .tag와 동일한 플레인 텍스트 스타일 */
+.answerChip {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #5a6068;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.answerChip:active {
+  opacity: 0.6;
+}
+
+/* 폼 화면 전용: 답변 칩 wrap의 하단 여백을 결과 화면(.tagsWrap)보다 줄임 */
+.formTagsWrap {
+  margin-bottom: 4px;
+}
+
+/* 하단 시작 버튼 — BottomNav 바로 위에 붙임 (간격 없음) */
+.startBtnWrap {
+  position: sticky;
+  bottom: 60px; /* BottomNav 높이만큼만 띄움, 추가 간격 없음 */
+  padding: 12px 0 0;
+  background: linear-gradient(to top, #ffffff 70%, rgba(255,255,255,0));
+}
+.startBtn {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #87DFFF 0%, #64D4F5 100%);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+.startBtn:active {
+  transform: scale(0.98);
+}
+.startBtn:disabled {
+  background: #e6e8eb;
+  color: #b0b8c2;
+  cursor: default;
+}
+/* ── 스크롤 방식 폼 레이아웃 추가 스타일 ── */
+/* 진행 바를 화면 상단에 고정 */
+.progressWrapSticky {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  z-index: 5;
+  padding-top: 4px;
+}
+
+/* 섹션 간 구분 + 여백 (STEP1~5가 스크롤로 나열되므로 간격 확보) */
+.questionStep {
+  padding: 24px 0 32px;
+  border-bottom: 1px solid #eceef1;
+}
+.questionStep:first-of-type {
+  padding-top: 4px;
+}
+.questionStep:last-of-type {
+  border-bottom: none;
+}
+
+/* 지금까지 고른 답변 칩 (누르면 해당 섹션으로 스크롤) — 기존 .tag와 동일한 플레인 텍스트 스타일 */
+.answerChip {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #5a6068;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.answerChip:active {
+  opacity: 0.6;
+}
+
+/* STEP1~5 전체를 3열 정사각형 그리드로 통일 (기존 base.css의 4열 정의를 오버라이드) */
+.optionGrid4col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* 폼 화면 전용: 답변 칩 wrap의 하단 여백을 결과 화면(.tagsWrap)보다 줄임 */
+.formTagsWrap {
+  margin-bottom: 4px;
+}
+
+/* 하단 시작 버튼 — BottomNav 바로 위에 붙임 (간격 없음) */
+.startBtnWrap {
+  position: sticky;
+  bottom: 60px; /* BottomNav 높이만큼만 띄움, 추가 간격 없음 */
+  padding: 12px 0 0;
+  background: linear-gradient(to top, #ffffff 70%, rgba(255,255,255,0));
+}
+.startBtn {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #87DFFF 0%, #64D4F5 100%);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+.startBtn:active {
+  transform: scale(0.98);
+}
+.startBtn:disabled {
+  background: #e6e8eb;
+  color: #b0b8c2;
+  cursor: default;
+}

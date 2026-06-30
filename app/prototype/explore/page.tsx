@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './explore.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
@@ -12,18 +12,38 @@ import { useRecentViews } from '@/components/prototype/RecentViewContext';
 
 // ── 단계 데이터 ──────────────────────────────────────────────
 
-type StepKey = 'city' | 'duration' | 'companion' | 'groupSize' | 'concept' | 'budget';
+type StepKey = 'city' | 'duration' | 'groupSize' | 'companion' | 'concept' | 'budget';
 
-const STEP_KEYS: StepKey[] = ['city', 'duration', 'companion', 'groupSize', 'concept', 'budget'];
+// STEP1~5 순서: 여행기간 → 몇명이서 → 누구와 → 컨셉 → 예산
+const STEP_KEYS: StepKey[] = ['city', 'duration', 'groupSize', 'companion', 'concept', 'budget'];
 
-const STEP_QUESTIONS: Array<null | { badge: string; title: string; options: string[] }> = [
-  null,
-  { badge: 'STEP 1. 여행기간', title: '여행 기간은 어느 정도인가요?', options: ['3일 이하', '5일 이하', '일주일 이상', '3주 이상'] },
-  { badge: 'STEP 2. 누구와?', title: '누구와 함께 가시나요?', options: ['나 혼자', '친구와', '아이와', '10대와', '연인과', '동료와', '부모님과', '조부모님과'] },
-  { badge: 'STEP 3. 몇명이서?', title: '몇 명이서 가시나요?', options: ['1명~4명', '5명 이상', '10인 이하', '10인 이상', '단체'] },
-  { badge: 'STEP 4. 여행 컨셉', title: '어떤 여행 컨셉인가요?', options: ['식도락', '힐링', '핫플', '액티비티'] },
-  { badge: 'STEP 5. 예산', title: '예산은 어느 정도인가요?', options: ['가성비', '밸런스', '럭셔리'] },
-];
+const STEP_QUESTIONS: Record<Exclude<StepKey, 'city'>, { badge: string; title: string; options: string[] }> = {
+  duration: {
+    badge: 'STEP 1. 여행기간',
+    title: '여행 기간은 어느 정도인가요?',
+    options: ['당일치기', '1박2일', '2박3일', '3박4일', '4박5일', '5일 이상'],
+  },
+  groupSize: {
+    badge: 'STEP 2. 몇명이서?',
+    title: '몇 명이서 가시나요?',
+    options: ['1인', '2인', '3인', '4인', '5인 이상'],
+  },
+  companion: {
+    badge: 'STEP 3. 누구와?',
+    title: '누구와 함께 가시나요?',
+    options: ['혼자', '친구와', '연인과', '부모님과', '아이와'],
+  },
+  concept: {
+    badge: 'STEP 4. 여행 컨셉',
+    title: '어떤 여행 컨셉인가요?',
+    options: ['식도락', '힐링', '핫플', '액티비티', '로맨틱', '효도여행'],
+  },
+  budget: {
+    badge: 'STEP 5. 예산',
+    title: '예산은 어느 정도인가요?',
+    options: ['가성비', '밸런스', '럭셔리'],
+  },
+};
 
 const CITIES = ['오사카', '시즈오카', '마쓰야마'];
 
@@ -77,11 +97,12 @@ export default function ExplorePage() {
   const { showToast } = useToast();
   const { isFavorited, toggleFavorite } = useFavorites();
   const { addRecentView } = useRecentViews();
-  const [step, setStep] = useState(0);
-  const [phase, setPhase] = useState<'steps' | 'loading' | 'result'>('steps');
+  const [phase, setPhase] = useState<'city' | 'form' | 'loading' | 'result'>('city');
   const [selections, setSelections] = useState<Selections>(INITIAL_SELECTIONS);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedComingSoon, setSelectedComingSoon] = useState<string | null>(null);
+
+  const sectionRefs = useRef<Partial<Record<StepKey, HTMLDivElement | null>>>({});
 
   useEffect(() => {
     if (phase !== 'loading') return;
@@ -89,32 +110,39 @@ export default function ExplorePage() {
     return () => clearTimeout(id);
   }, [phase]);
 
+  const FORM_KEYS = STEP_KEYS.slice(1); // city 제외, STEP1~5만
+  const answeredCount = FORM_KEYS.filter((k) => selections[k]).length;
+  const allAnswered = answeredCount === FORM_KEYS.length;
+
   function handleCitySelect(city: string) {
     setSelections((prev) => ({ ...prev, city }));
-    setStep(1);
+    setPhase('form');
   }
 
-  function handleOptionSelect(value: string) {
-    const key = STEP_KEYS[step];
+  function handleSelect(key: StepKey, value: string) {
     setSelections((prev) => ({ ...prev, [key]: value }));
-    if (step < 5) {
-      setStep((s) => s + 1);
-    } else {
-      setPhase('loading');
+
+    // 다음 미답변 섹션으로 자연스럽게 스크롤 이동
+    const idx = FORM_KEYS.indexOf(key);
+    const nextKey = FORM_KEYS.slice(idx + 1).find((k) => !selections[k]);
+    if (nextKey && nextKey !== key) {
+      requestAnimationFrame(() => {
+        sectionRefs.current[nextKey]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
     }
   }
 
-  function handleBack() {
-    if (step === 0) {
-      router.push('/prototype/home');
-    } else {
-      setStep((s) => s - 1);
-    }
+  function handleStart() {
+    if (!allAnswered) return;
+    setPhase('loading');
+  }
+
+  function handleFormBack() {
+    setPhase('city');
   }
 
   function handleReset() {
-    setPhase('steps');
-    setStep(0);
+    setPhase('city');
     setSelections(INITIAL_SELECTIONS);
     setSearchQuery('');
   }
@@ -254,27 +282,12 @@ export default function ExplorePage() {
     );
   }
 
-  // ── 단계 진행 화면 ────────────────────────────────────────
-  return (
-    <main className={styles.screen}>
-      {step === 0 ? (
+  // ── STEP 0: 도시 선택 화면 ──────────────────────────────────
+  if (phase === 'city') {
+    return (
+      <main className={styles.screen}>
         <PageHeader />
-      ) : (
-        <PageHeader onBack={handleBack} backLabel="이전" />
-      )}
 
-      {/* 진행 바 (step 1~5) */}
-      {step > 0 && (
-        <div className={styles.progressWrap}>
-          <div className={styles.progressBar}>
-            <div className={styles.progressFill} style={{ width: `${(step / 5) * 100}%` }} />
-          </div>
-          <span className={styles.progressCount}>{step}<span className={styles.progressTotal}>/5</span></span>
-        </div>
-      )}
-
-      {/* STEP 0: 도시 선택 */}
-      {step === 0 && (
         <div className={styles.cityStep}>
           <span className={styles.stepBadge}>STEP 0. 도시를 선택하세요</span>
           <div className={styles.cityCards}>
@@ -355,28 +368,84 @@ export default function ExplorePage() {
             ))}
           </div>
         </div>
-      )}
 
-      {/* STEP 1~5: 객관식 선택 */}
-      {step > 0 && STEP_QUESTIONS[step] && (
-        <div className={styles.questionStep}>
-          <span className={styles.stepBadge}>{STEP_QUESTIONS[step]!.badge}</span>
-          <div className={`${styles.optionGrid} ${step >= 2 ? styles.optionGrid4col : ''}`}>
-            {STEP_QUESTIONS[step]!.options.map((opt) => {
-              const isSelected = selections[STEP_KEYS[step]] === opt;
-              return (
-                <button
-                  key={opt}
-                  className={`${styles.optionBtn} ${isSelected ? styles.optionBtnActive : ''}`}
-                  onClick={() => handleOptionSelect(opt)}
-                >
-                  {opt}
-                </button>
-              );
-            })}
-          </div>
+        <div className={styles.bottomPad} />
+        <BottomNav />
+      </main>
+    );
+  }
+
+  // ── STEP 1~5: 한 화면 스크롤 폼 ──────────────────────────────
+  return (
+    <main className={styles.screen}>
+      <PageHeader onBack={handleFormBack} backLabel="도시 다시 선택" />
+
+      {/* 진행 바 (스티키, 답변 개수 기준) */}
+      <div className={`${styles.progressWrap} ${styles.progressWrapSticky}`}>
+        <div className={styles.progressBar}>
+          <div className={styles.progressFill} style={{ width: `${(answeredCount / FORM_KEYS.length) * 100}%` }} />
+        </div>
+        <span className={styles.progressCount}>
+          {answeredCount}<span className={styles.progressTotal}>/{FORM_KEYS.length}</span>
+        </span>
+      </div>
+
+      {/* 지금까지 선택한 답변 칩 (누르면 해당 섹션으로 이동) */}
+      {answeredCount > 0 && (
+        <div className={`${styles.tagsWrap} ${styles.formTagsWrap}`}>
+          <span className={styles.answerChip}>#{selections.city}</span>
+          {FORM_KEYS.filter((k) => selections[k]).map((k) => (
+            <button
+              key={k}
+              type="button"
+              className={styles.answerChip}
+              onClick={() => sectionRefs.current[k]?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+            >
+              #{selections[k]}
+            </button>
+          ))}
         </div>
       )}
+
+      {/* STEP 1~5: 객관식 — 전부 나열, 언제든 다시 클릭해서 수정 가능 */}
+      {FORM_KEYS.map((key) => {
+        const q = STEP_QUESTIONS[key as Exclude<StepKey, 'city'>];
+        return (
+          <div
+            key={key}
+            ref={(el) => { sectionRefs.current[key] = el; }}
+            className={styles.questionStep}
+          >
+            <span className={styles.stepBadge}>{q.badge}</span>
+            <div className={`${styles.optionGrid} ${styles.optionGrid4col}`}>
+              {q.options.map((opt) => {
+                const isSelected = selections[key] === opt;
+                return (
+                  <button
+                    key={opt}
+                    className={`${styles.optionBtn} ${isSelected ? styles.optionBtnActive : ''}`}
+                    onClick={() => handleSelect(key, opt)}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+
+      {/* 전체 답변 완료 시 노출되는 시작 버튼 */}
+      <div className={styles.startBtnWrap}>
+        <button
+          type="button"
+          className={styles.startBtn}
+          onClick={handleStart}
+          disabled={!allAnswered}
+        >
+          {allAnswered ? '여행 설계 시작하기' : `${FORM_KEYS.length - answeredCount}개 항목을 더 선택해주세요`}
+        </button>
+      </div>
 
       <div className={styles.bottomPad} />
       <BottomNav />
