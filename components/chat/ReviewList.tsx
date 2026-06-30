@@ -1,9 +1,11 @@
 'use client';
 
+import { Fragment } from 'react';
 import styles from './chat.module.css';
 import RenderContent from './RenderContent';
 import RefBadge from './RefBadge';
 import type { Review } from './types';
+import { splitJoinedSentences } from './displayTextUtils';
 import { pickPlaceReviews } from './reviewUtils';
 
 function parseReviewDisplay(text: string, refField?: number) {
@@ -29,6 +31,8 @@ export default function ReviewList({ reviews, onRefClick, placeName, description
     <div className={styles.reviewList}>
       {visible.map((review, i) => {
         const { body, refId } = parseReviewDisplay(review.text ?? '', review.ref);
+        if (refId == null) return null;
+        const segments = splitJoinedSentences(body);
 
         return (
           <blockquote
@@ -44,14 +48,19 @@ export default function ReviewList({ reviews, onRefClick, placeName, description
               <span className={styles.reviewQuote}>
                 <span className={styles.reviewQuoteMark} aria-hidden="true">&quot;</span>
                 <span className={styles.reviewQuoteBody}>
-                  <RenderContent content={body} onRefClick={onRefClick} plainBold />
+                  {segments.map((seg, si) => (
+                    <Fragment key={si}>
+                      {si > 0 && <br />}
+                      <RenderContent content={seg} onRefClick={onRefClick} plainBold />
+                    </Fragment>
+                  ))}
                 </span>
                 <span className={styles.reviewQuoteMark} aria-hidden="true">&quot;</span>
-                {refId != null && (
+                {refId != null ? (
                   <span className={styles.reviewQuoteRef}>
                     <RefBadge id={refId} onClick={() => onRefClick(refId)} />
                   </span>
-                )}
+                ) : null}
               </span>
             </p>
             {review.date && (

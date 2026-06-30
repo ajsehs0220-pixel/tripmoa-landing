@@ -13,8 +13,11 @@ import {
   normalizePlaceLabel,
   parseContentItems,
   prepareItineraryContentItems,
+  expandPlaceItems,
   isOneLineConclusionLine,
+  descriptionToHighlights as highlightsFromDescription,
 } from './placeUtils';
+import { splitJoinedSentences } from './displayTextUtils';
 import type { Place, PlaceDetail } from './types';
 
 interface Props {
@@ -28,12 +31,8 @@ interface Props {
   boldPlaceNames?: boolean;
 }
 
-function descriptionToHighlights(description: string | undefined): string[] {
-  if (!description?.trim()) return [];
-  return description
-    .split(/\n+/)
-    .map((s) => s.trim())
-    .filter(Boolean);
+function descriptionToHighlights(description: string | undefined, placeName: string): string[] {
+  return highlightsFromDescription(description, placeName);
 }
 
 function ConclusionContent({
@@ -93,7 +92,7 @@ export default function ContentWithPhotos({
     if (variant === 'itinerary') {
       return prepareItineraryContentItems(parsed, placesDetail);
     }
-    return parsed;
+    return expandPlaceItems(parsed, placesDetail, sectionTitle);
   }, [content, sectionTitle, variant, placesDetail]);
 
   if (variant === 'conclusion') {
@@ -153,7 +152,7 @@ export default function ContentWithPhotos({
         const highlights =
           item.highlights.length > 0
             ? item.highlights
-            : descriptionToHighlights(detail?.description);
+            : descriptionToHighlights(detail?.description, displayName);
 
         const showPhoto =
           matchedForPhoto?.photo_urls &&
@@ -171,7 +170,7 @@ export default function ContentWithPhotos({
 
             {highlights.length > 0 && (
               <ul className={styles.placeHighlights}>
-                {highlights.map((text, hi) => (
+                {highlights.flatMap((text) => splitJoinedSentences(text)).map((text, hi) => (
                   <li key={hi} className={styles.placeHighlightItem}>
                     <RenderContent
                       content={text}

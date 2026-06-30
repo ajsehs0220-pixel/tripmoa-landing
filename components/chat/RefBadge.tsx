@@ -5,6 +5,9 @@ import styles from './chat.module.css';
 import { useSourceLookup } from './SourceLookupContext';
 import { formatSourceChannel, truncateSourceTitle, displaySourceTitle } from './sourceUtils';
 
+/** Link emoji via Unicode escape (avoids merge/encoding corruption) */
+const LINK_ICON = '\u{1F517}';
+
 interface Props {
   id: number;
   onClick: () => void;
@@ -64,12 +67,13 @@ export default function RefBadge({ id, onClick }: Props) {
         aria-label={
           source
             ? `${formatSourceChannel(source.channel)}: ${displaySourceTitle(source)}`
-            : `?? ${id}? ??`
+            : `\uCD9C\uCC98 ${id}\uBC88 \uBCF4\uAE30`
         }
         aria-expanded={pinned}
         aria-describedby={showTooltip ? `ref-tooltip-${id}` : undefined}
       >
-        ??{id}
+        {LINK_ICON}
+        {id}
       </button>
 
       {showTooltip && (
@@ -102,19 +106,17 @@ export default function RefBadge({ id, onClick }: Props) {
                     <span className={styles.refTooltipDate}>{source.date}</span>
                   )}
                   {source.is_ad && (
-                    <span className={styles.refBadgeLabel}>??</span>
+                    <span className={styles.refBadgeLabel}>{'\uD611\uCC30'}</span>
                   )}
                 </span>
               )}
-              {pinned && (
-                <span className={styles.refTooltipHint}>??? ?? ??? ??</span>
-              )}
             </>
           ) : (
-            <>
-              <span className={styles.refTooltipTitle}>?? ?? {id}?</span>
-              <span className={styles.refTooltipHint}>??? ???? ??</span>
-            </>
+            <span className={styles.refTooltipTitle}>
+              {'\uCD9C\uCC98 \uC815\uBCF4 '}
+              {id}
+              {'\uBC88'}
+            </span>
           )}
         </span>
       )}

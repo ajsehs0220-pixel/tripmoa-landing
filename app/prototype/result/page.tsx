@@ -143,7 +143,7 @@ function ResultInner() {
         const cleanedResult: SearchResponse = {
           ...data,
           places: Array.isArray(data.places)
-            ? data.places.filter((p): p is NonNullable<typeof p> => p !== null)
+            ? data.places.filter((p: Place | null): p is Place => p != null)
             : data.places,
         };
         setMessages((prev) =>

@@ -94,7 +94,12 @@ export function filterValidReviews<T extends { text?: string }>(reviews: T[]): T
   return reviews.filter((r) => isValidReviewText(r.text ?? ''));
 }
 
-export function pickPlaceReviews<T extends { text?: string }>(
+function reviewHasRef(r: { text?: string; ref?: number }): boolean {
+  if (r.ref != null && Number.isFinite(Number(r.ref))) return true;
+  return /\[ref:\d+\]/.test(r.text ?? '');
+}
+
+export function pickPlaceReviews<T extends { text?: string; ref?: number }>(
   reviews: T[],
   options: PickPlaceReviewsOptions = {}
 ): T[] {
@@ -113,7 +118,7 @@ export function pickPlaceReviews<T extends { text?: string }>(
 
   for (const r of reviews) {
     const text = (r.text ?? '').trim();
-    if (!text || !isRelevant(r)) continue;
+    if (!text || !isRelevant(r) || !reviewHasRef(r)) continue;
 
     rawPool.push(r);
     if (isValidReviewText(text)) strict.push(r);
@@ -140,6 +145,7 @@ export function pickPlaceReviews<T extends { text?: string }>(
       if (out.length >= MIN_PLACE_REVIEWS) break;
       const text = (r.text ?? '').trim();
       if (text.length < 8 || seen.has(text)) continue;
+      if (!reviewHasRef(r)) continue;
       if (STRICT_QUESTION_PATTERN.test(text)) continue;
       if (ITINERARY_DUMP_PATTERN.test(text)) continue;
       append(r);

@@ -1,4 +1,5 @@
 import type { Place, PlaceDetail } from './types';
+import { splitJoinedSentences } from './displayTextUtils';
 
 /** • **장소명** → 설명 / 👉 소제목 / 장소 블록 파싱 */
 export type ParsedContentLine =
@@ -167,12 +168,28 @@ export function parseContentItems(
 
     const highlightMatch = trimmed.match(/^[-•]\s+(.+)$/);
     if (highlightMatch && current) {
-      current.highlights.push(highlightMatch[1].trim());
+      for (const seg of splitLineAtEmbeddedPlace(highlightMatch[1].trim())) {
+        const header = parsePlaceHeaderFromLine(seg, sectionTitle);
+        if (header) {
+          flushPlace();
+          current = header;
+        } else if (current) {
+          current.highlights.push(seg);
+        }
+      }
       continue;
     }
 
     if (current && !trimmed.startsWith('✔')) {
-      current.highlights.push(trimmed);
+      for (const seg of splitLineAtEmbeddedPlace(trimmed)) {
+        const header = parsePlaceHeaderFromLine(seg, sectionTitle);
+        if (header) {
+          flushPlace();
+          current = header;
+        } else if (current) {
+          current.highlights.push(seg);
+        }
+      }
       continue;
     }
 
@@ -182,6 +199,86 @@ export function parseContentItems(
 
   flushPlace();
   return items;
+}
+
+/** 한 place 블록 highlights 안에 🏨 다른장소 → 블록 분리 */
+function splitPlaceItemByHeaders(
+  item: Extract<ContentItem, { kind: 'place' }>,
+  sectionTitle?: string
+): Extract<ContentItem, { kind: 'place' }>[] {
+  const out: Extract<ContentItem, { kind: 'place' }>[] = [];
+  let current: Extract<ContentItem, { kind: 'place' }> = {
+    kind: 'place',
+    emoji: item.emoji,
+    placeName: item.placeName,
+    highlights: [],
+  };
+
+  const flush = () => {
+    if (current.highlights.length > 0 || out.length === 0) {
+      out.push({ ...current, highlights: [...current.highlights] });
+    }
+  };
+
+  for (const line of item.highlights) {
+    for (const seg of splitLineAtEmbeddedPlace(line)) {
+      const header = parsePlaceHeaderFromLine(seg, sectionTitle);
+      if (header && !placeNamesMatch(header.placeName, current.placeName)) {
+        flush();
+        current = { ...header, highlights: [] };
+        continue;
+      }
+      if (isOtherPlaceHeaderLine(seg, current.placeName)) {
+        flush();
+        const next = parsePlaceHeaderFromLine(seg, sectionTitle);
+        current = next ?? {
+          kind: 'place',
+          emoji: inferPlaceEmoji(seg, sectionTitle),
+          placeName: normalizePlaceLabel(seg),
+          highlights: [],
+        };
+        continue;
+      }
+      const cleaned = stripTrailingEmbeddedPlace(seg, current.placeName);
+      if (cleaned) current.highlights.push(cleaned);
+    }
+  }
+
+  flush();
+  return out.length > 0 ? out : [item];
+}
+
+/** content 장소 블록 + places_detail 동기화 — 합쳐진 장소 분리·누락 보충 */
+export function expandPlaceItems(
+  items: ContentItem[],
+  placesDetail?: PlaceDetail[],
+  sectionTitle?: string
+): ContentItem[] {
+  const expanded: ContentItem[] = [];
+
+  for (const item of items) {
+    if (item.kind !== 'place') {
+      expanded.push(item);
+      continue;
+    }
+    expanded.push(...splitPlaceItemByHeaders(item, sectionTitle));
+  }
+
+  for (const pd of placesDetail ?? []) {
+    if (!pd.name?.trim()) continue;
+    const exists = expanded.some(
+      (i) => i.kind === 'place' && placeNamesMatch(i.placeName, pd.name)
+    );
+    if (exists) continue;
+    expanded.push({
+      kind: 'place',
+      emoji: inferPlaceEmoji(pd.name, sectionTitle),
+      placeName: pd.name,
+      highlights: descriptionToHighlights(pd.description, pd.name),
+    });
+  }
+
+  return expanded;
 }
 
 /** 카테고리만 있는 줄 (점심 및 쇼핑, 숙소 체크인 등) */
@@ -283,15 +380,169 @@ export function findPlaceDetail(
   const name = normalizePlaceLabel(label);
   if (!name) return undefined;
 
+  const exact = details.find((p) => normalizePlaceLabel(p.name) === name);
+  if (exact) return exact;
+
   return details.find((p) => {
     const pn = normalizePlaceLabel(p.name);
-    return pn === name || pn.includes(name) || name.includes(pn);
+    if (pn.length < 3 || name.length < 3) return pn === name;
+    return pn.includes(name) || name.includes(pn);
   });
 }
 
 /** 장소명·제목 줄에서 [ref:N] 제거 */
 export function stripInlineRefs(text: string): string {
   return text.replace(/\s*(?:\[ref:\d+\])+\s*/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+const PLACE_EMOJI_HEADER =
+  /^(\p{Extended_Pictographic}(?:\uFE0F)?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F)?)*)\s+(?:\*\*([^*]+)\*\*|(.+?))\s*$/u;
+
+const EMBEDDED_PLACE_IN_LINE =
+  /\s(\p{Extended_Pictographic}(?:\uFE0F)?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F)?)*)\s+(?:\*\*([^*]+)\*\*|([^\n•\-]+))/u;
+
+function placeNamesMatch(a: string, b: string): boolean {
+  const na = normalizePlaceLabel(a);
+  const nb = normalizePlaceLabel(b);
+  if (!na || !nb) return false;
+  return na === nb || na.includes(nb) || nb.includes(na);
+}
+
+/** 줄이 다른 장소 헤더(🏨 호텔명)인지 */
+function isOtherPlaceHeaderLine(line: string, placeName: string): boolean {
+  const trimmed = line.trim();
+  const m = trimmed.match(PLACE_EMOJI_HEADER);
+  if (!m) return false;
+  const name = normalizePlaceLabel(m[2] ?? m[3] ?? '');
+  if (!name) return false;
+  return !placeNamesMatch(name, placeName);
+}
+
+/** "…설명 🏨 다른호텔 …" → 앞 설명만 */
+function stripTrailingEmbeddedPlace(line: string, placeName: string): string {
+  const idx = line.search(EMBEDDED_PLACE_IN_LINE);
+  if (idx < 0) return line.trim();
+  const tail = line.slice(idx).trim();
+  const m = tail.match(PLACE_EMOJI_HEADER);
+  if (!m) return line.trim();
+  const embeddedName = normalizePlaceLabel(m[2] ?? m[3] ?? '');
+  if (embeddedName && !placeNamesMatch(embeddedName, placeName)) {
+    return line.slice(0, idx).trim();
+  }
+  return line.trim();
+}
+
+/** description / highlights — 해당 장소만 남김 */
+export function filterHighlightsForPlace(lines: string[], placeName: string): string[] {
+  const out: string[] = [];
+  for (const raw of lines) {
+    let line = (raw ?? '').trim();
+    if (!line) continue;
+    if (isOtherPlaceHeaderLine(line, placeName)) break;
+    line = stripTrailingEmbeddedPlace(line, placeName);
+    if (!line || isOtherPlaceHeaderLine(line, placeName)) continue;
+    out.push(line);
+  }
+  return out;
+}
+
+/** description을 🏨/🍜 헤더 기준 블록으로 분리 */
+export function splitDescriptionByPlaceHeaders(text: string): { name: string; lines: string[] }[] {
+  const blocks: { name: string; lines: string[] }[] = [];
+
+  for (const line of text.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    const header = trimmed.match(PLACE_EMOJI_HEADER);
+    if (header) {
+      blocks.push({
+        name: normalizePlaceLabel(header[2] ?? header[3] ?? ''),
+        lines: [],
+      });
+      continue;
+    }
+
+    const embedded = trimmed.match(EMBEDDED_PLACE_IN_LINE);
+    if (embedded) {
+      const before = trimmed.slice(0, embedded.index ?? 0).trim();
+      const tail = blocks[blocks.length - 1];
+      if (before && tail) tail.lines.push(before);
+      blocks.push({
+        name: normalizePlaceLabel(embedded[2] ?? embedded[3] ?? ''),
+        lines: [],
+      });
+      continue;
+    }
+
+    const last = blocks[blocks.length - 1];
+    if (last) last.lines.push(trimmed);
+    else blocks.push({ name: '', lines: [trimmed] });
+  }
+
+  return blocks;
+}
+
+/** places_detail.description → 해당 장소 설명 불릿만 */
+export function descriptionToHighlights(description: string | undefined, placeName?: string): string[] {
+  if (!description?.trim()) return [];
+
+  const blocks = splitDescriptionByPlaceHeaders(description);
+  if (placeName && blocks.length > 1) {
+    const block = blocks.find((b) => b.name && placeNamesMatch(b.name, placeName));
+    if (block) {
+      return filterHighlightsForPlace(block.lines, placeName);
+    }
+  }
+
+  const lines = description
+    .split(/\n+/)
+    .flatMap((line) => splitJoinedSentences(line))
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  return placeName ? filterHighlightsForPlace(lines, placeName) : lines;
+}
+
+/** content 한 줄에 다른 장소가 붙어 있으면 분리 */
+function splitLineAtEmbeddedPlace(line: string): string[] {
+  const parts: string[] = [];
+  let rest = line.trim();
+  while (rest) {
+    const m = rest.match(EMBEDDED_PLACE_IN_LINE);
+    if (!m || m.index == null || m.index === 0) {
+      parts.push(rest);
+      break;
+    }
+    const before = rest.slice(0, m.index).trim();
+    if (before) parts.push(before);
+    rest = rest.slice(m.index).trim();
+  }
+  return parts;
+}
+
+function parsePlaceHeaderFromLine(line: string, sectionTitle?: string): Extract<ContentItem, { kind: 'place' }> | null {
+  const trimmed = line.trim();
+  const headerMatch = trimmed.match(PLACE_HEADER);
+  if (headerMatch) {
+    const emoji = headerMatch[1] ?? inferPlaceEmoji(headerMatch[2], sectionTitle);
+    return {
+      kind: 'place',
+      emoji,
+      placeName: normalizePlaceLabel(headerMatch[2]),
+      highlights: [],
+    };
+  }
+  const emojiHeader = trimmed.match(PLACE_EMOJI_HEADER);
+  if (emojiHeader) {
+    return {
+      kind: 'place',
+      emoji: emojiHeader[1],
+      placeName: normalizePlaceLabel(emojiHeader[2] ?? emojiHeader[3] ?? ''),
+      highlights: [],
+    };
+  }
+  return null;
 }
 
 const TIME_OF_DAY_LABEL = /^(오전|오후|저녁|아침|점심|밤)(?:\s*[\/·]\s*(오전|오후|저녁|아침|점심|밤))*$/i;

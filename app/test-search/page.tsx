@@ -1,55 +1,33 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
+// ── 테스트용: endpoint를 코드에 직접 박음 (본격 UI 갈 때 .env로 분리) ──
 const API_URL = 'https://eeesytripmoa-project-production.up.railway.app/search';
 
-type Source = {
-  id?: number;
-  title?: string;
-  channel?: string;
-  date?: string;
-  link: string;
-};
-
-type SearchResponse = {
-  summary?: string;
-  answer?: string;
-  sections?: unknown[];
-  sources?: Source[];
-  youtube_videos?: { title?: string; url?: string }[];
-  warning?: string[];
-  follow_up?: string[];
-};
+// 백엔드 응답 타입
+type Source = { link: string; text: string };
+type SearchResponse = { answer: string; sources: Source[] };
 
 export default function TestSearchPage() {
-  const router = useRouter();
   const [query, setQuery] = useState('오사카 맛집');
   const [city, setCity] = useState('오사카');
-  const [category, setCategory] = useState('');
-  const [travelStyle, setTravelStyle] = useState('');
+  const [category, setCategory] = useState(''); // 비워두면 안 보냄
+  const [travelStyle, setTravelStyle] = useState(''); // 비워두면 안 보냄
   const [matchCount, setMatchCount] = useState(5);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<SearchResponse | null>(null);
-  const [rawJson, setRawJson] = useState('');
+  const [rawJson, setRawJson] = useState<string>(''); // 디버깅용 원본 응답
 
-  function openStyledResult() {
-    const q = query.trim();
-    if (!q) return;
-    const params = new URLSearchParams({ q });
-    if (city.trim()) params.set('city', city.trim());
-    router.push(`/prototype/result?${params.toString()}`);
-  }
-
-  async function handleRawApiTest() {
+  async function handleSearch() {
     setLoading(true);
     setError(null);
     setResult(null);
     setRawJson('');
 
+    // ── 빈 필터 버그 회피: 빈 값은 body에서 아예 제외 ──
     const body: Record<string, unknown> = {
       query,
       city,
@@ -66,7 +44,7 @@ export default function TestSearchPage() {
       });
 
       const text = await res.text();
-      setRawJson(text);
+      setRawJson(text); // 무슨 일이 나든 원본은 보여줌
 
       if (!res.ok) {
         setError(`서버 에러 ${res.status}: ${text.slice(0, 300)}`);
@@ -76,23 +54,25 @@ export default function TestSearchPage() {
       const data = JSON.parse(text) as SearchResponse;
       setResult(data);
     } catch (e) {
+      // CORS 차단, 네트워크 끊김, JSON 파싱 실패 등 전부 여기로
       setError(`요청 실패: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setLoading(false);
     }
   }
 
+  // sources가 배열이 아니거나 link가 깨져 나와도 안 터지게 방어
   const safeSources: Source[] = Array.isArray(result?.sources)
     ? result!.sources.filter((s) => s && typeof s.link === 'string')
     : [];
 
-  const summaryText = result?.summary ?? result?.answer ?? '';
-
+  // 혹시 link에 마크다운 래핑이 섞여 나오면 순수 URL만 추출 (지금은 깨끗하지만 보험)
   function cleanUrl(raw: string): string {
     const m = raw.match(/https?:\/\/[^\s)\]]+/);
     return m ? m[0] : raw;
   }
 
+  // GA4 출처링크 클릭 이벤트 (NSM) — gtag 있으면 발사
   function trackSourceClick(url: string) {
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'click_source_link', { source_url: url });
@@ -102,15 +82,11 @@ export default function TestSearchPage() {
   return (
     <main style={{ maxWidth: 720, margin: '40px auto', padding: '0 16px', fontFamily: 'system-ui, sans-serif' }}>
       <h1 style={{ fontSize: 20, marginBottom: 4 }}>🔧 검색 연동 테스트</h1>
-      <p style={{ color: '#666', fontSize: 13, marginBottom: 8 }}>
-        스타일 적용 UI는 <strong>/prototype/result</strong> 입니다. 이 페이지는 Raw API 검증용입니다.
-      </p>
-      <p style={{ marginBottom: 20 }}>
-        <a href="/prototype/home" style={{ color: '#0070E0', fontSize: 13 }}>
-          → 프로토타입 홈으로 이동
-        </a>
+      <p style={{ color: '#666', fontSize: 13, marginBottom: 20 }}>
+        Railway endpoint 실호출 검증용. 디자인 X, 기능만.
       </p>
 
+      {/* 입력 */}
       <div style={{ display: 'grid', gap: 8, marginBottom: 12 }}>
         <label style={lbl}>
           query (검색어) *
@@ -134,15 +110,11 @@ export default function TestSearchPage() {
         </label>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <button onClick={openStyledResult} style={btnPrimary}>
-          검색 (스타일 UI)
-        </button>
-        <button onClick={handleRawApiTest} disabled={loading} style={btnSecondary}>
-          {loading ? '호출 중…' : 'Raw API만 테스트'}
-        </button>
-      </div>
+      <button onClick={handleSearch} disabled={loading} style={btn}>
+        {loading ? '검색 중…' : '검색'}
+      </button>
 
+      {/* 상태별 출력 */}
       <div style={{ marginTop: 24 }}>
         {loading && <p style={{ color: '#0070E0' }}>⏳ 백엔드 호출 중…</p>}
 
@@ -154,31 +126,15 @@ export default function TestSearchPage() {
 
         {result && (
           <>
+            {/* answer */}
             <section style={{ marginBottom: 24 }}>
-              <h2 style={h2}>📝 요약 (summary)</h2>
+              <h2 style={h2}>📝 요약 (answer)</h2>
               <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, fontSize: 14 }}>
-                {summaryText || '(summary 비어있음)'}
+                {result.answer || '(answer 비어있음)'}
               </div>
             </section>
 
-            {Array.isArray(result.youtube_videos) && result.youtube_videos.length > 0 && (
-              <section style={{ marginBottom: 24 }}>
-                <h2 style={h2}>🎬 유튜브 ({result.youtube_videos.length}건)</h2>
-                <ul style={{ listStyle: 'none', padding: 0, display: 'grid', gap: 8 }}>
-                  {result.youtube_videos.map((v, i) => (
-                    <li key={i} style={card}>
-                      <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>{v.title || '(제목 없음)'}</p>
-                      {v.url && (
-                        <a href={v.url} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', fontSize: 13 }}>
-                          {v.url}
-                        </a>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
+            {/* sources */}
             <section>
               <h2 style={h2}>🔗 출처 ({safeSources.length}건)</h2>
               {safeSources.length === 0 ? (
@@ -191,23 +147,18 @@ export default function TestSearchPage() {
                     const url = cleanUrl(s.link);
                     return (
                       <li key={i} style={card}>
-                        {s.title && (
-                          <p style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 600 }}>{s.title}</p>
-                        )}
-                        {(s.channel || s.date) && (
-                          <p style={{ margin: '0 0 6px', fontSize: 12, color: '#666' }}>
-                            {[s.channel, s.date].filter(Boolean).join(' · ')}
-                          </p>
-                        )}
                         <a
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={() => trackSourceClick(url)}
-                          style={{ color: '#2563eb', fontSize: 13, wordBreak: 'break-all', textDecoration: 'underline' }}
+                          style={{ color: '#0070E0', fontSize: 13, wordBreak: 'break-all' }}
                         >
                           {url}
                         </a>
+                        <p style={{ margin: '6px 0 0', fontSize: 13, color: '#333', whiteSpace: 'pre-wrap' }}>
+                          {s.text}
+                        </p>
                       </li>
                     );
                   })}
@@ -217,6 +168,7 @@ export default function TestSearchPage() {
           </>
         )}
 
+        {/* 디버깅용 원본 응답 (접어둠) */}
         {rawJson && (
           <details style={{ marginTop: 24 }}>
             <summary style={{ cursor: 'pointer', fontSize: 12, color: '#999' }}>🐛 원본 응답 JSON 보기</summary>
@@ -230,9 +182,9 @@ export default function TestSearchPage() {
   );
 }
 
+// ── 인라인 스타일 (테스트용이라 CSS 파일 안 만듦) ──
 const lbl: React.CSSProperties = { display: 'grid', gap: 4, fontSize: 12, color: '#555' };
 const inp: React.CSSProperties = { padding: '8px 10px', border: '1px solid #ccc', borderRadius: 6, fontSize: 14 };
-const btnPrimary: React.CSSProperties = { padding: '10px 20px', background: '#0070E0', color: '#fff', border: 'none', borderRadius: 6, fontSize: 14, cursor: 'pointer' };
-const btnSecondary: React.CSSProperties = { padding: '10px 20px', background: '#fff', color: '#333', border: '1px solid #ccc', borderRadius: 6, fontSize: 14, cursor: 'pointer' };
+const btn: React.CSSProperties = { padding: '10px 20px', background: '#0070E0', color: '#fff', border: 'none', borderRadius: 6, fontSize: 14, cursor: 'pointer' };
 const h2: React.CSSProperties = { fontSize: 15, marginBottom: 8, borderBottom: '1px solid #eee', paddingBottom: 4 };
 const card: React.CSSProperties = { border: '1px solid #eee', borderRadius: 8, padding: 12, background: '#fafafa' };

@@ -149,9 +149,6 @@
   flex-shrink: 0;
   color: #9aa0a6;
 }
-.searchBarLocked {
-  opacity: 0.92;
-}
 .searchInput {
   flex: 1 1 auto;
   min-width: 0;
@@ -161,10 +158,6 @@
   color: #1f2937;
   background: transparent;
   font-family: inherit;
-}
-.searchInput:disabled {
-  cursor: default;
-  color: #9aa0a6;
 }
 .searchInput::placeholder { color: #9aa0a6; }
 .submitBtn {
