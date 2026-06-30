@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './chat.module.css';
 import type { Source } from './types';
-import { formatSourceChannel } from './sourceUtils';
+import { formatSourceChannel, displaySourceTitle } from './sourceUtils';
 
 interface Props {
   sources: Source[];
@@ -93,24 +93,29 @@ export default function SourceAccordion({
                 </div>
 
                 <p className={styles.sourceRowTitle}>
-                  {s.title}
+                  {displaySourceTitle(s) || '제목 없음'}
                 </p>
 
-                {s.link ? (
-                  <a
-                    className={styles.sourceRowLink}
-                    href={s.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => onSourceClick(s.link)}
-                  >
-                    원문 보기 →
-                  </a>
-                ) : (
-                  <span className={styles.sourceRowLinkDisabled}>
-                    링크 없음
-                  </span>
-                )}
+                <div className={styles.sourceRowActions}>
+                  {s.link ? (
+                    <a
+                      className={styles.sourceRowLink}
+                      href={s.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => onSourceClick(s.link)}
+                    >
+                      원문 보기 →
+                    </a>
+                  ) : (
+                    <span className={styles.sourceRowLinkDisabled}>
+                      링크 없음
+                    </span>
+                  )}
+                  {s.is_ad && (
+                    <span className={styles.refBadgeLabel}>협찬</span>
+                  )}
+                </div>
               </div>
             ))}
           </div>

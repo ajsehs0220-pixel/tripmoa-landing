@@ -124,7 +124,7 @@
 /* ── 하단 고정 검색바 ── */
 .searchBarWrap {
   position: fixed;
-  bottom: 60;
+  bottom: 60px;
   left: 0;
   right: 0;
   max-width: 767px;

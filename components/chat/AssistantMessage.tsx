@@ -6,6 +6,7 @@ import AIAnalysisCard from './AIAnalysisCard';
 import TravelSection from './TravelSection';
 import MapSection from './MapSection';
 import SourceAccordion from './SourceAccordion';
+import YoutubeVideos from './YoutubeVideos';
 import FollowUpChips from './FollowUpChips';
 import RenderContent from './RenderContent';
 import TypewriterText from './TypewriterText';
@@ -13,13 +14,13 @@ import { SourceLookupProvider } from './SourceLookupContext';
 import MessageToolbarBar from './MessageToolbarBar';
 import { IconCopy, IconThumbUp, IconShare } from './MessageToolbar';
 import { formatAnswerForCopy } from './formatAnswerForCopy';
+import { isDaySectionTitle } from './placeUtils';
 import type { SearchResponse, Place } from './types';
 
 interface Props {
   result: SearchResponse;
   query: string;
   city?: string;
-  genTime: number;
   places: Place[];
   dayList: number[];
   activeDay: number | null;
@@ -37,7 +38,6 @@ export default function AssistantMessage({
   result,
   query,
   city,
-  genTime,
   places,
   dayList,
   activeDay,
@@ -50,14 +50,22 @@ export default function AssistantMessage({
 }: Props) {
   const [liked, setLiked] = useState(false);
   const sections = Array.isArray(result.sections) ? result.sections : [];
+  const daySectionCount = sections.filter((s) => isDaySectionTitle(s.title)).length;
   const sources = Array.isArray(result.sources) ? result.sources : [];
-  const warnings = Array.isArray(result.warning) ? result.warning : [];
   const followUps = Array.isArray(result.follow_up) ? result.follow_up : [];
+  const youtubeVideos = Array.isArray(result.youtube_videos) ? result.youtube_videos : [];
 
   // skipIntro면 처음부터 전부 노출 상태로 시작 (히스토리 복원용)
   const [summaryDone, setSummaryDone] = useState(skipIntro);
   const [visibleSectionCount, setVisibleSectionCount] = useState(skipIntro ? sections.length : 0);
   const [showTail, setShowTail] = useState(skipIntro); // 지도/소스/팔로우업/툴바
+
+  // summary 없으면 타이핑 단계 생략
+  useEffect(() => {
+    if (!skipIntro && !result.summary?.trim()) {
+      setSummaryDone(true);
+    }
+  }, [skipIntro, result.summary]);
 
   // summary가 끝나면 section을 하나씩 순차 노출
   useEffect(() => {
@@ -123,29 +131,17 @@ export default function AssistantMessage({
           {result.summary && (
             <p className={styles.summaryText}>
               {skipIntro ? (
-                <RenderContent content={result.summary} />
+                <RenderContent content={result.summary} onRefClick={onRefClick} hideRefs />
               ) : (
                 <TypewriterText
                   content={result.summary}
                   onRefClick={onRefClick}
+                  hideRefs
                   onDone={() => setSummaryDone(true)}
                   speed={Math.max(18, Math.min(45, 900 / Math.max(result.summary.length, 1)))}
                 />
               )}
             </p>
-          )}
-
-          {warnings.length > 0 && (summaryDone || skipIntro) && (
-            <div className={styles.inlineWarnings} role="note">
-              {warnings.map((w, i) => (
-                <p key={i} className={styles.inlineWarning}>
-                  <span className={styles.inlineWarningIcon} aria-hidden="true">⚠️</span>
-                  <span className={styles.inlineWarningBody}>
-                    <RenderContent content={w} />
-                  </span>
-                </p>
-              ))}
-            </div>
           )}
 
           {(summaryDone || skipIntro) && sections.length === 0 && (
@@ -163,6 +159,7 @@ export default function AssistantMessage({
                   places={places}
                   onRefClick={onRefClick}
                   index={i}
+                  daySectionCount={daySectionCount}
                 />
               ))}
             </div>
@@ -176,7 +173,11 @@ export default function AssistantMessage({
                 dayList={dayList}
                 activeDay={activeDay}
                 onDayChange={setActiveDay}
-                query={query}
+              />
+
+              <YoutubeVideos
+                videos={youtubeVideos}
+                onVideoClick={onSourceClick}
               />
 
               <SourceAccordion

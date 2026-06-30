@@ -8,14 +8,14 @@ import UserMessage from '@/components/chat/UserMessage';
 import LoadingMessage from '@/components/chat/LoadingMessage';
 import AssistantMessage from '@/components/chat/AssistantMessage';
 import type { SearchResponse, Place } from '@/components/chat/types';
+import { inferCityFromQuery } from '@/components/chat/mapLabelUtils';
 
 type ChatMessage = {
   id: string;
   query: string;
   result: SearchResponse | null;
-  genTime: number;
   error: string | null;
-  status: 'loading' | 'done' | 'error';
+  status: 'loading' | 'done' | 'error' | 'cancelled';
   /** sessionStorage에서 복원된 메시지인지 (타이핑 효과 생략용) */
   restored?: boolean;
 };
@@ -73,7 +73,6 @@ function MessageTurn({
           result={msg.result}
           query={msg.query}
           city={city}
-          genTime={msg.genTime}
           places={places}
           dayList={dayList}
           activeDay={activeDay}
@@ -90,22 +89,30 @@ function MessageTurn({
 }
 
 function chatStorageKey(city: string, seedQuery: string) {
-  return `tripmoa-chat:v2:${city}:${seedQuery}`;
+  return `tripmoa-chat:v3:${city}:${seedQuery}`;
 }
 
 function ResultInner() {
   const router = useRouter();
   const params = useSearchParams();
   const initialQuery = params.get('q') ?? '';
-  const city = params.get('city') ?? '';
+  const urlCity = params.get('city')?.trim() ?? '';
+
+  const resolveCityForQuery = useCallback(
+    (q: string) => urlCity || inferCityFromQuery(q) || '',
+    [urlCity]
+  );
+
+  const storageCity = resolveCityForQuery(initialQuery);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const initialSearchDone = useRef(false);
   const loadingRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const storageKey = chatStorageKey(city, initialQuery);
+  const storageKey = chatStorageKey(storageCity, initialQuery);
 
   const runSearch = useCallback(
     async (q: string) => {
@@ -115,21 +122,28 @@ function ResultInner() {
       loadingRef.current = true;
       setLoading(true);
 
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       const msgId = crypto.randomUUID();
       setMessages((prev) => [
         ...prev,
-        { id: msgId, query: trimmed, result: null, genTime: 0, error: null, status: 'loading' },
+        { id: msgId, query: trimmed, result: null, error: null, status: 'loading' },
       ]);
 
-      const start = Date.now();
-
       try {
-        const data = await search({ query: trimmed, city, match_count: 20 });
+        const effectiveCity = resolveCityForQuery(trimmed);
+        const data = await search({
+          query: trimmed,
+          city: effectiveCity || undefined,
+          match_count: 20,
+          signal: controller.signal,
+        });
         // places 배열에 null이 섞여 들어올 수 있어 타입을 맞추기 위해 제거
         const cleanedResult: SearchResponse = {
           ...data,
           places: Array.isArray(data.places)
-            ? data.places.filter((p): p is NonNullable<typeof p> => p !== null)
+            ? data.places.filter((p: Place | null): p is Place => p != null)
             : data.places,
         };
         setMessages((prev) =>
@@ -138,13 +152,20 @@ function ResultInner() {
               ? {
                   ...m,
                   result: cleanedResult,
-                  genTime: (Date.now() - start) / 1000,
                   status: 'done' as const,
                 }
               : m
           )
         );
       } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === msgId ? { ...m, status: 'cancelled' as const, error: null } : m
+            )
+          );
+          return;
+        }
         setMessages((prev) =>
           prev.map((m) =>
             m.id === msgId
@@ -157,11 +178,14 @@ function ResultInner() {
           )
         );
       } finally {
+        if (abortControllerRef.current === controller) {
+          abortControllerRef.current = null;
+        }
         loadingRef.current = false;
         setLoading(false);
       }
     },
-    [city]
+    [resolveCityForQuery]
   );
 
   // URL 첫 진입: sessionStorage 복원 또는 최초 검색 (HMR/새로고침 시 대화 유지)
@@ -223,9 +247,11 @@ function ResultInner() {
         highlight(el);
         return;
       }
-      if (attempt < 8) {
-        setTimeout(() => tryScroll(attempt + 1), 80);
+      if (attempt < 12) {
+        setTimeout(() => tryScroll(attempt + 1), 100);
+        return;
       }
+      document.getElementById('source-list')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     };
 
     setTimeout(() => tryScroll(), 50);
@@ -236,6 +262,10 @@ function ResultInner() {
     trackFollowUpClick(text);
     setInputValue('');
     runSearch(text);
+  };
+
+  const handleStopSearch = () => {
+    abortControllerRef.current?.abort();
   };
 
   const handleNewSearch = () => {
@@ -267,7 +297,7 @@ function ResultInner() {
           <MessageTurn
             key={msg.id}
             msg={msg}
-            city={city}
+            city={resolveCityForQuery(msg.query)}
             onRefClick={handleRefClick}
             onFollowUpClick={handleFollowUpClick}
             onSourceClick={trackSourceClick}
@@ -301,14 +331,21 @@ function ResultInner() {
             enterKeyHint="search"
           />
           <button
-            className={styles.submitBtn}
-            onClick={handleNewSearch}
-            disabled={!inputValue.trim() || loading}
-            aria-label="검색"
+            type="button"
+            className={loading ? styles.stopBtn : styles.submitBtn}
+            onClick={loading ? handleStopSearch : handleNewSearch}
+            disabled={loading ? false : !inputValue.trim()}
+            aria-label={loading ? '검색 중지' : '검색'}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-              <path d="M12 2.5l1.9 5.4a3 3 0 001.8 1.8l5.4 1.9-5.4 1.9a3 3 0 00-1.8 1.8L12 20.7l-1.9-5.4a3 3 0 00-1.8-1.8L2.9 11.6l5.4-1.9a3 3 0 001.8-1.8L12 2.5z" />
-            </svg>
+            {loading ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+                <rect x="5" y="5" width="14" height="14" rx="2" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+                <path d="M12 2.5l1.9 5.4a3 3 0 001.8 1.8l5.4 1.9-5.4 1.9a3 3 0 00-1.8 1.8L12 20.7l-1.9-5.4a3 3 0 00-1.8-1.8L2.9 11.6l5.4-1.9a3 3 0 001.8-1.8L12 2.5z" />
+              </svg>
+            )}
           </button>
         </div>
       </div>

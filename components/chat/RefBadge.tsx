@@ -1,139 +1,122 @@
 'use client';
 
-import { useState, useRef, useEffect, type CSSProperties } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './chat.module.css';
 import { useSourceLookup } from './SourceLookupContext';
-import {
-  formatSourceChannel,
-  truncateSourceTitle,
-} from './sourceUtils';
+import { formatSourceChannel, truncateSourceTitle, displaySourceTitle } from './sourceUtils';
+
+/** Link emoji via Unicode escape (avoids merge/encoding corruption) */
+const LINK_ICON = '\u{1F517}';
 
 interface Props {
   id: number;
+  onClick: () => void;
 }
 
-const TOOLTIP_MAX_WIDTH = 280;
-const EDGE_PADDING = 16;
-
-export default function RefBadge({ id }: Props) {
+export default function RefBadge({ id, onClick }: Props) {
   const source = useSourceLookup(id);
-
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [tooltipStyle, setTooltipStyle] = useState<CSSProperties>({});
-
+  const [hovered, setHovered] = useState(false);
+  const [pinned, setPinned] = useState(false);
   const wrapRef = useRef<HTMLSpanElement>(null);
-  const badgeRef = useRef<HTMLButtonElement>(null);
 
-  const tooltipVisible = showTooltip && !!source;
-
-  useEffect(() => {
-    if (!tooltipVisible || !badgeRef.current) return;
-
-    const badgeRect = badgeRef.current.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-
-    const badgeCenter = badgeRect.left + badgeRect.width / 2;
-    const halfTooltip = TOOLTIP_MAX_WIDTH / 2;
-
-    const idealLeft = badgeCenter - halfTooltip;
-    const idealRight = badgeCenter + halfTooltip;
-
-    let style: CSSProperties = {
-      left: '50%',
-      transform: 'translateX(-50%)',
-    };
-
-    if (idealLeft < EDGE_PADDING) {
-      const shift = EDGE_PADDING - idealLeft;
-      style = {
-        left: `calc(50% + ${shift}px)`,
-        transform: 'translateX(-50%)',
-      };
-    } else if (idealRight > viewportWidth - EDGE_PADDING) {
-      const shift = idealRight - (viewportWidth - EDGE_PADDING);
-      style = {
-        left: `calc(50% - ${shift}px)`,
-        transform: 'translateX(-50%)',
-      };
-    }
-
-    setTooltipStyle(style);
-  }, [tooltipVisible]);
+  const showTooltip = pinned || hovered;
 
   useEffect(() => {
-    if (!showTooltip) return;
-
-    const handleOutside = (e: MouseEvent | TouchEvent) => {
-      if (
-        wrapRef.current &&
-        !wrapRef.current.contains(e.target as Node)
-      ) {
-        setShowTooltip(false);
+    if (!pinned) return;
+    const close = (e: Event) => {
+      if (!wrapRef.current?.contains(e.target as Node)) {
+        setPinned(false);
       }
     };
-
-    document.addEventListener('mousedown', handleOutside);
-    document.addEventListener('touchstart', handleOutside);
-
+    document.addEventListener('touchstart', close, { passive: true });
+    document.addEventListener('click', close);
     return () => {
-      document.removeEventListener('mousedown', handleOutside);
-      document.removeEventListener('touchstart', handleOutside);
+      document.removeEventListener('touchstart', close);
+      document.removeEventListener('click', close);
     };
-  }, [showTooltip]);
+  }, [pinned]);
+
+  const handleBadgeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (source) {
+      setPinned((p) => !p);
+      return;
+    }
+    onClick();
+  };
+
+  const handleTooltipClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setPinned(false);
+    setHovered(false);
+    onClick();
+  };
 
   return (
     <span className={styles.refBadgeWrap} ref={wrapRef}>
       <button
-        ref={badgeRef}
         type="button"
         className={styles.refBadge}
-        onClick={() => setShowTooltip((v) => !v)}
+        onClick={handleBadgeClick}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onFocus={() => setHovered(true)}
+        onBlur={() => setHovered(false)}
         aria-label={
           source
-            ? `${formatSourceChannel(source.channel)}: ${source.title}`
-            : `출처 ${id}번`
+            ? `${formatSourceChannel(source.channel)}: ${displaySourceTitle(source)}`
+            : `\uCD9C\uCC98 ${id}\uBC88 \uBCF4\uAE30`
         }
-        aria-expanded={tooltipVisible}
-        aria-describedby={
-          tooltipVisible ? `ref-tooltip-${id}` : undefined
-        }
+        aria-expanded={pinned}
+        aria-describedby={showTooltip ? `ref-tooltip-${id}` : undefined}
       >
-        🔗{id}
+        {LINK_ICON}
+        {id}
       </button>
 
-      {source && (
+      {showTooltip && (
         <span
           id={`ref-tooltip-${id}`}
-          className={`${styles.refTooltip} ${
-            tooltipVisible ? styles.refTooltipVisible : ''
-          }`}
-          style={tooltipVisible ? tooltipStyle : undefined}
-          role="tooltip"
+          role="button"
+          tabIndex={pinned ? 0 : -1}
+          className={`${styles.refTooltip} ${styles.refTooltipVisible}`}
+          onClick={handleTooltipClick}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setPinned(false);
+              setHovered(false);
+              onClick();
+            }
+          }}
         >
-          <span className={styles.refTooltipChannel}>
-            {formatSourceChannel(source.channel)}
-          </span>
-
-          <span className={styles.refTooltipTitle}>
-            {truncateSourceTitle(source.title)}
-          </span>
-
-          {source.date && (
-            <span className={styles.refTooltipDate}>
-              {source.date}
+          {source ? (
+            <>
+              <span className={styles.refTooltipChannel}>
+                {formatSourceChannel(source.channel)}
+              </span>
+              <span className={styles.refTooltipTitle}>
+                {truncateSourceTitle(displaySourceTitle(source))}
+              </span>
+              {(source.date || source.is_ad) && (
+                <span className={styles.refTooltipMeta}>
+                  {source.date && (
+                    <span className={styles.refTooltipDate}>{source.date}</span>
+                  )}
+                  {source.is_ad && (
+                    <span className={styles.refBadgeLabel}>{'\uD611\uCC30'}</span>
+                  )}
+                </span>
+              )}
+            </>
+          ) : (
+            <span className={styles.refTooltipTitle}>
+              {'\uCD9C\uCC98 \uC815\uBCF4 '}
+              {id}
+              {'\uBC88'}
             </span>
-          )}
-
-          {source.link && (
-            <a
-              className={styles.refTooltipLink}
-              href={source.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-            >
-              원문 보기 →
-            </a>
           )}
         </span>
       )}
