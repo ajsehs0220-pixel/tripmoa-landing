@@ -80,7 +80,7 @@ export default function TypewriterText({ content, onRefClick, onDone, speed = 22
     <>
       {list.slice(0, tokenIndex).map((tok, i) => {
         if (tok.type === 'bold') return <strong key={i}>{tok.value}</strong>;
-        if (tok.type === 'ref') return <RefBadge key={i} id={tok.id} />;
+        if (tok.type === 'ref') return <RefBadge key={i} id={tok.id} onClick={() => onRefClick(tok.id)} />;
         return <span key={i}>{tok.value}</span>;
       })}
       {tokenIndex < list.length && list[tokenIndex].type === 'text' && (
