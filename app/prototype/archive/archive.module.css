@@ -2,7 +2,7 @@
 
 .screen {
   min-height: 100dvh;
-  background: #f7f8fa;
+  background: #fff;
   max-width: 767px;
   margin: 0 auto;
   padding: 0 20px;
@@ -297,7 +297,7 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
   cursor: pointer;
   font-family: inherit;
-  border: none;
+  border: 0.5px solid #f0f1f3;
   overflow: hidden;
 }
 .folderIconImg {

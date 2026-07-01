@@ -5,8 +5,8 @@ import Image from 'next/image';
 import styles from './chat.module.css';
 
 const STEPS = [
-  { text: '모아가 발로 뛰며 찾는 중이에요', duration: 3000 },
-  { text: '진짜 후기만 골라내는 중이에요', duration: 4000 },
+  { text: '모아가 발로 뛰며 찾는 중이에요', duration: 5000 },
+  { text: '진짜 후기만 골라내는 중이에요', duration: 5000 },
   { text: '모아가 열심히 읽고 있어요', duration: 5000 },
   { text: '장소 정보를 지도에 꽂는 중이에요', duration: 999999 },
 ];

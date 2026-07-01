@@ -98,7 +98,7 @@
 html,
 body {
   min-height: 100vh;
-  background: var(--surface);
+  background: #fff;
   /* Pretendard 미설치 시 시스템 한글 폰트로 자동 대체 */
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont,
     "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;

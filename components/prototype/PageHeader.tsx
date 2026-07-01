@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import styles from './PageHeader.module.css';
 
 type PageHeaderProps = {
@@ -9,6 +10,8 @@ type PageHeaderProps = {
 };
 
 export default function PageHeader({ onBack, onClose, backLabel = '이전' }: PageHeaderProps) {
+  const router = useRouter();
+
   return (
     <div className={styles.header}>
       <div className={styles.headerLeft}>
@@ -19,7 +22,10 @@ export default function PageHeader({ onBack, onClose, backLabel = '이전' }: Pa
             </svg>
           </button>
         )}
-        <span className={styles.headerWordmark}>
+        <span
+          className={styles.headerWordmark}
+          onClick={() => router.push('/prototype/home')}
+        >
           <span className={styles.wTrip}>Trip</span>
           <span className={styles.wMoa}> MOA</span>
         </span>

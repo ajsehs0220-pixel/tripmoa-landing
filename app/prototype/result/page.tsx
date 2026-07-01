@@ -9,6 +9,7 @@ import LoadingMessage from '@/components/chat/LoadingMessage';
 import AssistantMessage from '@/components/chat/AssistantMessage';
 import type { SearchResponse, Place } from '@/components/chat/types';
 import { inferCityFromQuery } from '@/components/chat/mapLabelUtils';
+import BottomNav from '@/components/prototype/BottomNav';
 
 type ChatMessage = {
   id: string;
@@ -279,14 +280,18 @@ function ResultInner() {
       <div className={styles.header}>
         <button
           className={styles.backBtn}
-          onClick={() => router.push('/prototype/home')}
-          aria-label="홈으로"
+          onClick={() => router.back()}
+          aria-label="뒤로가기"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
-        <span className={styles.headerWordmark}>
+        <span
+          className={styles.headerWordmark}
+          onClick={() => router.push('/prototype/home')}
+          aria-label="홈으로"
+        >
           <span className={styles.wTrip}>Trip</span>
           <span className={styles.wMoa}> MOA</span>
         </span>
@@ -351,6 +356,7 @@ function ResultInner() {
       </div>
 
       <div className={styles.bottomPad} />
+      <BottomNav />
     </main>
   );
 }
@@ -361,6 +367,7 @@ export default function ResultPage() {
       fallback={
         <main className={styles.screen}>
           <div className={styles.suspenseFallback}>불러오는 중…</div>
+          <BottomNav />
         </main>
       }
     >

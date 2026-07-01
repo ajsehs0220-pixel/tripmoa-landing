@@ -16,6 +16,7 @@
   font-size: 18px;
   font-weight: 400;
   letter-spacing: -0.3px;
+  cursor: pointer;
 }
 .wTrip { color: #5B5353; }
 .wMoa { color: #64D4F5; }

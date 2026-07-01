@@ -22,8 +22,6 @@ const CATEGORY_COUNTS = [
 
 const MY_FOLDERS = [
   { id: 'f1', name: '7월휴가', icon: '/file.svg' },
-  { id: 'f2', name: '오사카\n액티비티', icon: '/File-1.svg' },
-  { id: 'f3', name: '맛집 캡쳐', icon: '/File-2.svg' },
 ];
 
 // ── 아이콘 ────────────────────────────────────────────────────
