@@ -233,8 +233,8 @@ function ResultInner() {
 
     const highlight = (el: HTMLElement) => {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      el.style.background = '#fff8e1';
-      el.style.boxShadow = '0 0 0 2px #fbbf24';
+      el.style.background = '#f0f9ff';
+      el.style.boxShadow = '0 0 0 0.3px #64d4f5';
       setTimeout(() => {
         el.style.background = '';
         el.style.boxShadow = '';

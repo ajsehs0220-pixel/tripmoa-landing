@@ -8,7 +8,6 @@ import { formatSourceChannel, displaySourceTitle } from './sourceUtils';
 interface Props {
   sources: Source[];
   onSourceClick: (url: string) => void;
-  /** 여러 턴 채팅 시 출처 id·아코디언 열기 구분용 */
   messageId?: string;
 }
 
@@ -24,7 +23,11 @@ export default function SourceAccordion({
     const handler = (e: Event) => {
       const detail = (e as CustomEvent<{ messageId?: string }>).detail;
 
-      if (detail?.messageId && messageId && detail.messageId !== messageId) {
+      if (
+        detail?.messageId &&
+        messageId &&
+        detail.messageId !== messageId
+      ) {
         return;
       }
 
@@ -94,6 +97,18 @@ export default function SourceAccordion({
 
                 <p className={styles.sourceRowTitle}>
                   {displaySourceTitle(s) || '제목 없음'}
+
+                  {s.is_ad && (
+                    <span
+                      className={styles.refBadgeLabel}
+                      style={{
+                        marginLeft: 6,
+                        verticalAlign: 'middle',
+                      }}
+                    >
+                      협찬
+                    </span>
+                  )}
                 </p>
 
                 <div className={styles.sourceRowActions}>
@@ -111,9 +126,6 @@ export default function SourceAccordion({
                     <span className={styles.sourceRowLinkDisabled}>
                       링크 없음
                     </span>
-                  )}
-                  {s.is_ad && (
-                    <span className={styles.refBadgeLabel}>협찬</span>
                   )}
                 </div>
               </div>

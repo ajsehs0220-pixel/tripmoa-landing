@@ -6,12 +6,12 @@ import BottomNav from '@/components/prototype/BottomNav';
 import { useFavorites } from '@/components/prototype/FavoritesContext';
 
 const BADGE_STYLES: Record<string, { bg: string; color: string }> = {
-  'SNS스팟':   { bg: '#EFFBFE', color: '#6E6D6D' },
-  '맛집':      { bg: '#EFFBFE', color: '#6E6D6D' },
-  '찜한목록':  { bg: '#EFFBFE', color: '#6E6D6D' },
-  '갤러리':    { bg: '#EFFBFE', color: '#6E6D6D' },
-  '추천일정':  { bg: '#EFFBFE', color: '#6E6D6D' },
-  '숙소':      { bg: '#EFFBFE', color: '#6E6D6D' },
+  'SNS스팟':   { bg: '#eafaff', color: '#0c9ed1' },
+  '맛집':      { bg: '#eafaff', color: '#0c9ed1' },
+  '찜한목록':  { bg: '#eafaff', color: '#0c9ed1' },
+  '갤러리':    { bg: '#eafaff', color: '#0c9ed1' },
+  '추천일정':  { bg: '#eafaff', color: '#0c9ed1' },
+  '숙소':      { bg: '#eafaff', color: '#0c9ed1' },
 };
 
 export default function FavoritesPage() {
@@ -39,7 +39,7 @@ export default function FavoritesPage() {
       ) : (
         <div className={styles.list}>
           {favorites.map((item) => {
-            const badge = BADGE_STYLES[item.category] ?? { bg: '#f0f1f3', color: '#6b7280' };
+            const badge = BADGE_STYLES[item.category] ?? { bg: '#eafaff', color: '#0c9ed1' };
             return (
               <div
                 key={item.id}
@@ -69,7 +69,7 @@ export default function FavoritesPage() {
                     removeFavorite(item.id);
                   }}
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#64D4F5" stroke="#64D4F5" strokeWidth="1.5">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#f43f5e" stroke="#f43f5e" strokeWidth="1.5">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
                 </button>

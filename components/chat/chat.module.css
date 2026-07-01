@@ -515,6 +515,9 @@
 .contentLineBlock:last-child {
   margin-bottom: 0;
 }
+.checkLineBlock:first-child {
+  margin-top: 0;
+}
 .contentLineSpacer {
   height: 8px;
 }
@@ -969,12 +972,12 @@
 .dayTabs::-webkit-scrollbar { display: none; }
 .dayTab {
   flex-shrink: 0;
-  background: rgba(20,20,22,.88);     /* ← 흰 배경 → 검정 반투명 */
+  background: rgba(255,255,255,.92);    
   border: none;
   border-radius: var(--tm-r-full);
   padding: 7px 16px;
   font-size: 12.5px; font-weight: 600;
-  color: #fff;                          /* ← 텍스트 흰색 */
+  color: var(--tm-ink-700, #374151);                      
   cursor: pointer;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -983,9 +986,9 @@
   font-family: inherit; white-space: nowrap;
 }
 .dayTabActive {
-  background: #000;
-  color: white;
-  box-shadow: 0 3px 12px rgba(0,0,0,.4);
+  background: #1f2329;               
+  color: #fff;                        
+  box-shadow: 0 3px 12px rgba(0,0,0,.32);
 }
 
 /* Place cards strip — below the map */
@@ -1420,6 +1423,19 @@
   min-width: 0;
   word-break: keep-all;
 }
+.sourceAdLabel {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #b45309;              /* 앰버 계열 — 주의 톤이지만 에러는 아님 */
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 4px;
+  padding: 1px 5px;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.02em;
+}
 .sourceRowLink {
   font-size: var(--tm-t-xs, 12px);
   font-weight: 600;
@@ -1553,4 +1569,18 @@
   font-size: var(--tm-t-base, 15px);
   padding: 20px 0;
   line-height: var(--tm-lh-normal, 1.65);
+}
+/* ─────────────────────────────
+   Loading — centered vertical layout
+───────────────────────────── */
+.loadingRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 0;
+}
+.loadingTextWrap {
+  flex: 1;
+  min-width: 0;
 }

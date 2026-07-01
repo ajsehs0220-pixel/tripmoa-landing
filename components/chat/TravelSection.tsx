@@ -60,6 +60,7 @@ export default function TravelSection({ section, places, onRefClick, index = 0, 
     sectionTitle: section.title,
     variant: isConclusion ? ('conclusion' as const) : isDaySection ? ('itinerary' as const) : ('default' as const),
     boldPlaceNames: isSituationRec,
+    hideRefs: isTravelTip,
   };
 
   if (hasTable) {

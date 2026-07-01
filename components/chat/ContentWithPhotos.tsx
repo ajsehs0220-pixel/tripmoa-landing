@@ -27,8 +27,8 @@ interface Props {
   onRefClick: (id: number) => void;
   sectionTitle?: string;
   variant?: 'default' | 'conclusion' | 'itinerary';
-  /** 상황별 추천 — **장소명** bold */
   boldPlaceNames?: boolean;
+  hideRefs?: boolean;   /* ← 오타 수정 */
 }
 
 function descriptionToHighlights(description: string | undefined, placeName: string): string[] {
@@ -39,20 +39,33 @@ function ConclusionContent({
   content,
   onRefClick,
   boldPlaceNames = false,
+  hideRefs = false,
 }: {
   content: string;
   onRefClick: (id: number) => void;
   boldPlaceNames?: boolean;
+  hideRefs?: boolean;
 }) {
+  const CHECK_RE = /^[✔✅☑]/u;
+
+  // ← 체크 기호 앞에 강제 줄바꿈 삽입
+  const normalized = content.replace(/([^\n])([✔✅☑])/gu, '$1\n$2');
+
   return (
     <div className={`${styles.contentWithPhotos} ${styles.contentConclusion}`}>
-      {content.split('\n').map((line, i) => {
+      {normalized.split('\n').map((line, i) => {
         const trimmed = line.trim();
         if (!trimmed) {
           return <div key={i} className={styles.contentLineSpacer} aria-hidden="true" />;
         }
+
+        const isCheck = CHECK_RE.test(trimmed);
+
         return (
-          <div key={i} className={styles.contentLineBlock}>
+          <div
+            key={i}
+            className={`${styles.contentLineBlock} ${isCheck ? styles.checkLineBlock : ''}`}
+          >
             <p
               className={
                 isOneLineConclusionLine(trimmed)
@@ -64,6 +77,7 @@ function ConclusionContent({
                 content={trimmed}
                 onRefClick={onRefClick}
                 plainBold={!boldPlaceNames}
+                hideRefs={hideRefs}
               />
             </p>
           </div>
@@ -81,6 +95,7 @@ export default function ContentWithPhotos({
   sectionTitle,
   variant = 'default',
   boldPlaceNames = false,
+  hideRefs = false,   /* ← destructure 추가 */
 }: Props) {
   if (!content) return null;
 
@@ -101,6 +116,7 @@ export default function ContentWithPhotos({
         content={content}
         onRefClick={onRefClick}
         boldPlaceNames={boldPlaceNames}
+        hideRefs={hideRefs}
       />
     );
   }
@@ -111,7 +127,6 @@ export default function ContentWithPhotos({
       variant === 'itinerary' ? computeItineraryPhotoVisibility(items, places) : null,
     [variant, items, places]
   );
-  /** 섹션 내 설명·warning — 동일 ref는 첫 표기만 */
   const descriptionDedupeRefs = useMemo(() => new Set<number>(), [content]);
 
   return (
