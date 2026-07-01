@@ -59,12 +59,16 @@ export default function MapSection({
     if (idx !== null) scrollCardIntoView(idx);
   }, [scrollCardIntoView]);
 
+  // 카드 클릭: 살짝 잘려서 보이는(peek) 카드를 클릭해도 중앙으로 스크롤되도록
+  // selectedIdx와 무관하게 항상 scrollCardIntoView를 호출한다.
+  // 이미 활성화된 카드를 다시 클릭한 경우엔 스크롤이 사실상 no-op이라 자연스럽다.
   const handleCardClick = useCallback((place: Place, idx: number) => {
     setSelectedIdx(idx);
+    scrollCardIntoView(idx);
     if (mapInstanceRef.current) {
       mapInstanceRef.current.panTo({ lat: place.lat, lng: place.lng });
     }
-  }, []);
+  }, [scrollCardIntoView]);
 
   const handleNameTabClick = useCallback((idx: number) => {
     const place = visiblePlaces[idx];

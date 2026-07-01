@@ -999,14 +999,18 @@
   right: 14px;
   z-index: 10;
 }
+
+/* Peek carousel: 카드가 화면을 꽉 채우지 않고 옆 카드 머리가 살짝 보이도록
+   width를 줄이고, 마우스로 클릭해서 넘어갈 수 있게 center 스냅으로 변경.
+   (스크롤 로직은 MapSection.tsx의 scrollCardIntoView가 카드를 중앙으로 맞춤) */
 .placeStrip {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding: 14px 0 4px;
+  padding: 14px 6px 4px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
 }
 .placeStrip::-webkit-scrollbar { display: none; }
 
@@ -1048,11 +1052,11 @@
 
 .placeStripCard {
   flex-shrink: 0;
-  width: calc(100% - 36px);   /* ← 260px → 화면 폭 기준, 옆 카드가 살짝 보이게 여유 둠 */
+  width: 86%;                 /* ← 옆 카드 머리가 ~10% 정도 보이도록 폭 축소 (기존: calc(100% - 36px), 사실상 풀폭) */
   display: flex;
   align-items: center;
   gap: 12px;
-  scroll-snap-align: start;
+  scroll-snap-align: center;  /* ← start → center: scrollCardIntoView의 중앙 정렬 로직과 맞춤 */
   border-radius: 10px;
   overflow: hidden;
   background: white;
@@ -1060,16 +1064,19 @@
   box-shadow: var(--tm-el-2);
   border: 1px solid var(--tm-ink-100, #f0f2f5);
   padding: 8px 12px 8px 8px;
-  transition: transform .2s ease, box-shadow .2s ease;
+  opacity: 0.6;                /* ← 비활성 카드는 흐리게 → 클릭 가능한 다음 카드라는 시각적 신호 */
+  transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
 }
 .placeStripCard:hover {
   box-shadow: var(--tm-el-3);
   transform: translateY(-2px);
+  opacity: 0.85;
 }
 .placeStripCard:active { transform: scale(.97); }
 .placeStripCardActive {
   box-shadow: 0 4px 20px rgba(100,212,245,.38);
-  border-color: var(--tm-brand, #64D4F5);
+  
+  opacity: 1;                  /* ← 활성 카드만 완전히 선명하게 */
 }
 .placeStripCard:focus-visible {
   outline: 2px solid var(--tm-brand);
