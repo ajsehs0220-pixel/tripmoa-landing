@@ -20,7 +20,7 @@ export function formatSourceChannel(channel: string): string {
 export function normalizeSourceTitle(title: string | undefined | null): string {
   if (!title) return '';
 
-  let t = title.trim().replace(/^[#*\-\d.)\s]+/, '').trim();
+  let t = title.trim().replace(/^(?:[#*\-]+\s*|\d+[.)]\s+|\s+)+/, '').trim();
   const questionMatch = t.match(/^질문\s*[:：]\s*(.+)$/i);
   if (questionMatch?.[1]) {
     t = questionMatch[1].trim();
@@ -98,7 +98,7 @@ function titleFromTextFallback(text: string, maxLen = 56): string {
   const skip = /^(제목|작성자|날짜|출처|링크|url|http|www\.|ref:|\[ref:|댓글)/i;
 
   for (const rawLine of normalized.split('\n').slice(0, 15)) {
-    const bare = rawLine.trim().replace(/^[#*\-\d.)\s]+/, '').trim();
+    const bare = rawLine.trim().replace(/^(?:[#*\-]+\s*|\d+[.)]\s+|\s+)+/, '').trim();
     const qm = bare.match(/^질문\s*[:：]\s*(.+)$/i);
     if (qm?.[1]) {
       const questionTitle = normalizeSourceTitle(qm[1]);
