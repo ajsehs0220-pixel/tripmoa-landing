@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import styles from '@/app/prototype/explore/explore.module.css';
+import { trackEvent } from '@/lib/gtag';
 
 const AGODA_URL = 'https://www.agoda.com/ko-kr/search?guid=afc440be-71b1-4580-97e3-6b882f4eb126&lastSearchedCity=19041&city=9590&locale=ko-kr&currency=KRW&cid=1844104&aid=130589&checkIn=2026-07-11&checkOut=2026-07-15&rooms=1&adults=2&children=0&los=4&textToSearch=%EC%98%A4%EC%82%AC%EC%B9%B4';
 const KLOOK_URL = 'https://www.klook.com/ko/search/result/?query=%EC%98%A4%EC%82%AC%EC%B9%B4&search_scope=main_search&date_range=2026-07-11&sort=most_relevant&tab_key=1&start=1&clickId=0ee83cdabe';
@@ -28,13 +29,12 @@ const SLIDES = [
 ];
 
 function trackAdClick(adType: string, href: string) {
-  if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag) {
-    (window as unknown as { gtag: (...a: unknown[]) => void }).gtag('event', 'click_ad_banner', {
-      ad_type: adType,
-      href,
-      placement: 'explore',
-    });
-  }
+  trackEvent('click_ad_banner', {
+    ad_type: adType,
+    href,
+    placement: 'explore',
+    screen: 'explore',
+  });
 }
 
 export default function ExploreBanner() {

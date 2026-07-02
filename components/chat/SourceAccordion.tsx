@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './chat.module.css';
 import type { Source } from './types';
 import { formatSourceChannel, displaySourceTitle } from './sourceUtils';
+import { trackEvent } from '@/lib/gtag';
 
 interface Props {
   sources: Source[];
@@ -48,7 +49,11 @@ export default function SourceAccordion({
       <button
         type="button"
         className={styles.sourceToggle}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => setOpen((o) => {
+          const next = !o;
+          trackEvent('click_source_accordion', { open: next });
+          return next;
+        })}
         aria-expanded={open}
         aria-controls="source-list"
       >

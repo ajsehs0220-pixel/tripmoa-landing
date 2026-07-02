@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import styles from './chat.module.css';
 import MapLoader from '@/components/MapLoader';
 import AdBanner from './AdBanner';
+import { trackEvent } from '@/lib/gtag';
 import type { Place, Section } from './types';
 
 interface Props {
@@ -70,6 +71,7 @@ export default function MapSection({
   // selectedIdx와 무관하게 항상 scrollCardIntoView를 호출한다.
   // 이미 활성화된 카드를 다시 클릭한 경우엔 스크롤이 사실상 no-op이라 자연스럽다.
   const handleCardClick = useCallback((place: Place, idx: number) => {
+    trackEvent('click_map_place_card', { place: place.name, day: place.day });
     setSelectedIdx(idx);
     scrollCardIntoView(idx);
     if (mapInstanceRef.current) {
@@ -111,7 +113,10 @@ export default function MapSection({
                   key={d}
                   type="button"
                   className={`${styles.dayTab} ${activeDay === d ? styles.dayTabActive : ''}`}
-                  onClick={() => onDayChange(d)}
+                  onClick={() => {
+                    trackEvent('click_map_day_tab', { day: d });
+                    onDayChange(d);
+                  }}
                 >
                   Day {d}
                 </button>

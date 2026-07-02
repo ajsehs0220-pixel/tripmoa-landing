@@ -6,6 +6,7 @@ import BottomNav from '@/components/prototype/BottomNav';
 import PageHeader from '@/components/prototype/PageHeader';
 import { useToast } from '@/components/prototype/Toast';
 import { useRecentViews } from '@/components/prototype/RecentViewContext';
+import { trackEvent } from '@/lib/gtag';
 
 const DUMMY_TRIP = {
   title: '오사카 여행 정보 탐색 중',
@@ -71,7 +72,10 @@ export default function MyPage() {
         </div>
         <button
           className={styles.profileLoginBtn}
-          onClick={() => showToast('로그인 기능은 준비 중입니다')}
+          onClick={() => {
+            trackEvent('click_login');
+            showToast('로그인 기능은 준비 중입니다');
+          }}
           aria-label="로그인"
         >
           <span className={styles.profileAvatar}>
@@ -152,6 +156,7 @@ export default function MyPage() {
                 key={item.id}
                 className={styles.recentCard}
                 onClick={() => {
+                  trackEvent('click_recent_card', { id: item.id, title: item.title });
                   if (!item.path) return;
                   if (item.path.startsWith('http')) {
                     window.open(item.path, '_blank', 'noopener,noreferrer');
@@ -219,6 +224,7 @@ export default function MyPage() {
               key={label}
               className={styles.menuItem}
               onClick={() => {
+                trackEvent('click_menu_item', { label });
                 if (href) {
                   window.open(href, '_blank', 'noopener,noreferrer');
                 } else {

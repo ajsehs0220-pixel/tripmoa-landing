@@ -10,6 +10,7 @@ import { useToast } from '@/components/prototype/Toast';
 import { useFavorites } from '@/components/prototype/FavoritesContext';
 import { useRecentViews } from '@/components/prototype/RecentViewContext';
 import ExploreBanner from '@/components/explore/ExploreBanner';
+import { trackEvent } from '@/lib/gtag';
 
 // ── 단계 데이터 ──────────────────────────────────────────────
 
@@ -111,16 +112,23 @@ export default function ExplorePage() {
     return () => clearTimeout(id);
   }, [phase]);
 
+  useEffect(() => {
+    if (phase !== 'result') return;
+    trackEvent('explore_view_result', { city: selections.city, concept: selections.concept });
+  }, [phase]);
+
   const FORM_KEYS = STEP_KEYS.slice(1); // city 제외, STEP1~5만
   const answeredCount = FORM_KEYS.filter((k) => selections[k]).length;
   const allAnswered = answeredCount === FORM_KEYS.length;
 
   function handleCitySelect(city: string) {
+    trackEvent('explore_select_city', { city });
     setSelections((prev) => ({ ...prev, city }));
     setPhase('form');
   }
 
   function handleSelect(key: StepKey, value: string) {
+    trackEvent('explore_answer_step', { step: key, value });
     setSelections((prev) => ({ ...prev, [key]: value }));
 
     // 다음 미답변 섹션으로 자연스럽게 스크롤 이동
@@ -135,6 +143,7 @@ export default function ExplorePage() {
 
   function handleStart() {
     if (!allAnswered) return;
+    trackEvent('explore_form_complete', { ...selections });
     setPhase('loading');
   }
 
@@ -277,6 +286,7 @@ export default function ExplorePage() {
                           aria-label={favorited ? '찜 해제' : '찜하기'}
                           onClick={(e) => {
                             e.stopPropagation();
+                            trackEvent('explore_toggle_favorite', { id: card.id, title: card.title, favorited: !favorited });
                             toggleFavorite({
                               id: card.id,
                               title: card.title,
@@ -350,6 +360,7 @@ export default function ExplorePage() {
                           aria-label={favorited ? '찜 해제' : '찜하기'}
                           onClick={(e) => {
                             e.stopPropagation();
+                            trackEvent('explore_toggle_favorite', { id: favId, title: city, favorited: !favorited });
                             toggleFavorite({
                               id: favId,
                               title: `${city} (${CITY_EN[city]})`,

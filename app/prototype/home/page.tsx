@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './home.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
+import { trackEvent } from '@/lib/gtag';
 
 const CITIES = ['마쓰야마', '시즈오카', '오사카'];
 
@@ -15,6 +16,7 @@ export default function HomePage() {
   function handleSearch() {
     const q = query.trim();
     if (!q || !city) return;
+    trackEvent('search_submit', { city, query: q, query_length: q.length });
     // 결과 페이지로 이동 (쿼리/도시를 URL로 전달)
     const params = new URLSearchParams({ q, city });
     router.push(`/prototype/result?${params.toString()}`);

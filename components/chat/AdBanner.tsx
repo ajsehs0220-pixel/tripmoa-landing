@@ -2,6 +2,7 @@
 
 import styles from './chat.module.css';
 import type { Section } from './types';
+import { trackEvent } from '@/lib/gtag';
 
 // 숙박 판별: 섹션에 🏨 아이콘이 있거나(정보형) 쿼리에 숙박 키워드가 있으면(추천형) 숙박 배너
 const LODGING_RE = /숙소|숙박|호텔|료칸|게하|게스트하우스|호스텔|민박|에어비앤비|펜션|잘\s?곳|묵을|묵기/;
@@ -12,12 +13,11 @@ const AGODA_URL = 'https://www.agoda.com/ko-kr/search?guid=afc440be-71b1-4580-97
 const KLOOK_URL = 'https://www.klook.com/ko/search/result/?query=%EC%98%A4%EC%82%AC%EC%B9%B4&search_scope=main_search&date_range=2026-07-11&sort=most_relevant&tab_key=1&start=1&spm=SearchResult.Confirm&clickId=0ee83cdabe';
 
 function trackAdClick(adType: string, href: string) {
-  if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag) {
-    (window as unknown as { gtag: (...a: unknown[]) => void }).gtag('event', 'click_ad_banner', {
-      ad_type: adType,
-      href,
-    });
-  }
+  trackEvent('click_ad_banner', {
+    ad_type: adType,
+    href,
+    screen: 'result',
+  });
 }
 
 export default function AdBanner({

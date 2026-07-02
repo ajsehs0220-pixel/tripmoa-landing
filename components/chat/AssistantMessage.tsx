@@ -17,6 +17,7 @@ import { IconCopy, IconThumbUp, IconShare } from './MessageToolbar';
 import { formatAnswerForCopy } from './formatAnswerForCopy';
 import { isDaySectionTitle } from './placeUtils';
 import { useChatLikes } from '@/components/prototype/ChatLikesContext';
+import { trackEvent } from '@/lib/gtag';
 import type { SearchResponse, Place } from './types';
 
 interface Props {
@@ -101,6 +102,7 @@ export default function AssistantMessage({
   const shareUrl = 'https://tripmoa.com';
 
   const handleShare = async () => {
+    trackEvent('share_response', { query, city });
     if (navigator.share) {
       try {
         await navigator.share({ title: 'TripMOA', url: shareUrl });
@@ -120,11 +122,8 @@ export default function AssistantMessage({
       summary: (result.summary ?? '').slice(0, 120),
       city,
     });
-    if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
-      (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'like_response', {
-        liked: next,
-      });
-    }
+    trackEvent('like_response', { liked: next });
+    trackEvent('save_to_archive', { saved: next, query, city });
   };
 
   const introFinished = skipIntro || showTail;

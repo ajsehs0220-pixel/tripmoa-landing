@@ -10,6 +10,7 @@ import AssistantMessage from '@/components/chat/AssistantMessage';
 import type { SearchResponse, Place } from '@/components/chat/types';
 import { inferCityFromQuery } from '@/components/chat/mapLabelUtils';
 import BottomNav from '@/components/prototype/BottomNav';
+import { trackEvent } from '@/lib/gtag';
 
 type ChatMessage = {
   id: string;
@@ -22,15 +23,11 @@ type ChatMessage = {
 };
 
 function trackSourceClick(url: string) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', 'click_source_link', { source_url: url });
-  }
+  trackEvent('click_source_link', { source_url: url });
 }
 
 function trackFollowUpClick(text: string) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', 'click_follow_up', { follow_up_text: text });
-  }
+  trackEvent('click_follow_up', { follow_up_text: text });
 }
 
 function MessageTurn({
@@ -158,6 +155,10 @@ function ResultInner() {
               : m
           )
         );
+        trackEvent('view_answer', { query: trimmed, city: effectiveCity || undefined });
+        if (!Array.isArray(cleanedResult.sections) || cleanedResult.sections.length === 0) {
+          trackEvent('search_no_result', { query: trimmed, city: effectiveCity || undefined });
+        }
       } catch (e) {
         if (e instanceof DOMException && e.name === 'AbortError') {
           setMessages((prev) =>

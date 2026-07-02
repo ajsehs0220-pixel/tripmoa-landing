@@ -5,6 +5,7 @@ import styles from './chatlikes.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
 import { useChatLikes } from '@/components/prototype/ChatLikesContext';
 import { IconThumbUp } from '@/components/chat/MessageToolbar';
+import { trackEvent } from '@/lib/gtag';
 
 export default function ChatLikesPage() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function ChatLikesPage() {
               key={item.id}
               className={styles.item}
               onClick={() => {
+                trackEvent('click_archived_chat', { id: item.id, query: item.query, city: item.city });
                 const params = new URLSearchParams({ q: item.query });
                 if (item.city) params.set('city', item.city);
                 router.push(`/prototype/result?${params.toString()}`);

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import styles from './MemoModal.module.css';
 import { useMemos } from './MemosContext';
+import { trackEvent } from '@/lib/gtag';
 
 type MemoModalProps = {
   open: boolean;
@@ -22,6 +23,7 @@ export default function MemoModal({ open, onClose }: MemoModalProps) {
       onClose();
       return;
     }
+    trackEvent('save_memo', { title, item_count: items.filter((s) => s.trim()).length });
     addMemo(title, items);
     setTitle('');
     setBody('');

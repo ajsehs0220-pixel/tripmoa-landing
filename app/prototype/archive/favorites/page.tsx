@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import styles from './favorites.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
 import { useFavorites } from '@/components/prototype/FavoritesContext';
+import { trackEvent } from '@/lib/gtag';
 
 const BADGE_STYLES: Record<string, { bg: string; color: string }> = {
   'SNS스팟':   { bg: '#eafaff', color: '#0c9ed1' },
@@ -45,6 +46,7 @@ export default function FavoritesPage() {
                 key={item.id}
                 className={styles.item}
                 onClick={() => {
+                  trackEvent('click_favorite_link', { id: item.id, title: item.title, link: item.link });
                   if (item.link) window.open(item.link, '_blank', 'noopener,noreferrer');
                 }}
                 role="link"

@@ -2,6 +2,7 @@
 
 import styles from './chat.module.css';
 import type { YoutubeVideo } from './types';
+import { trackEvent } from '@/lib/gtag';
 
 interface Props {
   videos: YoutubeVideo[];
@@ -30,7 +31,10 @@ export default function YoutubeVideos({ videos, onVideoClick }: Props) {
                 href={video.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => onVideoClick(video.url)}
+                onClick={() => {
+                  trackEvent('click_youtube_video', { url: video.url, title: video.title });
+                  onVideoClick(video.url);
+                }}
               >
                 {video.url}
               </a>

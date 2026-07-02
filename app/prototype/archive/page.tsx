@@ -10,6 +10,7 @@ import { useFavorites } from '@/components/prototype/FavoritesContext';
 import { useChatLikes } from '@/components/prototype/ChatLikesContext';
 import { useMemos, formatRelativeTime } from '@/components/prototype/MemosContext';
 import MemoModal from '@/components/prototype/MemoModal';
+import { trackEvent } from '@/lib/gtag';
 
 // ── Mock 데이터 ──────────────────────────────────────────────
 
@@ -146,7 +147,10 @@ export default function ArchivePage() {
             <button
               key={label}
               className={styles.catCard}
-              onClick={() => (route ? router.push(route) : showToast())}
+              onClick={() => {
+                trackEvent('click_archive_category', { category: label });
+                route ? router.push(route) : showToast();
+              }}
             >
               <span className={styles.catIconWrap}>
                 <Icon name={icon} className={styles.catIcon} />
@@ -176,9 +180,15 @@ export default function ArchivePage() {
                 className={styles.recentCard}
                 role="button"
                 tabIndex={0}
-                onClick={() => (item.route ? router.push(item.route) : showToast())}
+                onClick={() => {
+                  trackEvent('click_archive_recent_item', { id: item.id, title: item.title, icon: item.icon });
+                  item.route ? router.push(item.route) : showToast();
+                }}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') (item.route ? router.push(item.route) : showToast());
+                  if (e.key === 'Enter') {
+                    trackEvent('click_archive_recent_item', { id: item.id, title: item.title, icon: item.icon });
+                    item.route ? router.push(item.route) : showToast();
+                  }
                 }}
               >
                 <div className={styles.recentImgWrap}>
@@ -202,7 +212,13 @@ export default function ArchivePage() {
       </section>
 
       {/* AI 정리 배너 */}
-      <button className={styles.aiBanner} onClick={() => showToast()}>
+      <button
+        className={styles.aiBanner}
+        onClick={() => {
+          trackEvent('click_archive_ai_banner');
+          showToast();
+        }}
+      >
         <span className={styles.aiBannerMascot}>
           <img src="/moa.png" alt="MOA" className={styles.aiBannerMascotImg} />
         </span>

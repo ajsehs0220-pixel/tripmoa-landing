@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import styles from './memos.module.css';
 import { useMemos, formatRelativeTime } from '@/components/prototype/MemosContext';
 import MemoModal from '@/components/prototype/MemoModal';
+import { trackEvent } from '@/lib/gtag';
 
 export default function MemosPage() {
   const router = useRouter();
@@ -32,12 +33,19 @@ export default function MemosPage() {
       ) : (
         <div className={styles.list}>
           {memos.map((memo) => (
-            <div key={memo.id} className={styles.memoCard}>
+            <div
+              key={memo.id}
+              className={styles.memoCard}
+              onClick={() => trackEvent('click_memo_card', { id: memo.id, title: memo.title })}
+            >
               <div className={styles.memoCardHead}>
                 <p className={styles.memoTitle}>{memo.title}</p>
                 <button
                   className={styles.deleteBtn}
-                  onClick={() => setConfirmId(memo.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setConfirmId(memo.id);
+                  }}
                   aria-label="삭제"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -81,6 +89,7 @@ export default function MemosPage() {
               <button
                 className={styles.confirmDelete}
                 onClick={() => {
+                  trackEvent('delete_memo', { id: confirmId });
                   removeMemo(confirmId);
                   setConfirmId(null);
                 }}

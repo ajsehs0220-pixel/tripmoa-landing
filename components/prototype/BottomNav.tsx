@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './BottomNav.module.css';
+import { trackEvent } from '@/lib/gtag';
 
 function IconHome({ active }: { active: boolean }) {
   return (
@@ -72,7 +73,10 @@ export default function BottomNav() {
           <button
             key={path}
             className={`${styles.tab} ${active ? styles.tabActive : ''}`}
-            onClick={() => router.push(path)}
+            onClick={() => {
+              trackEvent('click_bottom_nav', { tab_name: label, from_path: pathname });
+              router.push(path);
+            }}
             aria-current={active ? 'page' : undefined}
           >
             <Icon active={active} />
