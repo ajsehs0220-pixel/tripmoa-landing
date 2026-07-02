@@ -5,6 +5,7 @@ import styles from './chat.module.css';
 import AIAnalysisCard from './AIAnalysisCard';
 import TravelSection from './TravelSection';
 import MapSection from './MapSection';
+import AdBanner from './AdBanner';
 import SourceAccordion from './SourceAccordion';
 import YoutubeVideos from './YoutubeVideos';
 import FollowUpChips from './FollowUpChips';
@@ -176,12 +177,18 @@ export default function AssistantMessage({
 
           {introFinished && (
             <>
+
+              <AdBanner query={query} sections={sections} city={city} />
+
               <MapSection
                 places={places}
                 visiblePlaces={visiblePlaces}
                 dayList={dayList}
                 activeDay={activeDay}
                 onDayChange={setActiveDay}
+                query={query}
+                sections={sections}
+                city={city}
               />
 
               <YoutubeVideos

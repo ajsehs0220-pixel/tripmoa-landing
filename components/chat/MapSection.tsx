@@ -3,7 +3,8 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import styles from './chat.module.css';
 import MapLoader from '@/components/MapLoader';
-import type { Place } from './types';
+import AdBanner from './AdBanner';
+import type { Place, Section } from './types';
 
 interface Props {
   places: Place[];
@@ -11,6 +12,9 @@ interface Props {
   dayList: number[];
   activeDay: number | null;
   onDayChange: (day: number) => void;
+  query: string;
+  sections: Section[];
+  city?: string;
 }
 
 export default function MapSection({
@@ -19,6 +23,9 @@ export default function MapSection({
   dayList,
   activeDay,
   onDayChange,
+  query,
+  sections,
+  city,
 }: Props) {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

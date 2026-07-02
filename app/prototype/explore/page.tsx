@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './explore.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
@@ -9,6 +9,7 @@ import { getExploreMock, ExploreCard, ExploreResult } from '@/lib/exploreMock';
 import { useToast } from '@/components/prototype/Toast';
 import { useFavorites } from '@/components/prototype/FavoritesContext';
 import { useRecentViews } from '@/components/prototype/RecentViewContext';
+import ExploreBanner from '@/components/explore/ExploreBanner';
 
 // ── 단계 데이터 ──────────────────────────────────────────────
 
@@ -97,7 +98,7 @@ export default function ExplorePage() {
   const { showToast } = useToast();
   const { isFavorited, toggleFavorite } = useFavorites();
   const { addRecentView } = useRecentViews();
-  const [phase, setPhase] = useState<'city' | 'form' | 'loading' | 'result'>('city');
+  const [phase, setPhase] = useState<'start' | 'city' | 'form' | 'loading' | 'result'>('start');
   const [selections, setSelections] = useState<Selections>(INITIAL_SELECTIONS);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedComingSoon, setSelectedComingSoon] = useState<string | null>(null);
@@ -142,7 +143,7 @@ export default function ExplorePage() {
   }
 
   function handleReset() {
-    setPhase('city');
+    setPhase('start');
     setSelections(INITIAL_SELECTIONS);
     setSearchQuery('');
   }
@@ -153,6 +154,34 @@ export default function ExplorePage() {
     const params = new URLSearchParams({ q });
     if (selections.city) params.set('city', selections.city);
     router.push(`/prototype/result?${params.toString()}`);
+  }
+
+// ── 인트로 화면 (탭 진입 시작 화면) ──────────────────────────
+  if (phase === 'start') {
+    return (
+      <main className={styles.startScreen}>
+        <div className={styles.startBody}>
+          <img src="/exploreStartPage.png" alt="" className={styles.startBgImg} />
+          <div className={styles.startTextWrap}>
+            <p className={styles.wordMark}>Trip <span style={{ color: '#64D4F5' }}>MOA</span></p>
+            <p className={styles.startTitle}>MOA와 함께<br />완벽한 여행을 탐색해보세요!</p>
+            <p className={styles.startSub}>당신만의 맞춤형 리얼 정보를 찾아드릴게요</p>
+          </div>
+        </div>
+
+        <div className={styles.startCtaWrap}>
+          <button
+            type="button"
+            className={styles.startBtn}
+            onClick={() => setPhase('city')}
+          >
+            탐색 시작하기
+          </button>
+        </div>
+
+        <BottomNav />
+      </main>
+    );
   }
 
   // ── 로딩 화면 ────────────────────────────────────────────
@@ -218,62 +247,66 @@ export default function ExplorePage() {
 
         {/* 카테고리별 카드 */}
         {CATEGORIES.map(({ key, label }) => (
-          <section key={key} className={styles.section}>
-            <h2 className={styles.sectionTitle}>{label}</h2>
-            <div className={styles.cardRow}>
-              {(result[key] as ExploreCard[]).map((card) => {
-                const favorited = isFavorited(card.id);
-                return (
-                  <div
-                    key={card.id}
-                    className={styles.card}
-                    onClick={() => {
-                      addRecentView({
-                        id: card.id,
-                        title: card.title,
-                        image: card.image,
-                        path: card.link ?? '',
-                      });
-                      if (card.link) window.open(card.link, '_blank', 'noopener,noreferrer');
-                    }}
-                    role="link"
-                    tabIndex={0}
-                  >
-                    <div className={styles.cardImgWrap}>
-                      <img src={card.image ?? undefined} alt={card.title} className={styles.cardImg} />
-                      <button
-                        type="button"
-                        className={styles.cardHeartBtn}
-                        aria-label={favorited ? '찜 해제' : '찜하기'}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleFavorite({
-                            id: card.id,
-                            title: card.title,
-                            subtitle: card.subtitle,
-                            image: card.image,
-                            category: card.tag,
-                            date: new Date().toISOString().slice(0, 10).replace(/-/g, '.'),
-                            link: card.link ?? '',
-                          });
-                          showToast(favorited ? '찜 목록에서 제거했어요' : '찜 목록에 추가했어요');
-                        }}
-                      >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill={favorited ? '#f43f5e' : 'rgba(255,255,255,0.9)'}>
-                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.061.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                        </svg>
-                      </button>
+          <React.Fragment key={key}>
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>{label}</h2>
+              <div className={styles.cardRow}>
+                {(result[key] as ExploreCard[]).map((card) => {
+                  const favorited = isFavorited(card.id);
+                  return (
+                    <div
+                      key={card.id}
+                      className={styles.card}
+                      onClick={() => {
+                        addRecentView({
+                          id: card.id,
+                          title: card.title,
+                          image: card.image,
+                          path: card.link ?? '',
+                        });
+                        if (card.link) window.open(card.link, '_blank', 'noopener,noreferrer');
+                      }}
+                      role="link"
+                      tabIndex={0}
+                    >
+                      <div className={styles.cardImgWrap}>
+                        <img src={card.image ?? undefined} alt={card.title} className={styles.cardImg} />
+                        <button
+                          type="button"
+                          className={styles.cardHeartBtn}
+                          aria-label={favorited ? '찜 해제' : '찜하기'}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite({
+                              id: card.id,
+                              title: card.title,
+                              subtitle: card.subtitle,
+                              image: card.image,
+                              category: card.tag,
+                              date: new Date().toISOString().slice(0, 10).replace(/-/g, '.'),
+                              link: card.link ?? '',
+                            });
+                            showToast(favorited ? '찜 목록에서 제거했어요' : '찜 목록에 추가했어요');
+                          }}
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill={favorited ? '#f43f5e' : 'rgba(255,255,255,0.9)'}>
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.061.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                          </svg>
+                        </button>
+                      </div>
+                      <div className={styles.cardBody}>
+                        <span className={styles.cardTag}>{card.tag}</span>
+                        <p className={styles.cardTitle}>{card.title}</p>
+                        <p className={styles.cardSub}>{card.subtitle}</p>
+                      </div>
                     </div>
-                    <div className={styles.cardBody}>
-                      <span className={styles.cardTag}>{card.tag}</span>
-                      <p className={styles.cardTitle}>{card.title}</p>
-                      <p className={styles.cardSub}>{card.subtitle}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
+                  );
+                })}
+              </div>
+            </section>
+
+            {key === 'lodging' && <ExploreBanner />}
+          </React.Fragment>
         ))}
 
         <div className={styles.bottomPad} />
@@ -286,7 +319,7 @@ export default function ExplorePage() {
   if (phase === 'city') {
     return (
       <main className={styles.screen}>
-        <PageHeader />
+        <PageHeader onBack={() => setPhase('start')} backLabel="처음으로" />
 
         <div className={styles.cityStep}>
           <span className={styles.stepBadge}>STEP 0. 도시를 선택하세요</span>
