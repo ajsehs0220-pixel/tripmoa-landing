@@ -629,31 +629,34 @@
 
 /* ── 탐색 인트로(시작) 화면 ── */
 .startScreen {
-  min-height: 100dvh;
+  height: 100dvh;
+  width: 100%;
   max-width: 767px;
   margin: 0 auto;
   background: #ffffff;
   position: relative;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
-/* 헤더 아래 이미지+텍스트 영역 */
+/* 헤더 아래부터 BottomNav 위까지 전체를 이미지 영역으로 사용 */
 .startBody {
-  flex: 1;
   position: relative;
+  flex: 1;
   min-height: 0;
+  overflow: hidden;
 }
 
-/* 이미지: body 영역 채움, 잘림 없이 */
+/* 비율 유지하면서 영역을 꽉 채움 (늘어나지 않음, 필요시 잘림) */
 .startBgImg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: top;
+  object-fit: cover;
+  object-position: center top;
   z-index: 0;
 }
 
@@ -669,7 +672,7 @@
 }
 .wordMark {
   font-family: var(--font-mungyeong);
-  font-size: 20px;
+  font-size: clamp(18px, 5vw, 24px);
   font-weight: 700;
   color: #5B5353;
   text-align: center;
@@ -677,7 +680,7 @@
   letter-spacing: -0.3px;
 }
 .startTitle {
-  font-size: clamp(20px, 5.5vw, 26px);
+  font-size: clamp(22px, 6vw, 28px);
   font-weight: 800;
   line-height: 1.35;
   color: #1a1d21;
@@ -685,16 +688,32 @@
 }
 .startSub {
   margin-top: 10px;
-  font-size: clamp(13px, 3.6vw, 15px);
+  font-size: clamp(13px, 3.8vw, 16px);
   font-weight: 500;
   color: #5a6068;
 }
 
-/* 하단 버튼 */
+/* CTA 버튼: 이미지 위에 절대 배치로 오버레이 */
 .startCtaWrap {
-  position: sticky;
-  bottom: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 24px;
   z-index: 2;
-  padding: 12px 20px calc(60px + 12px);
-  background: linear-gradient(to top, #ffffff 60%, rgba(255,255,255,0));
+  padding: 0 20px;
 }
+.startBtn {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 18px;
+  font-size: clamp(15px, 4vw, 17px);
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #87DFFF 0%, #64D4F5 100%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+.startBtn:active { transform: scale(0.98); }
