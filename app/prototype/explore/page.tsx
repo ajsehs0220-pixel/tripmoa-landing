@@ -57,8 +57,8 @@ const CITY_EN: Record<string, string> = {
 
 const CITY_DESC: Record<string, string> = {
   오사카: '맛있는 음식과 역사적 랜드마크',
-  시즈오카: '맛있는 음식과 역사적 랜드마크',
-  마쓰야마: '맛있는 음식과 역사적 랜드마크',
+  시즈오카: '후지산의 절경부터 온천마을 슈젠지까지',
+  마쓰야마: '소도시의 여유로움과 전통적인 거리풍경',
 };
 
 const CITY_IMAGES: Record<string, string> = {

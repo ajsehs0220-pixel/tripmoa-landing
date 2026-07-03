@@ -39,6 +39,7 @@ export default function AdBanner({
         title: ['나에게 딱 맞는 숙소', '최저가로 예약하세요'],
         sub: '엄선한 숙소만 모았어요',
         cta: '숙소 예약하기',
+        ctaBg: '#FC9E04',
         href: AGODA_URL,
       }
     : {
@@ -47,6 +48,7 @@ export default function AdBanner({
         title: [`${city ? `${city}를` : '여행을'} 더 특별하게`, '인기 투어·티켓'],
         sub: '검증된 투어만 모았어요',
         cta: '투어 예약하기',
+        ctaBg: '#2F7F73',
         href: KLOOK_URL,
       };
 
@@ -68,7 +70,7 @@ export default function AdBanner({
         </strong>
         <span className={styles.adBannerSub}>{ad.sub}</span>
       </div>
-      <span className={styles.adBannerCta}>
+      <span className={styles.adBannerCta} style={{ background: ad.ctaBg }}>
         {ad.cta}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
