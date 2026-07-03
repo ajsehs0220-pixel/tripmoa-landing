@@ -125,13 +125,15 @@
 .loadingTop {
   display: flex;
   align-items: center;
-  gap: 6px;       /* ← 10px → 6px, 텍스트와 도트 간격 좁힘 */
+  gap: 10px;       /* ← 10px → 6px, 텍스트와 도트 간격 좁힘 */
   margin-bottom: 6px;
 }
 .loadingLabel {
-  font-size: var(--tm-t-base, 15px);
-  font-weight: 600;
-  color: var(--tm-ink-600, #374151);
+  font-size: var(--tm-t-base, 10px);
+  color: #000;
+  font-weight: 500;
+  display: block;
+  white-space: pre-line;
 }
 .loadingHint {
   font-size: var(--tm-t-sm, 13px);
@@ -1052,10 +1054,10 @@
 
 .placeStripCard {
   flex-shrink: 0;
-  width: 66%;                 /* ← 옆 카드 머리가 ~10% 정도 보이도록 폭 축소 (기존: calc(100% - 36px), 사실상 풀폭) */
+  width: 73%;                 /* ← 옆 카드 머리가 ~10% 정도 보이도록 폭 축소 (기존: calc(100% - 36px), 사실상 풀폭) */
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   scroll-snap-align: center;  /* ← start → center: scrollCardIntoView의 중앙 정렬 로직과 맞춤 */
   border-radius: 10px;
   overflow: hidden;
@@ -1619,7 +1621,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 14px;
+  gap: 5px;
   padding: 4px 0;
 }
 .loadingTextWrap {
