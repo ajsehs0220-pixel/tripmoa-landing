@@ -272,6 +272,7 @@ function ResultInner() {
 
   const handleNewSearch = () => {
     if (!inputValue.trim() || loading) return;
+    trackEvent('search_submit', { query: inputValue.trim(), query_length: inputValue.trim().length, screen: 'result' });
     runSearch(inputValue);
     setInputValue('');
   };

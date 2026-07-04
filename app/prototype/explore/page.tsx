@@ -160,6 +160,7 @@ export default function ExplorePage() {
   function handleSearch() {
     const q = searchQuery.trim();
     if (!q) return;
+    trackEvent('search_submit', { query: q, query_length: q.length, screen: 'explore' });
     const params = new URLSearchParams({ q });
     if (selections.city) params.set('city', selections.city);
     router.push(`/prototype/result?${params.toString()}`);

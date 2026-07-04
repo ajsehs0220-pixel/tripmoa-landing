@@ -16,7 +16,7 @@ export default function HomePage() {
   function handleSearch() {
     const q = query.trim();
     if (!q || !city) return;
-    trackEvent('search_submit', { city, query: q, query_length: q.length });
+    trackEvent('search_submit', { city, query: q, query_length: q.length, screen: 'home' });
     // 결과 페이지로 이동 (쿼리/도시를 URL로 전달)
     const params = new URLSearchParams({ q, city });
     router.push(`/prototype/result?${params.toString()}`);
