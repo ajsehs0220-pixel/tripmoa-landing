@@ -25,6 +25,7 @@ export default function HomePage() {
   // 도시 칩: 토글. 선택 시 city 세팅, 다시 누르면 해제
   function toggleCity(c: string) {
     setCity((prev) => (prev === c ? null : c));
+    trackEvent('click_city_chip', { city: c });
   }
 
   return (

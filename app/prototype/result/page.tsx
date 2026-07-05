@@ -311,8 +311,10 @@ function ResultInner() {
       <div className={styles.header}>
         <button
           className={styles.backBtn}
-          onClick={() => router.back()}
-          aria-label="뒤로가기"
+          onClick={() => {
+            trackEvent('click_back', { screen: 'result' });
+            router.back();
+          }}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
@@ -320,8 +322,10 @@ function ResultInner() {
         </button>
         <span
           className={styles.headerWordmark}
-          onClick={() => router.push('/prototype/home')}
-          aria-label="홈으로"
+          onClick={() => {
+            trackEvent('click_home_wordmark', { screen: 'result' });
+            router.push('/prototype/home');
+          }}
         >
           <span className={styles.wTrip}>Trip</span>
           <span className={styles.wMoa}> MOA</span>

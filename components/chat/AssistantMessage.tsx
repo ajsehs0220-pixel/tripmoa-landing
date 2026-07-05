@@ -218,6 +218,7 @@ export default function AssistantMessage({
                     feedbackLabel: '복사됨',
                     onClick: async () => {
                       await navigator.clipboard.writeText(answerText);
+                      trackEvent('click_copy', { query, city });
                     },
                   },
                   {
