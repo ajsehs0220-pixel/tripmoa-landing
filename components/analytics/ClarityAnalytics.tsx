@@ -8,16 +8,18 @@ export default function ClarityAnalytics() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Clarity 외부 스크립트 로드 완료 후 consent + pageview
-    const tryConsent = () => {
+    const run = () => {
       if (typeof window.clarity === 'function') {
         window.clarity('consent');
         trackClarityPageView(pathname);
-      } else {
-        setTimeout(tryConsent, 500);
       }
     };
-    tryConsent();
+
+    if (document.readyState === 'complete') {
+      setTimeout(run, 1000);
+    } else {
+      window.addEventListener('load', () => setTimeout(run, 1000), { once: true });
+    }
   }, [pathname]);
 
   return null;
