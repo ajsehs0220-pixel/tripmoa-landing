@@ -10,3 +10,9 @@ export function trackEvent(name: string, params: Record<string, unknown> = {}) {
     window.gtag('event', name, params);
   }
 }
+
+export function trackPageview(url: string) {
+  if (typeof window === 'undefined') return;
+  window.gtag?.('config', 'G-EXXRWBVXCW', { page_path: url });
+  (window as any).clarity?.('set', 'pageview', url);
+}
