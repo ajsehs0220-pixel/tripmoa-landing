@@ -116,11 +116,16 @@ export default function AssistantMessage({
 
   const handleLike = () => {
     const next = !liked;
+    const thumbnail =
+      places.length > 0 && (places[0].photo_urls ?? []).length > 0
+        ? (places[0].photo_urls ?? [])[0]
+        : undefined;
     toggleChatLike({
       id: likeId,
       query,
       summary: (result.summary ?? '').slice(0, 120),
       city,
+      image: thumbnail,
     });
     trackEvent('like_response', { liked: next });
     trackEvent('save_to_archive', { saved: next, query, city });

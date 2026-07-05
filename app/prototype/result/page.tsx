@@ -18,7 +18,6 @@ type ChatMessage = {
   result: SearchResponse | null;
   error: string | null;
   status: 'loading' | 'done' | 'error' | 'cancelled';
-  /** sessionStorage에서 복원된 메시지인지 (타이핑 효과 생략용) */
   restored?: boolean;
 };
 
@@ -90,6 +89,44 @@ function chatStorageKey(city: string, seedQuery: string) {
   return `tripmoa-chat:v3:${city}:${seedQuery}`;
 }
 
+/** 마이페이지용 마지막 세션 저장 */
+function saveLastSession(
+  query: string,
+  city: string,
+  result: SearchResponse,
+  storageKey: string
+) {
+  try {
+    const places = Array.isArray(result.places) ? result.places : [];
+    const thumbnail =
+      places.length > 0 && (places[0].photo_urls ?? []).length > 0
+        ? (places[0].photo_urls ?? [])[0]
+        : null;
+    const followUps = result.follow_up ?? [];
+    const sections = result.sections ?? [];
+    const lastChat =
+      followUps.length > 0
+        ? followUps[0]
+        : sections.length > 0
+        ? sections[0].title ?? query
+        : query;
+
+    sessionStorage.setItem(
+      'tripmoa-last-session',
+      JSON.stringify({
+        query,
+        city: city || null,
+        thumbnail,
+        lastChat,
+        savedAt: new Date().toISOString(),
+        storageKey,
+      })
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
 function ResultInner() {
   const router = useRouter();
   const params = useSearchParams();
@@ -137,7 +174,6 @@ function ResultInner() {
           match_count: 20,
           signal: controller.signal,
         });
-        // places 배열에 null이 섞여 들어올 수 있어 타입을 맞추기 위해 제거
         const cleanedResult: SearchResponse = {
           ...data,
           places: Array.isArray(data.places)
@@ -147,11 +183,7 @@ function ResultInner() {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === msgId
-              ? {
-                  ...m,
-                  result: cleanedResult,
-                  status: 'done' as const,
-                }
+              ? { ...m, result: cleanedResult, status: 'done' as const }
               : m
           )
         );
@@ -159,6 +191,8 @@ function ResultInner() {
         if (!Array.isArray(cleanedResult.sections) || cleanedResult.sections.length === 0) {
           trackEvent('search_no_result', { query: trimmed, city: effectiveCity || undefined });
         }
+        // 마이페이지 채팅이어하기용 세션 저장
+        saveLastSession(trimmed, effectiveCity, cleanedResult, chatStorageKey(effectiveCity, trimmed));
       } catch (e) {
         if (e instanceof DOMException && e.name === 'AbortError') {
           setMessages((prev) =>
@@ -171,11 +205,7 @@ function ResultInner() {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === msgId
-              ? {
-                  ...m,
-                  error: e instanceof Error ? e.message : String(e),
-                  status: 'error' as const,
-                }
+              ? { ...m, error: e instanceof Error ? e.message : String(e), status: 'error' as const }
               : m
           )
         );
@@ -190,7 +220,7 @@ function ResultInner() {
     [resolveCityForQuery]
   );
 
-  // URL 첫 진입: sessionStorage 복원 또는 최초 검색 (HMR/새로고침 시 대화 유지)
+  // URL 첫 진입: sessionStorage 복원 또는 최초 검색
   useEffect(() => {
     if (!initialQuery) return;
 
@@ -199,14 +229,13 @@ function ResultInner() {
       if (saved) {
         const parsed = JSON.parse(saved) as ChatMessage[];
         if (parsed.length > 0) {
-          // 복원된 메시지는 타이핑 효과 없이 바로 전체 표시
           setMessages(parsed.map((m) => ({ ...m, restored: true })));
           initialSearchDone.current = true;
           return;
         }
       }
     } catch {
-      /* ignore corrupt storage */
+      /* ignore */
     }
 
     if (initialSearchDone.current) return;

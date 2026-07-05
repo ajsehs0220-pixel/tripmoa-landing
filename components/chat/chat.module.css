@@ -74,7 +74,7 @@
   width: 56px;       
   height: 56px;     
   flex-shrink: 0;
-  margin-top: -4px;  /* 텍스트와 수직 정렬 맞추기 위한 보정 */
+  margin-top: -4px;  
   animation: mascotFloat 2.2s ease-in-out infinite;
 }
 .mascotImg {
@@ -129,7 +129,7 @@
   margin-bottom: 6px;
 }
 .loadingLabel {
-  font-size: var(--tm-t-base, 10px);
+  font-size: var(--tm-t-base, 7px);
   color: #000;
   font-weight: 500;
   display: block;

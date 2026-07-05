@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import styles from './mypage.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
 import PageHeader from '@/components/prototype/PageHeader';
@@ -8,12 +9,10 @@ import { useToast } from '@/components/prototype/Toast';
 import { useRecentViews } from '@/components/prototype/RecentViewContext';
 import { trackEvent } from '@/lib/gtag';
 
-const DUMMY_TRIP = {
-  title: '오사카 여행 정보 탐색 중',
-  thumbnail: '/mypage_thumbnail.png',
-  lastEdited: '2시간 전',
-  progress: 45,
-  lastChat: '교토 버스투어 후기 알려줘!',
+const CITY_THUMBNAILS: Record<string, string> = {
+  오사카: '/images/osaka_default.jpg',
+  시즈오카: '/images/shizuoka_default.jpg',
+  마쓰야마: '/images/matsuyama_default.jpg',
 };
 
 const TRAVEL_TAGS = ['오사카', '20대', '친구와', '3명이서', '핫플', '가성비'];
@@ -53,12 +52,57 @@ const MENU_ITEMS = [
   },
 ];
 
+interface LastSession {
+  query: string;
+  city: string | null;
+  thumbnail: string | null;
+  lastChat: string;
+  savedAt: string;
+  storageKey: string;
+}
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return '방금 전';
+  if (min < 60) return `${min}분 전`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}시간 전`;
+  return `${Math.floor(hr / 24)}일 전`;
+}
+
 export default function MyPage() {
   const router = useRouter();
   const { showToast } = useToast();
   const { recentViews } = useRecentViews();
+  const [session, setSession] = useState<LastSession | null>(null);
 
   const recentTop3 = recentViews.slice(0, 3);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('tripmoa-last-session');
+      if (raw) setSession(JSON.parse(raw));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const thumbnail =
+    session?.thumbnail ||
+    (session?.city ? CITY_THUMBNAILS[session.city] : null) ||
+    '/mypage_thumbnail.png';
+
+  const handleContinueChat = () => {
+    if (!session) return;
+    trackEvent('click_continue_chat', { query: session.query, city: session.city });
+    // sessionStorage에 이미 대화 내용이 있으므로 prefill 없이 그대로 복원
+    const params = new URLSearchParams({
+      q: session.query,
+      ...(session.city ? { city: session.city } : {}),
+    });
+    router.push(`/prototype/result?${params.toString()}`);
+  };
 
   return (
     <main className={styles.screen}>
@@ -90,41 +134,44 @@ export default function MyPage() {
 
       {/* 진행중인 여행 */}
       <section className={styles.section}>
-        <div className={styles.tripCard}>
-          <img src={DUMMY_TRIP.thumbnail} alt={DUMMY_TRIP.title} className={styles.tripThumb} />
-          <div className={styles.tripRight}>
-            <div className={styles.tripTitleRow}>
-              <p className={styles.tripTitle}>{DUMMY_TRIP.title}</p>
-              <div className={styles.tripDateRow}>
-                <p className={styles.tripDate}>마지막 수정 {DUMMY_TRIP.lastEdited}</p>
-                <div className={styles.progressBarTrack}>
-                  <div className={styles.progressBarFill} style={{ width: `${DUMMY_TRIP.progress}%` }} />
+        {session ? (
+          <div className={styles.tripCard}>
+            <img src={thumbnail} alt={session.query} className={styles.tripThumb} />
+            <div className={styles.tripRight}>
+              <div className={styles.tripTitleRow}>
+                <p className={styles.tripTitle}>
+                  {session.city ? `${session.city} 여행 정보 탐색 중` : session.query}
+                </p>
+                <div className={styles.tripDateRow}>
+                  <p className={styles.tripDate}>마지막 수정 {timeAgo(session.savedAt)}</p>
+                  <div className={styles.progressBarTrack}>
+                    <div className={styles.progressBarFill} style={{ width: '45%' }} />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className={styles.tripChatBubble}>
-              <span className={styles.tripChatIcon}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                </svg>
-              </span>
-              <span className={styles.tripChatText}>
-                <span className={styles.tripChatLabel}>최근대화</span>
-                <span className={styles.tripChatQuote}>&ldquo;{DUMMY_TRIP.lastChat}&rdquo;</span>
-              </span>
-            </div>
+              <div className={styles.tripChatBubble}>
+                <span className={styles.tripChatIcon}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                  </svg>
+                </span>
+                <span className={styles.tripChatText}>
+                  <span className={styles.tripChatLabel}>최근대화</span>
+                  <span className={styles.tripChatQuote}>&ldquo;{session.lastChat}&rdquo;</span>
+                </span>
+              </div>
 
-            <div className={styles.tripActionRow}>
-              <button
-                className={styles.continueChatBtn}
-                onClick={() => showToast('로그인 기능은 준비 중입니다')}
-              >
-                채팅이어하기
-              </button>
+              <div className={styles.tripActionRow}>
+                <button className={styles.continueChatBtn} onClick={handleContinueChat}>
+                  채팅이어하기
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className={styles.emptyBox}>최근 검색 기록이 없어요</div>
+        )}
       </section>
 
       {/* 최근 본 정보 */}
@@ -194,7 +241,7 @@ export default function MyPage() {
             </svg>
             내 탐색
           </h2>
-          <button className={styles.seeAll} onClick={() => showToast('수정 기능은 준비 중입니다')}>
+          <button className={styles.seeAll} onClick={() => showToast('로그인 시 이용 가능한 서비스입니다')}>
             수정하기
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 18l6-6-6-6" />
@@ -228,7 +275,7 @@ export default function MyPage() {
                 if (href) {
                   window.open(href, '_blank', 'noopener,noreferrer');
                 } else {
-                  showToast('준비 중인 기능입니다');
+                  showToast('로그인 시 이용 가능한 서비스입니다');
                 }
               }}
             >
