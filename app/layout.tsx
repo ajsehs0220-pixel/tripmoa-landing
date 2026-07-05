@@ -48,7 +48,7 @@ export default function RootLayout({
             })(window,document,"clarity","script","xg6qrs1cvm");
             (function wait(){
               if (typeof window.clarity === 'function') {
-                window.clarity("consentv2", { ad_Storage: "granted", analytics_Storage: "granted" });
+                window.clarity("consent", { ad_Storage: "granted", analytics_Storage: "granted" });
               } else { setTimeout(wait, 50); }
             })();
           `}
