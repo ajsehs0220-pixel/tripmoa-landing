@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import ClarityAnalytics from "@/components/analytics/ClarityAnalytics";
 import { mungyeongGamhong } from "@/lib/fonts";
 import "./globals.css";
 
@@ -24,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className={mungyeongGamhong.variable}>
       <body>
+        <ClarityAnalytics />
         {children}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
@@ -41,12 +43,14 @@ export default function RootLayout({
           {`
             (function(c,l,a,r,i,t,y){
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-              t=l.createElement(r);t.async=1;
-              t.src="https://www.clarity.ms/tag/"+i;
-              y=l.getElementsByTagName(r)[0];
-              y.parentNode.insertBefore(t,y);
+              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
             })(window,document,"clarity","script","xg6qrs1cvm");
-            clarity("consent");
+            (function wait(){
+              if (typeof window.clarity === 'function') {
+                window.clarity("consentv2", { ad_Storage: "granted", analytics_Storage: "granted" });
+              } else { setTimeout(wait, 50); }
+            })();
           `}
         </Script>
         <Script id="meta-pixel" strategy="afterInteractive">
