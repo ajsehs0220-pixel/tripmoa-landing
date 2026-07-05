@@ -14,7 +14,7 @@ export default function ClarityAnalytics() {
         window.clarity('consent');
         trackClarityPageView(pathname);
       } else {
-        setTimeout(tryConsent, 100);
+        setTimeout(tryConsent, 500);
       }
     };
     tryConsent();
