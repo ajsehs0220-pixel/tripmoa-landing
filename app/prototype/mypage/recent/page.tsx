@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import styles from './recent.module.css';
 import { useRecentViews } from '@/components/prototype/RecentViewContext';
+import { trackEvent } from '@/lib/gtag';
 
 function formatDate(iso: string) {
   const d = new Date(iso);
@@ -29,7 +30,10 @@ export default function RecentViewsPage() {
       <div className={styles.topRow}>
         <span className={styles.countText}>{recentViews.length}개</span>
         {recentViews.length > 0 && (
-          <button className={styles.clearAllBtn} onClick={clearRecentViews}>
+          <button className={styles.clearAllBtn} onClick={() => {
+            trackEvent('clear_recent_views');
+            clearRecentViews();
+          }}>
             전체 비우기
           </button>
         )}
@@ -46,7 +50,10 @@ export default function RecentViewsPage() {
               <button
                 className={styles.deleteBtn}
                 aria-label="삭제"
-                onClick={() => removeRecentView(item.id)}
+                onClick={() => {
+                  trackEvent('delete_recent_view', { id: item.id });
+                  removeRecentView(item.id);
+                }}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
                   <path d="M18 6L6 18M6 6l12 12" />
@@ -55,6 +62,7 @@ export default function RecentViewsPage() {
               <button
                 className={styles.cardLink}
                 onClick={() => {
+                  trackEvent('click_recent_view_card', { id: item.id, title: item.title });
                   if (!item.path) return;
                   if (item.path.startsWith('http')) {
                     window.open(item.path, '_blank', 'noopener,noreferrer');
