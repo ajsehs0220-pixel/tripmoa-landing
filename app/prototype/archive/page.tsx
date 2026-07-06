@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './archive.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
@@ -98,6 +98,10 @@ export default function ArchivePage() {
   const { chatLikes } = useChatLikes();
   const { memos } = useMemos();
   const [memoModalOpen, setMemoModalOpen] = useState(false);
+
+  useEffect(() => {
+    trackEvent('view_archive');
+  }, []);
 
   // 최근 추가한 항목: 찜한목록 + 채팅 좋아요를 합쳐서 최신순 4개
   const recentItems = [
@@ -236,7 +240,13 @@ export default function ArchivePage() {
       <section className={styles.section}>
         <div className={styles.sectionRow}>
           <h2 className={styles.sectionTitle}>내 폴더</h2>
-          <button className={styles.seeAll} onClick={() => showToast('로그인 시 이용 가능한 서비스입니다')}>
+          <button
+            className={styles.seeAll}
+            onClick={() => {
+              trackEvent('click_stub_feature', { feature: 'folder_list' });
+              showToast('로그인 시 이용 가능한 서비스입니다');
+            }}
+          >
             더보기 <Icon name="chevron" className={styles.seeAllIcon} />
           </button>
         </div>
@@ -247,8 +257,16 @@ export default function ArchivePage() {
               className={styles.folderCard}
               role="button"
               tabIndex={0}
-              onClick={() => showToast('로그인 시 이용 가능한 서비스입니다')}
-              onKeyDown={(e) => { if (e.key === 'Enter') showToast('로그인 시 이용 가능한 서비스입니다'); }}
+              onClick={() => {
+                trackEvent('click_stub_feature', { feature: 'folder_open' });
+                showToast('로그인 시 이용 가능한 서비스입니다');
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  trackEvent('click_stub_feature', { feature: 'folder_open' });
+                  showToast('로그인 시 이용 가능한 서비스입니다');
+                }
+              }}
             >
               <img src={folder.icon} alt={folder.name.replace('\n', ' ')} className={styles.folderIconImg} />
               <p className={styles.folderName}>
@@ -265,8 +283,16 @@ export default function ArchivePage() {
             className={`${styles.folderCard} ${styles.folderAdd}`}
             role="button"
             tabIndex={0}
-            onClick={() => showToast('로그인 시 이용 가능한 서비스입니다')}
-            onKeyDown={(e) => { if (e.key === 'Enter') showToast('로그인 시 이용 가능한 서비스입니다'); }}
+            onClick={() => {
+              trackEvent('click_stub_feature', { feature: 'folder_add' });
+              showToast('로그인 시 이용 가능한 서비스입니다');
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                trackEvent('click_stub_feature', { feature: 'folder_add' });
+                showToast('로그인 시 이용 가능한 서비스입니다');
+              }
+            }}
           >
             <div className={styles.folderAddIcon}>
               <Icon name="plus" className={styles.folderAddPlus} />
@@ -289,8 +315,16 @@ export default function ArchivePage() {
             className={styles.recentEmptyBox}
             role="button"
             tabIndex={0}
-            onClick={() => setMemoModalOpen(true)}
-            onKeyDown={(e) => { if (e.key === 'Enter') setMemoModalOpen(true); }}
+            onClick={() => {
+              trackEvent('open_memo_modal');
+              setMemoModalOpen(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                trackEvent('open_memo_modal');
+                setMemoModalOpen(true);
+              }
+            }}
             style={{ cursor: 'pointer' }}
           >
             아직 작성한 메모가 없어요. 눌러서 추가해보세요
@@ -319,8 +353,16 @@ export default function ArchivePage() {
               className={`${styles.memoCard} ${styles.memoAddCard}`}
               role="button"
               tabIndex={0}
-              onClick={() => setMemoModalOpen(true)}
-              onKeyDown={(e) => { if (e.key === 'Enter') setMemoModalOpen(true); }}
+              onClick={() => {
+                trackEvent('open_memo_modal');
+                setMemoModalOpen(true);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  trackEvent('open_memo_modal');
+                  setMemoModalOpen(true);
+                }
+              }}
             >
               <div className={styles.memoAddIcon}>
                 <Icon name="plus" className={styles.memoAddPlus} />
@@ -332,7 +374,13 @@ export default function ArchivePage() {
       </section>
 
       {/* 업로드 */}
-      <button className={styles.uploadBtn} onClick={() => showToast('로그인 시 이용 가능한 서비스입니다')}>
+      <button
+        className={styles.uploadBtn}
+        onClick={() => {
+          trackEvent('click_stub_feature', { feature: 'upload' });
+          showToast('로그인 시 이용 가능한 서비스입니다');
+        }}
+      >
         <Icon name="upload" className={styles.uploadIcon} />
         업로드 하기
       </button>

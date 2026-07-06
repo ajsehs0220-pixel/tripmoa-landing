@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './chat.module.css';
+import { trackEvent } from '@/lib/gtag';
 
 interface Props {
   urls: string[];
@@ -112,6 +113,7 @@ export default function PhotoGallery({ urls, alt }: Props) {
 
   const openLightbox = (index: number) => {
     if (stripDidDrag.current) return;
+    trackEvent('open_lightbox', { image_index: index });
     setLightboxIndex(index);
   };
   const closeLightbox = () => setLightboxIndex(null);

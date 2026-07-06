@@ -80,6 +80,10 @@ export default function MyPage() {
   const recentTop3 = recentViews.slice(0, 3);
 
   useEffect(() => {
+    trackEvent('view_mypage');
+  }, []);
+
+  useEffect(() => {
     try {
       const raw = sessionStorage.getItem('tripmoa-last-session');
       if (raw) setSession(JSON.parse(raw));

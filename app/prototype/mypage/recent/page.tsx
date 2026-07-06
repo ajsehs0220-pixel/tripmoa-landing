@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './recent.module.css';
 import { useRecentViews } from '@/components/prototype/RecentViewContext';
@@ -14,6 +15,10 @@ function formatDate(iso: string) {
 export default function RecentViewsPage() {
   const router = useRouter();
   const { recentViews, removeRecentView, clearRecentViews } = useRecentViews();
+
+  useEffect(() => {
+    trackEvent('view_recent_all');
+  }, []);
 
   return (
     <main className={styles.screen}>

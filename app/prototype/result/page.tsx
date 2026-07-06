@@ -155,6 +155,7 @@ function ResultInner() {
       if (!trimmed || loadingRef.current) return;
 
       loadingRef.current = true;
+      trackEvent('start_search', { query: trimmed, city: resolveCityForQuery(trimmed) || undefined });
       setLoading(true);
 
       const controller = new AbortController();
@@ -296,6 +297,7 @@ function ResultInner() {
   };
 
   const handleStopSearch = () => {
+    trackEvent('stop_search', { query: inputValue.trim() });
     abortControllerRef.current?.abort();
   };
 
