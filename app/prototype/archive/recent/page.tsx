@@ -81,7 +81,7 @@ export default function RecentArchivePage() {
               role="link"
               tabIndex={0}
               onClick={() => {
-                trackEvent('click_recent_archive_item', { id: item.id, type: item.type });
+                trackEvent('click_archive_recent_item', { id: item.id, type: item.type });
                 router.push(item.route);
               }}
               onKeyDown={(e) => { if (e.key === 'Enter') router.push(item.route); }}

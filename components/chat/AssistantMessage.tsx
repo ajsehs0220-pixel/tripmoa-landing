@@ -128,7 +128,6 @@ export default function AssistantMessage({
       image: thumbnail,
     });
     trackEvent('like_response', { liked: next });
-    trackEvent('save_to_archive', { saved: next, query, city });
   };
 
   const introFinished = skipIntro || showTail;

@@ -269,6 +269,7 @@ export default function ExplorePage() {
                       key={card.id}
                       className={styles.card}
                       onClick={() => {
+                        trackEvent('explore_click_card', { id: card.id, title: card.title, category: key });
                         addRecentView({
                           id: card.id,
                           title: card.title,
