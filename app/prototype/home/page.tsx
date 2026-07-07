@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './home.module.css';
@@ -12,6 +13,10 @@ export default function HomePage() {
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [city, setCity] = useState<string | null>(null);
+
+  useEffect(() => {
+    trackEvent('view_landing');
+  }, []);
 
   function handleSearch() {
     const q = query.trim();
