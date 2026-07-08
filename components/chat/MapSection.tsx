@@ -82,6 +82,7 @@ export default function MapSection({
   const handleNameTabClick = useCallback((idx: number) => {
     const place = visiblePlaces[idx];
     if (!place) return;
+    trackEvent('click_map_day_tab', { place: place.name, idx });
     setSelectedIdx(idx);
     scrollCardIntoView(idx);
     if (mapInstanceRef.current) {

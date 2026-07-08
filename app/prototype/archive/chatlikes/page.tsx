@@ -63,6 +63,7 @@ export default function ChatLikesPage() {
                 aria-label="좋아요 해제"
                 onClick={(e) => {
                   e.stopPropagation();
+                  trackEvent('remove_chat_like', { id: item.id });
                   removeChatLike(item.id);
                 }}
               >

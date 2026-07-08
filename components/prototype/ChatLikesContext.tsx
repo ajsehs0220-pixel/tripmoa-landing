@@ -7,6 +7,7 @@ export type ChatLike = {
   query: string;         // 사용자가 던진 질문
   summary: string;       // AI 요약 (목록 미리보기용, 너무 길면 잘라서 저장)
   city?: string;
+  image?: string; 
   date: string;           // ISO string
 };
 

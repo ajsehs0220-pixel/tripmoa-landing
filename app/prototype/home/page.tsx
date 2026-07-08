@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './home.module.css';
@@ -13,6 +14,10 @@ export default function HomePage() {
   const [query, setQuery] = useState('');
   const [city, setCity] = useState<string | null>(null);
 
+  useEffect(() => {
+    trackEvent('view_landing');
+  }, []);
+
   function handleSearch() {
     const q = query.trim();
     if (!q || !city) return;
@@ -25,6 +30,7 @@ export default function HomePage() {
   // 도시 칩: 토글. 선택 시 city 세팅, 다시 누르면 해제
   function toggleCity(c: string) {
     setCity((prev) => (prev === c ? null : c));
+    trackEvent('click_city_chip', { city: c });
   }
 
   return (

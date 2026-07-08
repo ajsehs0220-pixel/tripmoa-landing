@@ -12,9 +12,9 @@
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 20px 0 8px;
-  min-height: 32px;  /* 추가 */
+  min-height: 32px; 
 }
 .backBtn {
   background: none;
@@ -28,6 +28,7 @@
   font-size: 17px;
   font-weight: 800;
   color: #1a1d21;
+  margin-left: 8px
 }
 .headerSpacer {
   width: 22px;

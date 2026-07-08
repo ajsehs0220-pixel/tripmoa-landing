@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './archive.module.css';
 import BottomNav from '@/components/prototype/BottomNav';
@@ -18,7 +18,7 @@ const CATEGORY_COUNTS = [
   { label: '채팅 좋아요', count: null as number | null, icon: 'chatHeart', route: '/prototype/archive/chatlikes' },
   { label: '찜한목록', count: null as number | null, icon: 'heart', route: '/prototype/archive/favorites' },
   { label: '메모', count: null as number | null, icon: 'memo', route: '/prototype/archive/memos' },
-  { label: '폴더', count: 3, icon: 'folder', route: null },
+  { label: '폴더', count: 1, icon: 'folder', route: null },
 ];
 
 const MY_FOLDERS = [
@@ -99,6 +99,10 @@ export default function ArchivePage() {
   const { memos } = useMemos();
   const [memoModalOpen, setMemoModalOpen] = useState(false);
 
+  useEffect(() => {
+    trackEvent('view_archive');
+  }, []);
+
   // 최근 추가한 항목: 찜한목록 + 채팅 좋아요를 합쳐서 최신순 4개
   const recentItems = [
     ...favorites.map((f) => ({
@@ -115,7 +119,7 @@ export default function ArchivePage() {
       title: c.query,
       meta: `${c.date.slice(0, 10)} · 채팅 좋아요`,
       icon: 'chatHeart' as const,
-      image: undefined as string | undefined,
+      image: c.image,
       route: '/prototype/archive/chatlikes' as string | null,
       date: c.date,
     })),
@@ -149,7 +153,7 @@ export default function ArchivePage() {
               className={styles.catCard}
               onClick={() => {
                 trackEvent('click_archive_category', { category: label });
-                route ? router.push(route) : showToast();
+                route ? router.push(route) : showToast('로그인 시 이용 가능한 서비스입니다');
               }}
             >
               <span className={styles.catIconWrap}>
@@ -166,7 +170,7 @@ export default function ArchivePage() {
       <section className={styles.section}>
         <div className={styles.sectionRow}>
           <h2 className={styles.sectionTitle}>최근 추가한 항목</h2>
-          <button className={styles.seeAll} onClick={() => showToast()}>
+          <button className={styles.seeAll} onClick={() => router.push('/prototype/archive/recent')}>
             더보기 <Icon name="chevron" className={styles.seeAllIcon} />
           </button>
         </div>
@@ -182,12 +186,12 @@ export default function ArchivePage() {
                 tabIndex={0}
                 onClick={() => {
                   trackEvent('click_archive_recent_item', { id: item.id, title: item.title, icon: item.icon });
-                  item.route ? router.push(item.route) : showToast();
+                  item.route ? router.push(item.route) : showToast('로그인 시 이용 가능한 서비스입니다');
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     trackEvent('click_archive_recent_item', { id: item.id, title: item.title, icon: item.icon });
-                    item.route ? router.push(item.route) : showToast();
+                    item.route ? router.push(item.route) : showToast('로그인 시 이용 가능한 서비스입니다');
                   }
                 }}
               >
@@ -216,7 +220,7 @@ export default function ArchivePage() {
         className={styles.aiBanner}
         onClick={() => {
           trackEvent('click_archive_ai_banner');
-          showToast();
+          showToast('로그인 시 이용 가능한 서비스입니다');
         }}
       >
         <span className={styles.aiBannerMascot}>
@@ -236,7 +240,13 @@ export default function ArchivePage() {
       <section className={styles.section}>
         <div className={styles.sectionRow}>
           <h2 className={styles.sectionTitle}>내 폴더</h2>
-          <button className={styles.seeAll} onClick={() => showToast()}>
+          <button
+            className={styles.seeAll}
+            onClick={() => {
+              trackEvent('click_stub_feature', { feature: 'folder_list' });
+              showToast('로그인 시 이용 가능한 서비스입니다');
+            }}
+          >
             더보기 <Icon name="chevron" className={styles.seeAllIcon} />
           </button>
         </div>
@@ -247,8 +257,16 @@ export default function ArchivePage() {
               className={styles.folderCard}
               role="button"
               tabIndex={0}
-              onClick={() => showToast()}
-              onKeyDown={(e) => { if (e.key === 'Enter') showToast(); }}
+              onClick={() => {
+                trackEvent('click_stub_feature', { feature: 'folder_open' });
+                showToast('로그인 시 이용 가능한 서비스입니다');
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  trackEvent('click_stub_feature', { feature: 'folder_open' });
+                  showToast('로그인 시 이용 가능한 서비스입니다');
+                }
+              }}
             >
               <img src={folder.icon} alt={folder.name.replace('\n', ' ')} className={styles.folderIconImg} />
               <p className={styles.folderName}>
@@ -265,8 +283,16 @@ export default function ArchivePage() {
             className={`${styles.folderCard} ${styles.folderAdd}`}
             role="button"
             tabIndex={0}
-            onClick={() => showToast()}
-            onKeyDown={(e) => { if (e.key === 'Enter') showToast(); }}
+            onClick={() => {
+              trackEvent('click_stub_feature', { feature: 'folder_add' });
+              showToast('로그인 시 이용 가능한 서비스입니다');
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                trackEvent('click_stub_feature', { feature: 'folder_add' });
+                showToast('로그인 시 이용 가능한 서비스입니다');
+              }
+            }}
           >
             <div className={styles.folderAddIcon}>
               <Icon name="plus" className={styles.folderAddPlus} />
@@ -289,8 +315,16 @@ export default function ArchivePage() {
             className={styles.recentEmptyBox}
             role="button"
             tabIndex={0}
-            onClick={() => setMemoModalOpen(true)}
-            onKeyDown={(e) => { if (e.key === 'Enter') setMemoModalOpen(true); }}
+            onClick={() => {
+              trackEvent('open_memo_modal');
+              setMemoModalOpen(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                trackEvent('open_memo_modal');
+                setMemoModalOpen(true);
+              }
+            }}
             style={{ cursor: 'pointer' }}
           >
             아직 작성한 메모가 없어요. 눌러서 추가해보세요
@@ -319,8 +353,16 @@ export default function ArchivePage() {
               className={`${styles.memoCard} ${styles.memoAddCard}`}
               role="button"
               tabIndex={0}
-              onClick={() => setMemoModalOpen(true)}
-              onKeyDown={(e) => { if (e.key === 'Enter') setMemoModalOpen(true); }}
+              onClick={() => {
+                trackEvent('open_memo_modal');
+                setMemoModalOpen(true);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  trackEvent('open_memo_modal');
+                  setMemoModalOpen(true);
+                }
+              }}
             >
               <div className={styles.memoAddIcon}>
                 <Icon name="plus" className={styles.memoAddPlus} />
@@ -332,7 +374,13 @@ export default function ArchivePage() {
       </section>
 
       {/* 업로드 */}
-      <button className={styles.uploadBtn} onClick={() => showToast()}>
+      <button
+        className={styles.uploadBtn}
+        onClick={() => {
+          trackEvent('click_stub_feature', { feature: 'upload' });
+          showToast('로그인 시 이용 가능한 서비스입니다');
+        }}
+      >
         <Icon name="upload" className={styles.uploadIcon} />
         업로드 하기
       </button>

@@ -68,6 +68,7 @@ export default function FavoritesPage() {
                   aria-label="찜 해제"
                   onClick={(e) => {
                     e.stopPropagation();
+                    trackEvent('remove_favorite', { id: item.id });
                     removeFavorite(item.id);
                   }}
                 >

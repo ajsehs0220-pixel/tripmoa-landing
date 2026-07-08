@@ -5,11 +5,7 @@ import { MemosProvider } from '@/components/prototype/MemosContext';
 import { ChatLikesProvider } from '@/components/prototype/ChatLikesContext';
 import SplashScreen from '@/components/prototype/SplashScreen';
 
-export default function PrototypeLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PrototypeLayout({ children }: { children: React.ReactNode }) {
   return (
     <FavoritesProvider>
       <ChatLikesProvider>

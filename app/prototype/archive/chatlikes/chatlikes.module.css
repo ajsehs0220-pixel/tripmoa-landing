@@ -13,7 +13,7 @@
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 20px 0 8px;
   min-height: 32px;
 }
@@ -31,6 +31,7 @@
   font-weight: 800;
   color: #000;
   letter-spacing: -0.5px;
+  margin-left: 8px;
 }
 
 .countText {

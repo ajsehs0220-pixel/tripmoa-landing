@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import styles from './chat.module.css';
 import { useSourceLookup } from './SourceLookupContext';
 import { formatSourceChannel, truncateSourceTitle, displaySourceTitle } from './sourceUtils';
+import { trackEvent } from '@/lib/gtag';
 
 const LINK_ICON = '\u{1F517}';
 
@@ -117,6 +118,7 @@ export default function RefBadge({ id, onClick }: Props) {
   }, [pinned]);
 
   const handleBadgeClick = (e: React.MouseEvent) => {
+    trackEvent('click_ref_badge', { source_id: id });
     e.preventDefault();
     e.stopPropagation();
     if (source) {

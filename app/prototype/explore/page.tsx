@@ -160,6 +160,7 @@ export default function ExplorePage() {
   function handleSearch() {
     const q = searchQuery.trim();
     if (!q) return;
+    trackEvent('explore_research', { query: q });
     trackEvent('search_submit', { query: q, query_length: q.length, screen: 'explore' });
     const params = new URLSearchParams({ q });
     if (selections.city) params.set('city', selections.city);
@@ -268,6 +269,7 @@ export default function ExplorePage() {
                       key={card.id}
                       className={styles.card}
                       onClick={() => {
+                        trackEvent('explore_click_card', { id: card.id, title: card.title, category: key });
                         addRecentView({
                           id: card.id,
                           title: card.title,
@@ -396,6 +398,7 @@ export default function ExplorePage() {
                 type="button"
                 className={styles.comingSoonItem}
                 onClick={() => {
+                  trackEvent('explore_click_coming_soon', { city_name: c.name });
                   setSelectedComingSoon(c.name);
                   showToast('오픈 예정인 도시예요');
                 }}
@@ -444,7 +447,10 @@ export default function ExplorePage() {
               key={k}
               type="button"
               className={styles.answerChip}
-              onClick={() => sectionRefs.current[k]?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+              onClick={() => {
+                trackEvent('click_explore_answer_chip', { step_key: k, answer: selections[k] });
+                sectionRefs.current[k]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }}
             >
               #{selections[k]}
             </button>
