@@ -10,6 +10,7 @@ export default function ClarityAnalytics() {
   useEffect(() => {
     const run = () => {
       if (typeof window.clarity === 'function') {
+        window.clarity('consent');
         trackClarityPageView(pathname);
       }
     };

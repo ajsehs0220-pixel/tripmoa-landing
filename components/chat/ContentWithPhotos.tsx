@@ -105,7 +105,8 @@ export default function ContentWithPhotos({
       itinerary: variant === 'itinerary',
     });
     if (variant === 'itinerary') {
-      return prepareItineraryContentItems(parsed, placesDetail);
+      const prepared = prepareItineraryContentItems(parsed, placesDetail);
+      return expandPlaceItems(prepared, placesDetail, sectionTitle);
     }
     return expandPlaceItems(parsed, placesDetail, sectionTitle);
   }, [content, sectionTitle, variant, placesDetail]);

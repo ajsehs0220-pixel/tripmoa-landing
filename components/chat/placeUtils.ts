@@ -18,7 +18,7 @@ const EMOJI_PREFIX =
   /^(\p{Extended_Pictographic}(?:\uFE0F)?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F)?)*)\s+/u;
 
 const PLACE_HEADER =
-  /^(?:(\p{Extended_Pictographic}(?:\uFE0F)?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F)?)*)\s*)?(?:[•\-]\s*)?\*\*([^*]+)\*\*\s*(?:→\s*(.*))?$/u;
+  /^(?:(\p{Extended_Pictographic}(?:\uFE0F)?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F)?)*)\s*)?(?:[•\-]\s*)?\*\*([^*]+)\*\*\s*(?:→\s*)?(.*)$/u;
 
 const CATEGORY_EMOJI: [RegExp, string][] = [
   [/맛집|식당|음식|타이메시|라멘|스시|카페|도미밥|메뉴|요리|식사|먹|브런치|디저트|베이커리|타코|오코노미/i, '🍜'],
@@ -385,7 +385,9 @@ export function findPlaceDetail(
 
   return details.find((p) => {
     const pn = normalizePlaceLabel(p.name);
-    if (pn.length < 3 || name.length < 3) return pn === name;
+    if (pn.length < 3 || name.length < 3) {
+      return pn === name || name.includes(pn) || pn.includes(name);
+    }
     return pn.includes(name) || name.includes(pn);
   });
 }
