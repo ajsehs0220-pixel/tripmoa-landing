@@ -9,6 +9,7 @@ import AdBanner from './AdBanner';
 import SourceAccordion from './SourceAccordion';
 import YoutubeVideos from './YoutubeVideos';
 import FollowUpChips from './FollowUpChips';
+import FeedbackForm from './FeedbackForm';
 import RenderContent from './RenderContent';
 import TypewriterText from './TypewriterText';
 import { SourceLookupProvider } from './SourceLookupContext';
@@ -32,6 +33,7 @@ interface Props {
   onFollowUpClick: (q: string) => void;
   onSourceClick: (url: string) => void;
   messageId?: string;
+  searchId?: string | null;
   /** 이미 한 번 타이핑 효과를 보여준 메시지인지 여부.
    *  과거 히스토리(새로고침 복원 등)에서는 다시 타이핑하지 않고 바로 전체를 보여준다. */
   skipIntro?: boolean;
@@ -49,6 +51,7 @@ export default function AssistantMessage({
   onFollowUpClick,
   onSourceClick,
   messageId,
+  searchId,
   skipIntro = false,
 }: Props) {
   const { isLiked, toggleChatLike } = useChatLikes();
@@ -236,6 +239,10 @@ export default function AssistantMessage({
                   },
                 ]}
               />
+
+              {searchId && (
+                <FeedbackForm searchId={searchId} query={query} city={city} />
+              )}
             </>
           )}
         </div>

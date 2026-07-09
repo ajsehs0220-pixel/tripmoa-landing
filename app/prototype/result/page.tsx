@@ -75,6 +75,7 @@ function MessageTurn({
           activeDay={activeDay}
           setActiveDay={setActiveDay}
           messageId={msg.id}
+          searchId={msg.result.search_id ?? null}
           skipIntro={msg.restored}
           onRefClick={(id) => onRefClick(msg.id, id)}
           onFollowUpClick={onFollowUpClick}
