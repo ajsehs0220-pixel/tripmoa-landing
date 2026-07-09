@@ -1,0 +1,159 @@
+/* position: fixed로 뷰포트 기준 정중앙 고정 */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.25s ease;
+}
+
+.overlayVisible {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.modal {
+  width: 270px;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  transform: scale(0.85);
+  opacity: 0;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.modalVisible {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.body {
+  padding: 24px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #000000;
+  text-align: center;
+  margin: 0;
+  line-height: 1.35;
+  white-space: pre-line;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #6d6d72;
+  text-align: center;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.stars {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.star {
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: #c7c7cc;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.12s, transform 0.1s;
+  line-height: 1;
+}
+
+.starFilled {
+  color: #007aff;
+}
+
+.star:active {
+  transform: scale(0.88);
+}
+
+.textarea {
+  width: 100%;
+  border: 1px solid #c7c7cc;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #000;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  background: #f2f2f7;
+  margin-top: 8px;
+}
+
+.textarea:focus {
+  border-color: #007aff;
+  background: #fff;
+}
+
+.divider {
+  height: 0.5px;
+  background: rgba(60, 60, 67, 0.29);
+}
+
+.actions {
+  display: flex;
+  height: 44px;
+}
+
+.btn {
+  flex: 1;
+  background: none;
+  border: none;
+  font-size: 17px;
+  cursor: pointer;
+  color: #007aff;
+  font-weight: 400;
+  padding: 0;
+}
+
+.btn:disabled {
+  color: #c7c7cc;
+  cursor: default;
+}
+
+.btnDivider {
+  width: 0.5px;
+  background: rgba(60, 60, 67, 0.29);
+  flex-shrink: 0;
+}
+
+.btnPrimary {
+  font-weight: 600;
+}
+
+.thanks {
+  font-size: 15px;
+  color: #3c3c43;
+  text-align: center;
+  padding: 28px 16px;
+  margin: 0;
+}
