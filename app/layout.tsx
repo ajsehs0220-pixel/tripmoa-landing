@@ -1,10 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import ClarityAnalytics from "@/components/analytics/ClarityAnalytics";
 import { mungyeongGamhong } from "@/lib/fonts";
 import "./globals.css";
 
 const GA_ID = "G-EXXRWBVXCW";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: "트립모아 - 일본 여행 후기, AI가 한눈에",
