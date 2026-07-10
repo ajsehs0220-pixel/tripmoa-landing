@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './chat.module.css';
 import AIAnalysisCard from './AIAnalysisCard';
 import TravelSection from './TravelSection';
@@ -9,7 +9,6 @@ import AdBanner from './AdBanner';
 import SourceAccordion from './SourceAccordion';
 import YoutubeVideos from './YoutubeVideos';
 import FollowUpChips from './FollowUpChips';
-import FeedbackForm from './FeedbackForm';
 import RenderContent from './RenderContent';
 import TypewriterText from './TypewriterText';
 import { SourceLookupProvider } from './SourceLookupContext';
@@ -20,11 +19,13 @@ import { isDaySectionTitle } from './placeUtils';
 import { useChatLikes } from '@/components/prototype/ChatLikesContext';
 import { trackEvent } from '@/lib/gtag';
 import type { SearchResponse, Place } from './types';
+import FeedbackPanel from './FeedbackPanel';
 
 interface Props {
   result: SearchResponse;
   query: string;
   city?: string;
+  isLast?: boolean;
   places: Place[];
   dayList: number[];
   activeDay: number | null;
@@ -43,6 +44,7 @@ export default function AssistantMessage({
   result,
   query,
   city,
+  isLast = false,
   places,
   dayList,
   activeDay,
@@ -55,7 +57,7 @@ export default function AssistantMessage({
   skipIntro = false,
 }: Props) {
   const { isLiked, toggleChatLike } = useChatLikes();
-  const likeId = messageId ?? `${query}-${city ?? ''}`; // messageId 없을 때 폴백
+  const likeId = messageId ?? `${query}-${city ?? ''}`;
   const liked = isLiked(likeId);
 
   const sections = Array.isArray(result.sections) ? result.sections : [];
@@ -64,10 +66,30 @@ export default function AssistantMessage({
   const followUps = Array.isArray(result.follow_up) ? result.follow_up : [];
   const youtubeVideos = Array.isArray(result.youtube_videos) ? result.youtube_videos : [];
 
-  // skipIntro면 처음부터 전부 노출 상태로 시작 (히스토리 복원용)
   const [summaryDone, setSummaryDone] = useState(skipIntro);
   const [visibleSectionCount, setVisibleSectionCount] = useState(skipIntro ? sections.length : 0);
-  const [showTail, setShowTail] = useState(skipIntro); // 지도/소스/팔로우업/툴바
+  const [showTail, setShowTail] = useState(skipIntro);
+
+  const sourceRef = useRef<HTMLDivElement>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+
+  useEffect(() => {
+    if (!isLast || showFeedback) return;
+
+    const handleScroll = () => {
+      const el = sourceRef.current;
+      if (!el) return;
+      if (sessionStorage.getItem('tripmoa-feedback-done')) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        setShowFeedback(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    setTimeout(handleScroll, 300);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isLast, showFeedback, showTail]);
 
   // summary 없으면 타이핑 단계 생략
   useEffect(() => {
@@ -87,7 +109,7 @@ export default function AssistantMessage({
     return () => clearTimeout(t);
   }, [summaryDone, visibleSectionCount, sections.length, skipIntro]);
 
-  // 모든 section이 다 노출되면 (또는 section이 0개면) tail 노출
+  // 모든 section이 다 노출되면 tail 노출
   useEffect(() => {
     if (skipIntro) return;
     if (!summaryDone) return;
@@ -183,7 +205,6 @@ export default function AssistantMessage({
 
           {introFinished && (
             <>
-
               <AdBanner query={query} sections={sections} city={city} />
 
               <MapSection
@@ -209,6 +230,18 @@ export default function AssistantMessage({
               />
 
               <FollowUpChips questions={followUps} onSelect={onFollowUpClick} />
+
+              {/* 스크롤 트리거 마커 */}
+              <div ref={sourceRef} />
+
+              {isLast && showFeedback && (
+                <FeedbackPanel
+                  query={query}
+                  city={city}
+                  searchId={searchId}
+                  onClose={() => setShowFeedback(false)}
+                />
+              )}
 
               <MessageToolbarBar
                 align="start"
@@ -240,9 +273,6 @@ export default function AssistantMessage({
                 ]}
               />
 
-              {searchId && (
-                <FeedbackForm searchId={searchId} query={query} city={city} />
-              )}
             </>
           )}
         </div>

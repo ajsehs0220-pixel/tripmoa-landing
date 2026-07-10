@@ -32,12 +32,16 @@ function trackFollowUpClick(text: string) {
 function MessageTurn({
   msg,
   city,
+  isLast,
+  searchId,
   onRefClick,
   onFollowUpClick,
   onSourceClick,
 }: {
   msg: ChatMessage;
   city: string;
+  isLast: boolean;
+  searchId?: string | null;
   onRefClick: (messageId: string, sourceId: number) => void;
   onFollowUpClick: (q: string) => void;
   onSourceClick: (url: string) => void;
@@ -70,12 +74,13 @@ function MessageTurn({
           result={msg.result}
           query={msg.query}
           city={city}
+          isLast={isLast}
           places={places}
           dayList={dayList}
           activeDay={activeDay}
           setActiveDay={setActiveDay}
           messageId={msg.id}
-          searchId={msg.result.search_id ?? null}
+          searchId={searchId}
           skipIntro={msg.restored}
           onRefClick={(id) => onRefClick(msg.id, id)}
           onFollowUpClick={onFollowUpClick}
@@ -193,7 +198,6 @@ function ResultInner() {
         if (!Array.isArray(cleanedResult.sections) || cleanedResult.sections.length === 0) {
           trackEvent('search_no_result', { query: trimmed, city: effectiveCity || undefined });
         }
-        // 마이페이지 채팅이어하기용 세션 저장
         saveLastSession(trimmed, effectiveCity, cleanedResult, chatStorageKey(effectiveCity, trimmed));
       } catch (e) {
         if (e instanceof DOMException && e.name === 'AbortError') {
@@ -336,11 +340,13 @@ function ResultInner() {
       </div>
 
       <div className={styles.chatWrap}>
-        {messages.map((msg) => (
+        {messages.map((msg, idx) => (
           <MessageTurn
             key={msg.id}
             msg={msg}
             city={resolveCityForQuery(msg.query)}
+            isLast={idx === messages.length - 1 && messages.length >= 2}
+            searchId={msg.result?.search_id ?? null}
             onRefClick={handleRefClick}
             onFollowUpClick={handleFollowUpClick}
             onSourceClick={trackSourceClick}
