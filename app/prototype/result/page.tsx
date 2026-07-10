@@ -33,6 +33,7 @@ function MessageTurn({
   msg,
   city,
   isLast,
+  searchId,
   onRefClick,
   onFollowUpClick,
   onSourceClick,
@@ -40,6 +41,7 @@ function MessageTurn({
   msg: ChatMessage;
   city: string;
   isLast: boolean;
+  searchId?: string | null;
   onRefClick: (messageId: string, sourceId: number) => void;
   onFollowUpClick: (q: string) => void;
   onSourceClick: (url: string) => void;
@@ -78,6 +80,7 @@ function MessageTurn({
           activeDay={activeDay}
           setActiveDay={setActiveDay}
           messageId={msg.id}
+          searchId={searchId}
           skipIntro={msg.restored}
           onRefClick={(id) => onRefClick(msg.id, id)}
           onFollowUpClick={onFollowUpClick}
@@ -343,6 +346,7 @@ function ResultInner() {
             msg={msg}
             city={resolveCityForQuery(msg.query)}
             isLast={idx === messages.length - 1 && messages.length >= 2}
+            searchId={msg.result?.search_id ?? null}
             onRefClick={handleRefClick}
             onFollowUpClick={handleFollowUpClick}
             onSourceClick={trackSourceClick}

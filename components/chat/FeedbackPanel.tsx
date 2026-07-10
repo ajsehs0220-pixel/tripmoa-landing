@@ -8,10 +8,11 @@ import { trackEvent } from '@/lib/gtag';
 interface FeedbackPanelProps {
   query: string;
   city?: string;
+  searchId?: string | null;
   onClose?: () => void;
 }
 
-export default function FeedbackPanel({ query, city, onClose }: FeedbackPanelProps) {
+export default function FeedbackPanel({ query, city, searchId, onClose }: FeedbackPanelProps) {
   const [rating, setRating] = useState<number | null>(null);
   const [comment, setComment] = useState('');
   const [step, setStep] = useState<'rating' | 'comment' | 'done'>('rating');
@@ -36,10 +37,10 @@ export default function FeedbackPanel({ query, city, onClose }: FeedbackPanelPro
     trackEvent('submit_feedback', { rating, query, city });
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/feedback`, {
+      await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query, city, rating, comment }),
+        body: JSON.stringify({ search_id: searchId, query, city, rating, comment }),
       });
     } catch (e) {
       console.error('feedback 전송 실패:', e);

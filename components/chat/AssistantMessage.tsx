@@ -34,6 +34,7 @@ interface Props {
   onFollowUpClick: (q: string) => void;
   onSourceClick: (url: string) => void;
   messageId?: string;
+  searchId?: string | null;
   skipIntro?: boolean;
 }
 
@@ -50,6 +51,7 @@ export default function AssistantMessage({
   onFollowUpClick,
   onSourceClick,
   messageId,
+  searchId,
   skipIntro = false,
 }: Props) {
   const { isLiked, toggleChatLike } = useChatLikes();
@@ -234,6 +236,7 @@ export default function AssistantMessage({
                 <FeedbackPanel
                   query={query}
                   city={city}
+                  searchId={searchId}
                   onClose={() => setShowFeedback(false)}
                 />
               )}

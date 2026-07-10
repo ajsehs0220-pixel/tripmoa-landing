@@ -51,4 +51,6 @@ export type SearchResponse = {
   sources: Source[];
   youtube_videos?: YoutubeVideo[];
   map_title?: string;
+  /** 백엔드 검색 로그 ID — /feedback 제출 시 사용 */
+  search_id?: string | null;
 };
