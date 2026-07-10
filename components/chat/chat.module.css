@@ -517,8 +517,14 @@
 .contentLineBlock:last-child {
   margin-bottom: 0;
 }
+.checkLineBlock {
+  margin-bottom: 2px;
+}
 .checkLineBlock:first-child {
   margin-top: 0;
+}
+.checkLineBlock .conclusionContentLine {
+  line-height: var(--tm-lh-tight, 1.3);
 }
 .contentLineSpacer {
   height: 8px;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 import styles from './chat.module.css';
 import RenderContent from './RenderContent';
 import PhotoGallery from './PhotoGallery';
@@ -60,6 +60,8 @@ function ConclusionContent({
         }
 
         const isCheck = CHECK_RE.test(trimmed);
+        // 체크 라인 안에 👉가 있으면 그 앞에서 개행
+        const segments = isCheck ? trimmed.split(/(?=👉)/u) : [trimmed];
 
         return (
           <div
@@ -73,12 +75,17 @@ function ConclusionContent({
                   : styles.conclusionContentLine
               }
             >
-              <RenderContent
-                content={trimmed}
-                onRefClick={onRefClick}
-                plainBold={!boldPlaceNames}
-                hideRefs={hideRefs}
-              />
+              {segments.map((segment, si) => (
+                <Fragment key={si}>
+                  {si > 0 && <br />}
+                  <RenderContent
+                    content={segment}
+                    onRefClick={onRefClick}
+                    plainBold={!boldPlaceNames}
+                    hideRefs={hideRefs}
+                  />
+                </Fragment>
+              ))}
             </p>
           </div>
         );
