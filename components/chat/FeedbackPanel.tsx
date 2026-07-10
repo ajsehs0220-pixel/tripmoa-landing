@@ -30,7 +30,7 @@ export default function FeedbackPanel({ query, city, searchId, onClose }: Feedba
   };
 
   const handleSubmit = async () => {
-    if (!rating) return;
+    if (!rating || !comment.trim()) return;
     trackEvent('submit_feedback', { rating, query, city });
     try {
       await fetch('/api/feedback', {
@@ -49,15 +49,17 @@ export default function FeedbackPanel({ query, city, searchId, onClose }: Feedba
   if (typeof document === 'undefined') return null;
 
   return createPortal(
-    <div
-      className={styles.overlay}
-      onClick={!rating ? handleClose : undefined}
-    >
+    <div className={styles.overlay}>
       <div className={`${styles.overlayInner} ${visible ? styles.overlayInnerVisible : ''}`}>
         <div
           className={`${styles.modal} ${visible ? styles.modalVisible : ''}`}
           onClick={(e) => e.stopPropagation()}
         >
+          {/* X 버튼 */}
+          {!done && (
+            <button className={styles.closeBtn} onClick={handleClose}>✕</button>
+          )}
+
           {done ? (
             /* 완료 */
             <div className={styles.body}>
@@ -95,7 +97,7 @@ export default function FeedbackPanel({ query, city, searchId, onClose }: Feedba
                 </div>
                 <textarea
                   className={styles.textarea}
-                  placeholder="의견을 자유롭게 적어주세요"
+                  placeholder="의견을 자유롭게 적어주세요 (선택)"
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   rows={3}
@@ -105,12 +107,9 @@ export default function FeedbackPanel({ query, city, searchId, onClose }: Feedba
                 <button
                   className={styles.btnPill}
                   onClick={handleSubmit}
-                  disabled={!rating || !comment.trim()}
+                  disabled={!rating}
                 >
                   보내기
-                </button>
-                <button className={styles.btnPillGhost} onClick={handleClose}>
-                  지금 안 함
                 </button>
               </div>
             </>
