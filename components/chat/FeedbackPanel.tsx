@@ -31,7 +31,7 @@ export default function FeedbackPanel({ query, city, searchId, onClose }: Feedba
 
   const handleSubmit = async () => {
     if (!rating) return;
-    trackEvent('submit_feedback', { rating, query, city });
+    trackEvent('submit_feedback', { rating, has_comment: comment.trim().length > 0, query, city });
     try {
       await fetch('/api/feedback', {
         method: 'POST',
@@ -57,7 +57,13 @@ export default function FeedbackPanel({ query, city, searchId, onClose }: Feedba
         >
           {/* X 버튼 */}
           {!done && (
-            <button className={styles.closeBtn} onClick={handleClose}>✕</button>
+            <button
+              className={styles.closeBtn}
+              onClick={() => {
+                trackEvent('close_feedback_modal', { rating, city, query });
+                handleClose();
+              }}
+            >✕</button>
           )}
 
           {done ? (
