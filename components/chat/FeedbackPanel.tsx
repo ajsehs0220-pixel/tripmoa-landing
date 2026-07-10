@@ -30,7 +30,7 @@ export default function FeedbackPanel({ query, city, searchId, onClose }: Feedba
   };
 
   const handleSubmit = async () => {
-    if (!rating || !comment.trim()) return;
+    if (!rating) return;
     trackEvent('submit_feedback', { rating, query, city });
     try {
       await fetch('/api/feedback', {
