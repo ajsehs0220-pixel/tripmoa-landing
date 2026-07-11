@@ -17,7 +17,7 @@ export default function SourceAccordion({
   onSourceClick,
   messageId,
 }: Props) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const sourceIdPrefix = messageId ? `${messageId}-` : '';
 
   useEffect(() => {
