@@ -1612,6 +1612,100 @@
 }
 
 /* ─────────────────────────────
+   Search Feedback Form
+───────────────────────────── */
+.feedbackBlock {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--tm-ink-100, #eef0f3);
+}
+.feedbackLabel {
+  font-size: var(--tm-t-sm, 13px);
+  color: var(--tm-ink-400, #6b7280);
+  margin: 0 0 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.feedbackStars {
+  display: flex;
+  gap: 4px;
+}
+.feedbackStar {
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  transition: transform 0.12s ease;
+}
+.feedbackStar:hover {
+  transform: scale(1.08);
+}
+.feedbackStarActive {
+  color: #e8b400;
+}
+.feedbackStarInactive {
+  color: var(--tm-ink-200, #d1d5db);
+}
+.feedbackTextarea {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 14px;
+  font-size: var(--tm-t-base, 15px);
+  font-family: inherit;
+  line-height: var(--tm-lh-snug, 1.5);
+  color: var(--tm-ink-800, #1a1d21);
+  background: var(--tm-ink-50, #f9fafb);
+  border: 1px solid var(--tm-ink-100, #eef0f3);
+  border-radius: var(--tm-r-md, 12px);
+  resize: vertical;
+  min-height: 84px;
+  box-sizing: border-box;
+}
+.feedbackTextarea::placeholder {
+  color: var(--tm-ink-300, #9ca3af);
+}
+.feedbackTextarea:focus {
+  outline: 2px solid var(--tm-brand);
+  outline-offset: 0;
+  border-color: transparent;
+}
+.feedbackSubmit {
+  margin-top: 12px;
+  padding: 10px 18px;
+  font-size: var(--tm-t-sm, 13px);
+  font-weight: 600;
+  font-family: inherit;
+  color: #fff;
+  background: var(--tm-brand-dark, #0096c7);
+  border: none;
+  border-radius: var(--tm-r-md, 12px);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+.feedbackSubmit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.feedbackSubmit:not(:disabled):hover {
+  opacity: 0.92;
+}
+.feedbackThanks {
+  margin: 0;
+  font-size: var(--tm-t-base, 15px);
+  font-weight: 600;
+  color: var(--tm-brand-dark, #0096c7);
+}
+.feedbackError {
+  margin: 10px 0 0;
+  font-size: var(--tm-t-sm, 13px);
+  color: #dc2626;
+}
+
+/* ─────────────────────────────
    Empty / Error states
 ───────────────────────────── */
 .emptyMsg {

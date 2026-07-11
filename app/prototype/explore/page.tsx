@@ -99,32 +99,16 @@ export default function ExplorePage() {
   const { showToast } = useToast();
   const { isFavorited, toggleFavorite } = useFavorites();
   const { addRecentView } = useRecentViews();
-  const [phase, setPhase] = useState<'start' | 'city' | 'form' | 'loading' | 'result'>(() => {
-    if (typeof window === 'undefined') return 'start';
-    const saved = sessionStorage.getItem('explore_phase') as any;
-    return (saved && saved !== 'loading') ? saved : 'start';
-  });
-  const [selections, setSelections] = useState<Selections>(() => {
-    if (typeof window === 'undefined') return INITIAL_SELECTIONS;
-    const saved = sessionStorage.getItem('explore_selections');
-    return saved ? JSON.parse(saved) : INITIAL_SELECTIONS;
-  });
+  const [phase, setPhase] = useState<'start' | 'city' | 'form' | 'loading' | 'result'>('start');
+  const [selections, setSelections] = useState<Selections>(INITIAL_SELECTIONS);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedComingSoon, setSelectedComingSoon] = useState<string | null>(null);
 
   const sectionRefs = useRef<Partial<Record<StepKey, HTMLDivElement | null>>>({});
 
   useEffect(() => {
-    sessionStorage.setItem('explore_phase', phase);
-  }, [phase]);
-
-  useEffect(() => {
-    sessionStorage.setItem('explore_selections', JSON.stringify(selections));
-  }, [selections]);
-
-  useEffect(() => {
     if (phase !== 'loading') return;
-    const id = setTimeout(() => setPhase('result'), 2500);
+    const id = setTimeout(() => setPhase('result'), 4500);
     return () => clearTimeout(id);
   }, [phase]);
 
@@ -168,8 +152,6 @@ export default function ExplorePage() {
   }
 
   function handleReset() {
-    sessionStorage.removeItem('explore_phase');
-    sessionStorage.removeItem('explore_selections');
     setPhase('start');
     setSelections(INITIAL_SELECTIONS);
     setSearchQuery('');

@@ -141,6 +141,15 @@
   margin-top: 6px;
 }
 
+.errorText {
+  width: 100%;
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #ff3b30;
+  text-align: left;
+}
+
 .actionsColumn {
   display: flex;
   flex-direction: column;
