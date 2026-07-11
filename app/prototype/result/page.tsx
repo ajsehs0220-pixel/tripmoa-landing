@@ -265,15 +265,11 @@ function ResultInner() {
                 prev.map((m) => {
                   if (m.id !== msgId) return m;
                   const base = m.result ?? emptyResult;
-                  const introReady = m.introReady ?? false;
                   return {
                     ...m,
-                    status: introReady
-                      ? m.status === 'loading'
-                        ? ('streaming' as const)
-                        : m.status
-                      : ('loading' as const),
-                    streamed: introReady ? true : m.streamed,
+                    status: m.status === 'loading' ? ('streaming' as const) : m.status,
+                    introReady: true,
+                    streamed: true,
                     result: {
                       ...base,
                       sections: upsertStreamingSection(base.sections, delta.index, {
@@ -292,15 +288,11 @@ function ResultInner() {
                 prev.map((m) => {
                   if (m.id !== msgId) return m;
                   const base = m.result ?? emptyResult;
-                  const introReady = m.introReady ?? false;
                   return {
                     ...m,
-                    status: introReady
-                      ? m.status === 'loading'
-                        ? ('streaming' as const)
-                        : m.status
-                      : ('loading' as const),
-                    streamed: introReady ? true : m.streamed,
+                    status: m.status === 'loading' ? ('streaming' as const) : m.status,
+                    introReady: true,
+                    streamed: true,
                     result: {
                       ...base,
                       sections: upsertStreamingSection(base.sections, idx, sec),
@@ -330,6 +322,8 @@ function ResultInner() {
                   return {
                     ...m,
                     status: 'done' as const,
+                    introReady: true,
+                    streamed: true,
                     result: merged,
                   };
                 })
