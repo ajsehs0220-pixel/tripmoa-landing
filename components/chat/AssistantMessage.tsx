@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import styles from './chat.module.css';
-import AIAnalysisCard from './AIAnalysisCard';
 import TravelSection from './TravelSection';
 import MapSection from './MapSection';
 import AdBanner from './AdBanner';
@@ -181,11 +180,6 @@ export default function AssistantMessage({
     <div className={styles.assistantRow}>
       <SourceLookupProvider sources={sources}>
         <div className={styles.assistantContent}>
-          <AIAnalysisCard
-            reviewCount={sources.length}
-            placeCount={places.length}
-          />
-
           {result.summary && (
             <p className={styles.summaryText}>
               {skipIntro ? (
