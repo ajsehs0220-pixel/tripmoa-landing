@@ -260,20 +260,17 @@ function ResultInner() {
             signal: controller.signal,
           },
           {
-            onDelta: (delta) => {
+            onDelta: (delta: any) => {
               setMessages((prev) =>
                 prev.map((m) => {
                   if (m.id !== msgId) return m;
                   const base = m.result ?? emptyResult;
-                  const introReady = m.introReady ?? false;
                   return {
                     ...m,
-                    status: introReady
-                      ? m.status === 'loading'
-                        ? ('streaming' as const)
-                        : m.status
-                      : ('loading' as const),
-                    streamed: introReady ? true : m.streamed,
+                    status:
+                      m.status === 'done' ? m.status : ('streaming' as const),
+                    introReady: true,
+                    streamed: true,
                     result: {
                       ...base,
                       sections: upsertStreamingSection(base.sections, delta.index, {
@@ -285,22 +282,19 @@ function ResultInner() {
               );
               requestAnimationFrame(() => scrollToBottomIfNeeded());
             },
-            onSection: (section) => {
+            onSection: (section: any) => {
               const idx = section.index ?? 0;
               const { index: _idx, ...sec } = section;
               setMessages((prev) =>
                 prev.map((m) => {
                   if (m.id !== msgId) return m;
                   const base = m.result ?? emptyResult;
-                  const introReady = m.introReady ?? false;
                   return {
                     ...m,
-                    status: introReady
-                      ? m.status === 'loading'
-                        ? ('streaming' as const)
-                        : m.status
-                      : ('loading' as const),
-                    streamed: introReady ? true : m.streamed,
+                    status:
+                      m.status === 'done' ? m.status : ('streaming' as const),
+                    introReady: true,
+                    streamed: true,
                     result: {
                       ...base,
                       sections: upsertStreamingSection(base.sections, idx, sec),
@@ -310,7 +304,7 @@ function ResultInner() {
               );
               requestAnimationFrame(() => scrollToBottomIfNeeded());
             },
-            onDone: (footer) => {
+            onDone: (footer: any) => {
               setMessages((prev) =>
                 prev.map((m) => {
                   if (m.id !== msgId) return m;
@@ -330,12 +324,14 @@ function ResultInner() {
                   return {
                     ...m,
                     status: 'done' as const,
+                    introReady: true,
+                    streamed: true,
                     result: merged,
                   };
                 })
               );
             },
-            onPhotos: (photoPlaces) => {
+            onPhotos: (photoPlaces: any) => {
               setMessages((prev) =>
                 prev.map((m) => {
                   if (m.id !== msgId || !m.result) return m;
@@ -361,7 +357,13 @@ function ResultInner() {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === msgId
-              ? { ...m, result: cleanedResult, status: 'done' as const }
+              ? {
+                  ...m,
+                  result: cleanedResult,
+                  status: 'done' as const,
+                  introReady: true,
+                  streamed: true,
+                }
               : m
           )
         );
@@ -531,7 +533,7 @@ function ResultInner() {
             key={msg.id}
             msg={msg}
             city={resolveCityForQuery(msg.query)}
-            isLast={idx === messages.length - 1}
+            isLast={idx === messages.length - 1 && messages.length >= 2}
             searchId={msg.result?.search_id ?? null}
             onRefClick={handleRefClick}
             onFollowUpClick={handleFollowUpClick}
