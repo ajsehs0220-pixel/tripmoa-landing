@@ -531,7 +531,7 @@ function ResultInner() {
             key={msg.id}
             msg={msg}
             city={resolveCityForQuery(msg.query)}
-            isLast={idx === messages.length - 1}
+            isLast={idx === messages.length - 1 && messages.length >= 2}
             searchId={msg.result?.search_id ?? null}
             onRefClick={handleRefClick}
             onFollowUpClick={handleFollowUpClick}

@@ -75,24 +75,40 @@ export default function AssistantMessage({
 
   const sourceRef = useRef<HTMLDivElement>(null);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [dismissedAt, setDismissedAt] = useState<number | null>(null);
 
   useEffect(() => {
     if (!isLast || showFeedback) return;
+    if (sessionStorage.getItem('tripmoa-feedback-done')) return;
+
+    if (dismissedAt !== null && Date.now() - dismissedAt < 30000) {
+      const remaining = 30000 - (Date.now() - dismissedAt);
+      const timer = setTimeout(() => {
+        const handleScroll = () => {
+          const el = sourceRef.current;
+          if (!el) return;
+          if (sessionStorage.getItem('tripmoa-feedback-done')) return;
+          const rect = el.getBoundingClientRect();
+          if (rect.top < window.innerHeight) setShowFeedback(true);
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        setTimeout(handleScroll, 100);
+      }, remaining);
+      return () => clearTimeout(timer);
+    }
 
     const handleScroll = () => {
       const el = sourceRef.current;
       if (!el) return;
       if (sessionStorage.getItem('tripmoa-feedback-done')) return;
       const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight) {
-        setShowFeedback(true);
-      }
+      if (rect.top < window.innerHeight) setShowFeedback(true);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     setTimeout(handleScroll, 300);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isLast, showFeedback, showTail]);
+  }, [isLast, showFeedback, showTail, dismissedAt]);
 
   // summary 없으면 타이핑 단계 생략
   useEffect(() => {
@@ -243,7 +259,10 @@ export default function AssistantMessage({
                   query={query}
                   city={city}
                   searchId={searchId}
-                  onClose={() => setShowFeedback(false)}
+                  onClose={() => {
+                    setShowFeedback(false);
+                    setDismissedAt(Date.now());
+                  }}
                 />
               )}
 
