@@ -25,6 +25,8 @@ const SAVORY_MARKERS =
 export type PickPlaceReviewsOptions = {
   placeName?: string;
   description?: string;
+  /** 서버 places_detail에 붙인 후기 — 장소명 키워드 매칭 생략 */
+  trustAssigned?: boolean;
 };
 
 export function isRelaxedReviewText(text: string): boolean {
@@ -107,7 +109,8 @@ export function pickPlaceReviews<T extends { text?: string; ref?: number }>(
 
   const placeName = options.placeName ?? '';
   const description = options.description ?? '';
-  const hasPlaceContext = Boolean(placeName.trim());
+  const trustAssigned = options.trustAssigned === true;
+  const hasPlaceContext = Boolean(placeName.trim()) && !trustAssigned;
 
   const isRelevant = (r: T) =>
     !hasPlaceContext || isReviewRelevantToPlace(r.text ?? '', placeName, description);
@@ -118,7 +121,8 @@ export function pickPlaceReviews<T extends { text?: string; ref?: number }>(
 
   for (const r of reviews) {
     const text = (r.text ?? '').trim();
-    if (!text || !isRelevant(r) || !reviewHasRef(r)) continue;
+    if (!text || !isRelevant(r)) continue;
+    if (!trustAssigned && !reviewHasRef(r)) continue;
 
     rawPool.push(r);
     if (isValidReviewText(text)) strict.push(r);
@@ -145,7 +149,7 @@ export function pickPlaceReviews<T extends { text?: string; ref?: number }>(
       if (out.length >= MIN_PLACE_REVIEWS) break;
       const text = (r.text ?? '').trim();
       if (text.length < 8 || seen.has(text)) continue;
-      if (!reviewHasRef(r)) continue;
+      if (!trustAssigned && !reviewHasRef(r)) continue;
       if (STRICT_QUESTION_PATTERN.test(text)) continue;
       if (ITINERARY_DUMP_PATTERN.test(text)) continue;
       append(r);

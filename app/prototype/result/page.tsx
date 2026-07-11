@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useRef, useCallback, Suspense } from 'rea
 import { useSearchParams, useRouter } from 'next/navigation';
 import styles from './result.module.css';
 import { searchStreaming } from '@/lib/searchClient';
-import { normalizeSearchResponse } from '@/lib/normalizeSearchResponse';
+import { mergeStreamSections, normalizeSearchResponse } from '@/lib/normalizeSearchResponse';
 import UserMessage from '@/components/chat/UserMessage';
 import LoadingMessage from '@/components/chat/LoadingMessage';
 import AssistantMessage from '@/components/chat/AssistantMessage';
@@ -20,6 +20,8 @@ type ChatMessage = {
   error: string | null;
   status: 'loading' | 'streaming' | 'done' | 'error' | 'cancelled';
   restored?: boolean;
+  /** 로딩 1~3번 완료 후 답변 노출 */
+  introReady?: boolean;
   /** SSE로 섹션을 이미 노출했으면 done 후에도 skipIntro 유지 */
   streamed?: boolean;
 };
@@ -40,6 +42,7 @@ function MessageTurn({
   onRefClick,
   onFollowUpClick,
   onSourceClick,
+  onIntroComplete,
 }: {
   msg: ChatMessage;
   city: string;
@@ -48,6 +51,7 @@ function MessageTurn({
   onRefClick: (messageId: string, sourceId: number) => void;
   onFollowUpClick: (q: string) => void;
   onSourceClick: (url: string) => void;
+  onIntroComplete?: (messageId: string) => void;
 }) {
   const places: Place[] = Array.isArray(msg.result?.places) ? msg.result!.places! : [];
 
@@ -62,19 +66,28 @@ function MessageTurn({
     setActiveDay(dayList.length > 0 ? dayList[0] : null);
   }, [dayList]);
 
+  const introReady = msg.introReady ?? msg.restored ?? false;
+  const showAnswer =
+    introReady && msg.result && (msg.status === 'streaming' || msg.status === 'done');
+
   return (
     <div className={styles.chatTurn}>
       <UserMessage query={msg.query} city={city} />
 
-      {msg.status === 'loading' && <LoadingMessage />}
+      {!introReady && msg.status === 'loading' && (
+        <LoadingMessage
+          mode="intro"
+          onIntroComplete={() => onIntroComplete?.(msg.id)}
+        />
+      )}
 
       {msg.error && (
         <div className={styles.errorMsg}>요청 실패: {msg.error}</div>
       )}
 
-      {(msg.status === 'streaming' || msg.status === 'done') && msg.result && (
+      {showAnswer && (
         <AssistantMessage
-          result={msg.result}
+          result={msg.result!}
           query={msg.query}
           city={city}
           isLast={isLast}
@@ -90,6 +103,10 @@ function MessageTurn({
           onFollowUpClick={onFollowUpClick}
           onSourceClick={onSourceClick}
         />
+      )}
+
+      {introReady && msg.status === 'streaming' && (
+        <LoadingMessage mode="tail" />
       )}
     </div>
   );
@@ -183,7 +200,21 @@ function ResultInner() {
       while (next.length <= index) {
         next.push({ title: '', content: '', places_detail: [] });
       }
-      next[index] = { ...next[index], ...patch };
+      const prev = next[index];
+      const merged = { ...prev, ...patch };
+
+      if (patch.places_detail?.length) {
+        merged.places_detail = patch.places_detail.map((pd) => {
+          const old = (prev.places_detail ?? []).find(
+            (p) => p.name === pd.name || p.name.includes(pd.name) || pd.name.includes(p.name)
+          );
+          const reviews =
+            (pd.reviews?.length ?? 0) > 0 ? pd.reviews : (old?.reviews ?? pd.reviews ?? []);
+          return { ...old, ...pd, reviews: reviews ?? [] };
+        });
+      }
+
+      next[index] = merged;
       return next;
     },
     []
@@ -204,7 +235,7 @@ function ResultInner() {
       const msgId = crypto.randomUUID();
       setMessages((prev) => [
         ...prev,
-        { id: msgId, query: trimmed, result: null, error: null, status: 'loading' },
+        { id: msgId, query: trimmed, result: null, error: null, status: 'loading', introReady: false },
       ]);
 
       try {
@@ -234,10 +265,15 @@ function ResultInner() {
                 prev.map((m) => {
                   if (m.id !== msgId) return m;
                   const base = m.result ?? emptyResult;
+                  const introReady = m.introReady ?? false;
                   return {
                     ...m,
-                    status: m.status === 'loading' ? ('streaming' as const) : m.status,
-                    streamed: true,
+                    status: introReady
+                      ? m.status === 'loading'
+                        ? ('streaming' as const)
+                        : m.status
+                      : ('loading' as const),
+                    streamed: introReady ? true : m.streamed,
                     result: {
                       ...base,
                       sections: upsertStreamingSection(base.sections, delta.index, {
@@ -256,10 +292,15 @@ function ResultInner() {
                 prev.map((m) => {
                   if (m.id !== msgId) return m;
                   const base = m.result ?? emptyResult;
+                  const introReady = m.introReady ?? false;
                   return {
                     ...m,
-                    status: m.status === 'loading' ? ('streaming' as const) : m.status,
-                    streamed: true,
+                    status: introReady
+                      ? m.status === 'loading'
+                        ? ('streaming' as const)
+                        : m.status
+                      : ('loading' as const),
+                    streamed: introReady ? true : m.streamed,
                     result: {
                       ...base,
                       sections: upsertStreamingSection(base.sections, idx, sec),
@@ -283,7 +324,7 @@ function ResultInner() {
                     youtube_videos: footer.youtube_videos ?? base.youtube_videos,
                     map_title: footer.map_title ?? base.map_title,
                     search_id: footer.search_id ?? base.search_id,
-                    sections: base.sections,
+                    sections: mergeStreamSections(base.sections, footer.sections),
                     places: base.places,
                   });
                   return {
@@ -393,6 +434,21 @@ function ResultInner() {
     scrollToBottomIfNeeded();
   }, [messages, scrollToBottomIfNeeded]);
 
+  const handleIntroComplete = useCallback((messageId: string) => {
+    setMessages((prev) =>
+      prev.map((m) => {
+        if (m.id !== messageId) return m;
+        return {
+          ...m,
+          introReady: true,
+          streamed: true,
+          status: m.status === 'loading' ? ('streaming' as const) : m.status,
+        };
+      })
+    );
+    requestAnimationFrame(() => scrollToBottomIfNeeded());
+  }, [scrollToBottomIfNeeded]);
+
   const handleRefClick = (messageId: string, id: number) => {
     window.dispatchEvent(
       new CustomEvent('tripmoa:openSources', { detail: { messageId } })
@@ -480,6 +536,7 @@ function ResultInner() {
             onRefClick={handleRefClick}
             onFollowUpClick={handleFollowUpClick}
             onSourceClick={trackSourceClick}
+            onIntroComplete={handleIntroComplete}
           />
         ))}
 
