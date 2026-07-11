@@ -13,13 +13,13 @@ export type PlaceDetail = {
   warnings?: string[];
 };
 export type Section = {
-  icon: string;
+  icon?: string;
   title: string;
   content: string;
   places_detail?: PlaceDetail[];
   /** @deprecated 섹션 레벨 reviews — places_detail 사용 */
   reviews?: Review[];
-  table: TableData | null;
+  table?: TableData | null;
 };
 export type Place = {
   day: number | null;

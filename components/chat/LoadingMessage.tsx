@@ -5,6 +5,7 @@ import Image from 'next/image';
 import styles from './chat.module.css';
 
 const STEPS = [
+  { text: '글-리뷰-사진순으로 완성되니 조금만 기다려주세요', duration: 7000 },
   { text: '모아가 실제 후기들을 꼼꼼하게 살펴보고 있어요!', duration: 7000 },
   { text: '현장감을 더해줄 생생한 사진들도 함께 모으는 중…', duration: 7000 },
   { text: '동선을 편하게 보실 수 있도록 맞춤 지도를 그리는 중이에요!', duration: 7000 },

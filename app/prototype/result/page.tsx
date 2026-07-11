@@ -4,10 +4,11 @@ import { useEffect, useState, useMemo, useRef, useCallback, Suspense } from 'rea
 import { useSearchParams, useRouter } from 'next/navigation';
 import styles from './result.module.css';
 import { searchStreaming } from '@/lib/searchClient';
+import { normalizeSearchResponse } from '@/lib/normalizeSearchResponse';
 import UserMessage from '@/components/chat/UserMessage';
 import LoadingMessage from '@/components/chat/LoadingMessage';
 import AssistantMessage from '@/components/chat/AssistantMessage';
-import type { SearchResponse, Place, Section } from '@/components/chat/types';
+import type { SearchResponse, Place } from '@/components/chat/types';
 import { inferCityFromQuery } from '@/components/chat/mapLabelUtils';
 import BottomNav from '@/components/prototype/BottomNav';
 import { trackEvent } from '@/lib/gtag';
@@ -180,7 +181,7 @@ function ResultInner() {
     ) => {
       const next = [...(sections ?? [])];
       while (next.length <= index) {
-        next.push({ title: '', content: '', places_detail: [], icon: '', table: null } as Section);
+        next.push({ title: '', content: '', places_detail: [] } as any);
       }
       next[index] = { ...next[index], ...patch };
       return next;
@@ -228,7 +229,7 @@ function ResultInner() {
             signal: controller.signal,
           },
           {
-            onDelta: (delta: { index: number; text: string }) => {
+            onDelta: (delta: any) => {
               setMessages((prev) =>
                 prev.map((m) => {
                   if (m.id !== msgId) return m;
@@ -248,7 +249,7 @@ function ResultInner() {
               );
               requestAnimationFrame(() => scrollToBottomIfNeeded());
             },
-            onSection: (section: NonNullable<SearchResponse['sections']>[number] & { index: number }) => {
+            onSection: (section: any) => {
               const idx = section.index ?? 0;
               const { index: _idx, ...sec } = section;
               setMessages((prev) =>
@@ -268,29 +269,32 @@ function ResultInner() {
               );
               requestAnimationFrame(() => scrollToBottomIfNeeded());
             },
-            onDone: (footer: Omit<SearchResponse, 'sections' | 'places'>) => {
+            onDone: (footer: any) => {
               setMessages((prev) =>
                 prev.map((m) => {
                   if (m.id !== msgId) return m;
                   const base = m.result ?? emptyResult;
+                  const merged = normalizeSearchResponse({
+                    ...base,
+                    summary: footer.summary ?? base.summary,
+                    warning: footer.warning ?? base.warning,
+                    follow_up: footer.follow_up ?? base.follow_up,
+                    sources: footer.sources ?? base.sources,
+                    youtube_videos: footer.youtube_videos ?? base.youtube_videos,
+                    map_title: footer.map_title ?? base.map_title,
+                    search_id: footer.search_id ?? base.search_id,
+                    sections: base.sections,
+                    places: base.places,
+                  });
                   return {
                     ...m,
                     status: 'done' as const,
-                    result: {
-                      ...base,
-                      summary: footer.summary,
-                      warning: footer.warning,
-                      follow_up: footer.follow_up,
-                      sources: footer.sources,
-                      youtube_videos: footer.youtube_videos,
-                      map_title: footer.map_title,
-                      search_id: footer.search_id,
-                    },
+                    result: merged,
                   };
                 })
               );
             },
-            onPhotos: (photoPlaces: NonNullable<SearchResponse['places']>) => {
+            onPhotos: (photoPlaces: any) => {
               setMessages((prev) =>
                 prev.map((m) => {
                   if (m.id !== msgId || !m.result) return m;
