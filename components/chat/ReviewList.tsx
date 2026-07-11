@@ -25,13 +25,13 @@ interface Props {
 export default function ReviewList({ reviews, onRefClick, placeName, description }: Props) {
   if (!reviews || reviews.length === 0) return null;
 
-  const visible = pickPlaceReviews(reviews, { placeName, description });
+  const visible = pickPlaceReviews(reviews, { placeName, description, trustAssigned: true });
 
   return (
     <div className={styles.reviewList}>
       {visible.map((review, i) => {
         const { body, refId } = parseReviewDisplay(review.text ?? '', review.ref);
-        if (refId == null) return null;
+        if (!body) return null;
         const segments = splitJoinedSentences(body);
 
         return (
