@@ -7,7 +7,7 @@ import { searchStreaming } from '@/lib/searchClient';
 import UserMessage from '@/components/chat/UserMessage';
 import LoadingMessage from '@/components/chat/LoadingMessage';
 import AssistantMessage from '@/components/chat/AssistantMessage';
-import type { SearchResponse, Place } from '@/components/chat/types';
+import type { SearchResponse, Place, Section } from '@/components/chat/types';
 import { inferCityFromQuery } from '@/components/chat/mapLabelUtils';
 import BottomNav from '@/components/prototype/BottomNav';
 import { trackEvent } from '@/lib/gtag';
@@ -158,6 +158,36 @@ function ResultInner() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const storageKey = chatStorageKey(storageCity, initialQuery);
 
+  const isNearBottom = useCallback(() => {
+    const threshold = 80;
+    return (
+      window.innerHeight + window.scrollY >=
+      document.documentElement.scrollHeight - threshold
+    );
+  }, []);
+
+  const scrollToBottomIfNeeded = useCallback(() => {
+    if (isNearBottom()) {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [isNearBottom]);
+
+  const upsertStreamingSection = useCallback(
+    (
+      sections: SearchResponse['sections'],
+      index: number,
+      patch: Partial<NonNullable<SearchResponse['sections']>[number]>
+    ) => {
+      const next = [...(sections ?? [])];
+      while (next.length <= index) {
+        next.push({ title: '', content: '', places_detail: [], icon: '', table: null } as Section);
+      }
+      next[index] = { ...next[index], ...patch };
+      return next;
+    },
+    []
+  );
+
   const runSearch = useCallback(
     async (q: string) => {
       const trimmed = q.trim();
@@ -198,7 +228,7 @@ function ResultInner() {
             signal: controller.signal,
           },
           {
-            onSection: (section: NonNullable<SearchResponse['sections']>[number]) => {
+            onDelta: (delta: { index: number; text: string }) => {
               setMessages((prev) =>
                 prev.map((m) => {
                   if (m.id !== msgId) return m;
@@ -209,13 +239,36 @@ function ResultInner() {
                     streamed: true,
                     result: {
                       ...base,
-                      sections: [...(base.sections ?? []), section],
+                      sections: upsertStreamingSection(base.sections, delta.index, {
+                        content: delta.text,
+                      }),
                     },
                   };
                 })
               );
+              requestAnimationFrame(() => scrollToBottomIfNeeded());
             },
-            onDone: (footer: SearchResponse) => {
+            onSection: (section: NonNullable<SearchResponse['sections']>[number] & { index: number }) => {
+              const idx = section.index ?? 0;
+              const { index: _idx, ...sec } = section;
+              setMessages((prev) =>
+                prev.map((m) => {
+                  if (m.id !== msgId) return m;
+                  const base = m.result ?? emptyResult;
+                  return {
+                    ...m,
+                    status: m.status === 'loading' ? ('streaming' as const) : m.status,
+                    streamed: true,
+                    result: {
+                      ...base,
+                      sections: upsertStreamingSection(base.sections, idx, sec),
+                    },
+                  };
+                })
+              );
+              requestAnimationFrame(() => scrollToBottomIfNeeded());
+            },
+            onDone: (footer: Omit<SearchResponse, 'sections' | 'places'>) => {
               setMessages((prev) =>
                 prev.map((m) => {
                   if (m.id !== msgId) return m;
@@ -237,7 +290,7 @@ function ResultInner() {
                 })
               );
             },
-            onPhotos: (photoPlaces: Place[]) => {
+            onPhotos: (photoPlaces: NonNullable<SearchResponse['places']>) => {
               setMessages((prev) =>
                 prev.map((m) => {
                   if (m.id !== msgId || !m.result) return m;
@@ -296,7 +349,7 @@ function ResultInner() {
         setLoading(false);
       }
     },
-    [resolveCityForQuery]
+    [resolveCityForQuery, scrollToBottomIfNeeded, upsertStreamingSection]
   );
 
   // URL 첫 진입: sessionStorage 복원 또는 최초 검색
@@ -333,8 +386,8 @@ function ResultInner() {
   }, [messages, storageKey, initialQuery]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    scrollToBottomIfNeeded();
+  }, [messages, scrollToBottomIfNeeded]);
 
   const handleRefClick = (messageId: string, id: number) => {
     window.dispatchEvent(
