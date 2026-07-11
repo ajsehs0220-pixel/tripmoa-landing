@@ -18,6 +18,8 @@ export default function FeedbackPanel({ query, city, searchId, onClose }: Feedba
   const [comment, setComment] = useState('');
   const [done, setDone] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 50);
@@ -30,16 +32,38 @@ export default function FeedbackPanel({ query, city, searchId, onClose }: Feedba
   };
 
   const handleSubmit = async () => {
-    if (!rating || !comment.trim()) return;
+    if (!rating || !searchId || submitting) return;
+    setSubmitting(true);
+    setError(null);
     trackEvent('submit_feedback', { rating, query, city });
     try {
-      await fetch('/api/feedback', {
+      const res = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ search_id: searchId, query, city, rating, comment }),
+        body: JSON.stringify({
+          search_id: searchId,
+          rating,
+          comment: comment.trim() || null,
+        }),
       });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
+        const msg =
+          typeof data.error === 'string'
+            ? data.error
+            : typeof data.detail === 'string'
+              ? data.detail
+              : '피드백 전송에 실패했어요. 잠시 후 다시 시도해주세요.';
+        setError(msg);
+        console.error('feedback 전송 실패:', data.error ?? res.status);
+        return;
+      }
     } catch (e) {
+      setError('피드백 전송에 실패했어요. 네트워크를 확인해주세요.');
       console.error('feedback 전송 실패:', e);
+      return;
+    } finally {
+      setSubmitting(false);
     }
     sessionStorage.setItem('tripmoa-feedback-done', 'true');
     setDone(true);
@@ -102,14 +126,18 @@ export default function FeedbackPanel({ query, city, searchId, onClose }: Feedba
                   onChange={(e) => setComment(e.target.value)}
                   rows={3}
                 />
+                {!searchId && (
+                  <p className={styles.errorText}>검색 ID가 없어 피드백을 보낼 수 없어요.</p>
+                )}
+                {error && <p className={styles.errorText}>{error}</p>}
               </div>
               <div className={styles.actionsColumn}>
                 <button
                   className={styles.btnPill}
                   onClick={handleSubmit}
-                  disabled={!rating}
+                  disabled={!rating || !searchId || submitting}
                 >
-                  보내기
+                  {submitting ? '보내는 중…' : '보내기'}
                 </button>
               </div>
             </>

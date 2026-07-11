@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import styles from './result.module.css';
-import { search } from '@/lib/searchClient';
+import { searchStreaming } from '@/lib/searchClient';
 import UserMessage from '@/components/chat/UserMessage';
 import LoadingMessage from '@/components/chat/LoadingMessage';
 import AssistantMessage from '@/components/chat/AssistantMessage';
@@ -17,8 +17,10 @@ type ChatMessage = {
   query: string;
   result: SearchResponse | null;
   error: string | null;
-  status: 'loading' | 'done' | 'error' | 'cancelled';
+  status: 'loading' | 'streaming' | 'done' | 'error' | 'cancelled';
   restored?: boolean;
+  /** SSE로 섹션을 이미 노출했으면 done 후에도 skipIntro 유지 */
+  streamed?: boolean;
 };
 
 function trackSourceClick(url: string) {
@@ -69,7 +71,7 @@ function MessageTurn({
         <div className={styles.errorMsg}>요청 실패: {msg.error}</div>
       )}
 
-      {msg.status === 'done' && msg.result && (
+      {(msg.status === 'streaming' || msg.status === 'done') && msg.result && (
         <AssistantMessage
           result={msg.result}
           query={msg.query}
@@ -81,7 +83,8 @@ function MessageTurn({
           setActiveDay={setActiveDay}
           messageId={msg.id}
           searchId={searchId}
-          skipIntro={msg.restored}
+          skipIntro={msg.restored || msg.streamed === true}
+          isStreaming={msg.status === 'streaming'}
           onRefClick={(id) => onRefClick(msg.id, id)}
           onFollowUpClick={onFollowUpClick}
           onSourceClick={onSourceClick}
@@ -175,12 +178,82 @@ function ResultInner() {
 
       try {
         const effectiveCity = resolveCityForQuery(trimmed);
-        const data = await search({
-          query: trimmed,
-          city: effectiveCity || undefined,
-          match_count: 20,
-          signal: controller.signal,
-        });
+        const emptyResult: SearchResponse = {
+          summary: '',
+          sections: [],
+          warning: [],
+          places: null,
+          follow_up: [],
+          sources: [],
+          youtube_videos: [],
+          map_title: '',
+          search_id: null,
+        };
+
+        const data = await searchStreaming(
+          {
+            query: trimmed,
+            city: effectiveCity || undefined,
+            match_count: 20,
+            signal: controller.signal,
+          },
+          {
+            onSection: (section) => {
+              setMessages((prev) =>
+                prev.map((m) => {
+                  if (m.id !== msgId) return m;
+                  const base = m.result ?? emptyResult;
+                  return {
+                    ...m,
+                    status: m.status === 'loading' ? ('streaming' as const) : m.status,
+                    streamed: true,
+                    result: {
+                      ...base,
+                      sections: [...(base.sections ?? []), section],
+                    },
+                  };
+                })
+              );
+            },
+            onDone: (footer) => {
+              setMessages((prev) =>
+                prev.map((m) => {
+                  if (m.id !== msgId) return m;
+                  const base = m.result ?? emptyResult;
+                  return {
+                    ...m,
+                    status: 'done' as const,
+                    result: {
+                      ...base,
+                      summary: footer.summary,
+                      warning: footer.warning,
+                      follow_up: footer.follow_up,
+                      sources: footer.sources,
+                      youtube_videos: footer.youtube_videos,
+                      map_title: footer.map_title,
+                      search_id: footer.search_id,
+                    },
+                  };
+                })
+              );
+            },
+            onPhotos: (photoPlaces) => {
+              setMessages((prev) =>
+                prev.map((m) => {
+                  if (m.id !== msgId || !m.result) return m;
+                  return {
+                    ...m,
+                    result: {
+                      ...m.result,
+                      places: photoPlaces,
+                    },
+                  };
+                })
+              );
+            },
+          }
+        );
+
         const cleanedResult: SearchResponse = {
           ...data,
           places: Array.isArray(data.places)
@@ -345,7 +418,7 @@ function ResultInner() {
             key={msg.id}
             msg={msg}
             city={resolveCityForQuery(msg.query)}
-            isLast={idx === messages.length - 1 && messages.length >= 2}
+            isLast={idx === messages.length - 1}
             searchId={msg.result?.search_id ?? null}
             onRefClick={handleRefClick}
             onFollowUpClick={handleFollowUpClick}

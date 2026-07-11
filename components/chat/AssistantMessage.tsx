@@ -38,6 +38,8 @@ interface Props {
   /** 이미 한 번 타이핑 효과를 보여준 메시지인지 여부.
    *  과거 히스토리(새로고침 복원 등)에서는 다시 타이핑하지 않고 바로 전체를 보여준다. */
   skipIntro?: boolean;
+  /** SSE 스트리밍 중 — 섹션은 즉시 노출, tail(지도·출처 등)은 done 전까지 숨김 */
+  isStreaming?: boolean;
 }
 
 export default function AssistantMessage({
@@ -55,6 +57,7 @@ export default function AssistantMessage({
   messageId,
   searchId,
   skipIntro = false,
+  isStreaming = false,
 }: Props) {
   const { isLiked, toggleChatLike } = useChatLikes();
   const likeId = messageId ?? `${query}-${city ?? ''}`;
@@ -155,7 +158,8 @@ export default function AssistantMessage({
     trackEvent('like_response', { liked: next });
   };
 
-  const introFinished = skipIntro || showTail;
+  const introFinished = !isStreaming && (skipIntro || showTail);
+  const showSectionsLive = skipIntro || isStreaming;
 
   return (
     <div className={styles.assistantRow}>
@@ -190,7 +194,7 @@ export default function AssistantMessage({
 
           {sections.length > 0 && (
             <div className={styles.sectionFlow}>
-              {sections.slice(0, skipIntro ? sections.length : visibleSectionCount).map((sec, i) => (
+              {sections.slice(0, showSectionsLive ? sections.length : visibleSectionCount).map((sec, i) => (
                 <TravelSection
                   key={i}
                   section={sec}
