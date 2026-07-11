@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useRef, useCallback, Suspense } from 'rea
 import { useSearchParams, useRouter } from 'next/navigation';
 import styles from './result.module.css';
 import { searchStreaming } from '@/lib/searchClient';
+import { normalizeSearchResponse } from '@/lib/normalizeSearchResponse';
 import UserMessage from '@/components/chat/UserMessage';
 import LoadingMessage from '@/components/chat/LoadingMessage';
 import AssistantMessage from '@/components/chat/AssistantMessage';
@@ -273,19 +274,22 @@ function ResultInner() {
                 prev.map((m) => {
                   if (m.id !== msgId) return m;
                   const base = m.result ?? emptyResult;
+                  const merged = normalizeSearchResponse({
+                    ...base,
+                    summary: footer.summary ?? base.summary,
+                    warning: footer.warning ?? base.warning,
+                    follow_up: footer.follow_up ?? base.follow_up,
+                    sources: footer.sources ?? base.sources,
+                    youtube_videos: footer.youtube_videos ?? base.youtube_videos,
+                    map_title: footer.map_title ?? base.map_title,
+                    search_id: footer.search_id ?? base.search_id,
+                    sections: base.sections,
+                    places: base.places,
+                  });
                   return {
                     ...m,
                     status: 'done' as const,
-                    result: {
-                      ...base,
-                      summary: footer.summary,
-                      warning: footer.warning,
-                      follow_up: footer.follow_up,
-                      sources: footer.sources,
-                      youtube_videos: footer.youtube_videos,
-                      map_title: footer.map_title,
-                      search_id: footer.search_id,
-                    },
+                    result: merged,
                   };
                 })
               );
